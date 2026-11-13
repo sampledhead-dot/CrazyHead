@@ -19,6 +19,7 @@ button:active{filter:brightness(1.3)}
 button.on,.tg.on{background:var(--c);border-color:var(--c);color:#111;font-weight:600}
 select{background:var(--p2);border:1px solid var(--ln);border-radius:8px;padding:6px;min-height:36px}
 .top{position:sticky;top:0;z-index:20;background:rgba(23,10,56,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--ln);padding:6px 0}
+#ordb{font-weight:800;font-size:13px;letter-spacing:-.5px}#ordb.on{background:var(--c);border-color:var(--c);color:#111}
 .top .wrap{display:flex;gap:6px;align-items:center}
 #play{width:52px;font-size:20px;background:var(--ac);border-color:var(--ac);color:#0b1;color:#2a1500;font-weight:700}
 #play.run{background:#ff4d4d;border-color:#ff4d4d;color:#fff}
@@ -78,6 +79,8 @@ canvas{display:block;touch-action:none}
 #grv{width:100%;border-radius:8px;background:#120629;border:1px solid var(--ln)}
 .logo{width:42px;height:42px;border-radius:10px;flex:none}
 .kg{display:grid;grid-template-columns:repeat(4,1fr);gap:2px 4px;margin:8px 0}
+.tbox{margin:6px 0;padding:6px 8px;border:1px solid var(--ln);border-radius:10px;background:var(--p2)}.trow{display:flex;gap:8px;align-items:baseline;font-size:15px}.trow.now b{color:var(--c);font-size:17px}.tbox .row{margin:5px 0 0;flex-wrap:wrap}.tbox .tm{min-height:30px;padding:2px 10px;font-size:13px}.tbox select{min-height:30px;font-size:13px;max-width:150px}
+.pbar{height:6px;background:var(--p2);border-radius:3px;margin:6px 0;overflow:hidden}.pbar i{display:block;height:100%;width:0;background:var(--c)}.stc .row{flex-wrap:wrap}.stc select{min-height:34px}.stmod{margin-top:8px}
 .kg.k3{grid-template-columns:repeat(3,1fr)}.kg.k2{grid-template-columns:repeat(2,1fr);max-width:260px}
 .kn{display:flex;flex-direction:column;align-items:center;touch-action:none;user-select:none;-webkit-user-select:none;cursor:ns-resize;padding:2px 0}
 .kn svg{width:100%;max-width:68px;height:auto}
@@ -130,6 +133,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
     <button id="bp" aria-label="BPM más">+</button>
     <button id="tap">TAP</button>
   </div>
+  <button id="ordb" title="Orden: los cortes suenan uno tras otro, sin azar" aria-label="Orden">123</button>
   <button id="genall" title="Regenerar todos (los no bloqueados)" aria-label="Regenerar todo">🎲</button>
   <button id="menu" aria-label="Ajustes y exportar">⋮</button>
 </div></div>
@@ -137,9 +141,10 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 <div class="wrap">
   <div id="ov"></div>
   <div id="scn" class="scn"></div>
-  <div class="views"><button id="vLoops" class="on">Loops</button><button id="vFx">FX pads</button><button id="vMix">Mixer</button><button id="rec" style="flex:0 0 78px" aria-label="Grabar la salida" title="Grabar la salida">⏺ REC</button></div>
+  <div class="views"><button id="vLoops" class="on">Loops</button><button id="vFx">FX pads</button><button id="vMix">Mixer</button><button id="vSt">Stems</button><button id="rec" style="flex:0 0 78px" aria-label="Grabar la salida" title="Grabar la salida">⏺ REC</button></div>
   <div id="fxview" style="display:none"></div>
   <div id="mixview" style="display:none"></div>
+  <div id="stview" style="display:none"></div>
   <div id="deck"></div>
 </div>
 
@@ -160,12 +165,16 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <p class="small">Por ejemplo las pistas del Looper o del generador de SampledHead (ZIP o WAV sueltos): se reparten en A, B, C y D por orden de nombre.</p>
   <div class="sub">Otros programas</div>
   <div class="row"><button id="exabl">Ableton Live · Drum Rack (.adg + MIDI)</button><button id="exkoa">Koala · proyecto con secuencias</button></div>
+  <div class="row"><button id="exmove">Ableton Move · set con 4 pistas (.ablbundle)</button></div>
   <p class="small">Ableton: un Drum Rack .adg por loop con sus cortes y la secuencia en .mid. Koala: un proyecto .koala con los 4 loops en los bancos A–D y sus 4 secuencias. El WAV incluye los efectos y las mutaciones de cada vuelta. El MIDI lleva un canal por loop; la nota 36 (C1) es el corte 1, 37 el corte 2, etc.</p>
   <div class="sub">SampledHead</div>
   <div class="row"><button id="tosh1">Enviar loops y mezcla</button><button id="tosh2">Enviar cortes como kit</button></div>
   <p class="small">Manda a SampledHead la mezcla y los 4 loops, o los cortes de cada loop como pads (A→banco A… hasta 16 por loop). Desde allí puedes exportarlos como kit a MPC, Move, SP-404, Koala o Ableton.</p>
   <div class="sub">Proyecto</div>
   <div class="row"><button id="bproj">📁 Proyectos</button><button id="clearall">Borrar todo</button></div>
+  <div class="sub">Rendimiento</div>
+  <div class="row"><button id="latb">Modo estable</button></div>
+  <p class="small">Estable (por defecto) usa más búfer de audio: menos cortes con muchos efectos, a cambio de unos milisegundos más de latencia. Baja latencia responde antes pero puede cortarse. Al cambiarlo hay que recargar la página.</p>
   <div class="sub">Idioma / Language</div>
   <div class="langs"><button data-lang="es">🇪🇸 Español</button><button data-lang="en">🇬🇧 English</button></div>
   <div class="row"><button id="bguide">📖 Guía</button></div>
@@ -447,6 +456,110 @@ function wsola(chs,ratio,sr){
   }
   return out.map(a=>a.subarray(0,N));
 }
+/* ---- tono: nota (YIN) + tonalidad (cromagrama + Krumhansl) ---- */
+function toneFFT(re,im){
+  const n=re.length;
+  for(let i=1,j=0;i<n;i++){let b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t}}
+  for(let len=2;len<=n;len<<=1){
+    const a=-2*Math.PI/len,wr=Math.cos(a),wi=Math.sin(a);
+    for(let i=0;i<n;i+=len){let cr=1,ci=0;
+      for(let k=0;k<len/2;k++){
+        const u=i+k,v=i+k+len/2,xr=re[v]*cr-im[v]*ci,xi=re[v]*ci+im[v]*cr;
+        re[v]=re[u]-xr;im[v]=im[u]-xi;re[u]+=xr;im[u]+=xi;
+        const t=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=t;
+      }}
+  }
+}
+const TONE_KP=[6.35,2.23,3.48,2.33,4.38,4.09,2.52,5.19,2.39,3.66,2.29,2.88],TONE_KN=[6.33,2.68,3.52,5.38,2.60,3.53,2.54,4.75,3.98,2.69,3.34,3.17];
+function toneCorr(a,b){let ma=0,mb=0;for(let i=0;i<12;i++){ma+=a[i];mb+=b[i]}ma/=12;mb/=12;let s=0,x=0,y=0;for(let i=0;i<12;i++){const p=a[i]-ma,q=b[i]-mb;s+=p*q;x+=p*p;y+=q*q}return x>0&&y>0?s/Math.sqrt(x*y):0}
+function toneKey(ch){
+  const r=[];
+  for(let t=0;t<12;t++){const rot=p=>{const o=new Array(12);for(let i=0;i<12;i++)o[(i+t)%12]=p[i];return o};
+    r.push({t,minor:false,r:toneCorr(ch,rot(TONE_KP))});r.push({t,minor:true,r:toneCorr(ch,rot(TONE_KN))})}
+  r.sort((a,b)=>b.r-a.r);return r;
+}
+/* devuelve {mono,midi,f0,note:{pc,oct,cents},tn,key:{t,minor,r,r2},chroma,tonal} */
+function toneAnalyze(chs,sr){
+  const dec=Math.max(1,Math.round(sr/16000)),fs=sr/dec,n0=Math.min(chs[0].length,Math.floor(sr*20)),n=Math.floor(n0/dec);
+  if(n<4096)return{mono:false,tonal:false,chroma:new Array(12).fill(0),key:null,note:null};
+  const x=new Float32Array(n);
+  for(let i=0;i<n;i++){let s=0;for(let c=0;c<chs.length;c++){const a=chs[c];for(let k=0;k<dec;k++)s+=a[i*dec+k]}x[i]=s/(dec*chs.length)}
+  /* ---- cromagrama ---- */
+  const N=8192,H=4096,hann=new Float32Array(N);for(let i=0;i<N;i++)hann[i]=.5-.5*Math.cos(2*Math.PI*i/(N-1));
+  const re=new Float64Array(N),im=new Float64Array(N),peaks=[];let gmax=0;const frames=[];
+  for(let o=0;o+N<=n||o===0;o+=H){
+    let e=0;for(let i=0;i<N;i++){const v=(o+i<n?x[o+i]:0);re[i]=v*hann[i];im[i]=0;e+=v*v}
+    if(e/N<1e-8){if(o+N>=n)break;continue}
+    toneFFT(re,im);const m=new Float32Array(N/2);let mx=0;
+    for(let i=0;i<N/2;i++){m[i]=Math.hypot(re[i],im[i]);if(m[i]>mx)mx=m[i]}
+    frames.push({m,mx,e});if(mx>gmax)gmax=mx;if(o+N>=n)break;
+  }
+  const bw=fs/N;let cs=0,sn=0;const P=[];
+  for(const f of frames){
+    const lo=Math.floor(50/bw),hi=Math.min(N/2-2,Math.floor(4000/bw));
+    for(let i=lo;i<hi;i++){const a=f.m[i];
+      if(a>f.m[i-1]&&a>=f.m[i+1]&&a>f.mx*.04){
+        const l=Math.log(f.m[i-1]+1e-12),c=Math.log(a+1e-12),r=Math.log(f.m[i+1]+1e-12),d=l-2*c+r,dl=d?.5*(l-r)/d:0;
+        const fr=(i+dl)*bw,midi=69+12*Math.log2(fr/440),w=Math.sqrt(a/gmax);
+        P.push([midi,w]);const ang=2*Math.PI*(midi-Math.round(midi));cs+=w*Math.cos(ang);sn+=w*Math.sin(ang);
+      }}
+  }
+  let tn=Math.atan2(sn,cs)/(2*Math.PI)*100;if(!isFinite(tn))tn=0;
+  const chroma=new Array(12).fill(0);
+  for(const[midi,w]of P){const pc=((Math.round(midi-tn/100)%12)+12)%12;chroma[pc]+=w}
+  const tot=chroma.reduce((a,b)=>a+b,0);if(tot>0)for(let i=0;i<12;i++)chroma[i]/=tot;
+  const ks=tot>0?toneKey(chroma):null;
+  const key=ks?{t:ks[0].t,minor:ks[0].minor,r:ks[0].r,r2:ks[1].r}:null;
+  /* ---- nota (YIN en ventanas de más energía) ---- */
+  const W=2048,TM=1024,cand=[];
+  for(let o=0;o+W+TM<=n;o+=1024){let e=0;for(let i=0;i<W;i++)e+=x[o+i]*x[o+i];cand.push([e,o])}
+  cand.sort((a,b)=>b[0]-a[0]);const sel=cand.slice(0,12).filter(c=>c[0]>1e-6&&c[0]>cand[0][0]*.05);
+  const ests=[];
+  for(const[,o]of sel){
+    const d=new Float32Array(TM);
+    for(let t=1;t<TM;t++){let s=0;for(let i=0;i<W-TM;i++){const q=x[o+i]-x[o+i+t];s+=q*q}d[t]=s}
+    let run=0;const cm=new Float32Array(TM);cm[0]=1;for(let t=1;t<TM;t++){run+=d[t];cm[t]=run>0?d[t]*t/run:1}
+    let tau=-1;for(let t=20;t<TM-1;t++){if(cm[t]<.15){while(t+1<TM-1&&cm[t+1]<cm[t])t++;tau=t;break}}
+    if(tau<0)continue;
+    const a=cm[tau-1],b=cm[tau],c=cm[tau+1],dn=a-2*b+c,tt=dn?tau+.5*(a-c)/dn:tau;
+    ests.push({f:fs/tt,v:b});
+  }
+  let mono=false,midi=0,f0=0,note=null;
+  if(ests.length>=2&&ests.length>=sel.length*.5){
+    const ms=ests.map(e=>69+12*Math.log2(e.f/440)).sort((a,b)=>a-b),med=ms[ms.length>>1];
+    const ok=ms.filter(v=>Math.abs(v-med)<.4);
+    if(ok.length>=Math.max(2,ests.length*.6)){midi=ok.reduce((a,b)=>a+b,0)/ok.length;mono=true;f0=440*Math.pow(2,(midi-69)/12);
+      const rm=Math.round(midi);note={pc:((rm%12)+12)%12,oct:Math.floor(rm/12)-1,cents:Math.round((midi-rm)*100)};if(chroma[note.pc]<.5){mono=false;note=null;f0=0}}
+  }
+  const tonal=mono||(key&&key.r>.6&&key.r-key.r2>.02);
+  return{mono,midi,f0,note,tn:Math.round(tn),key,chroma,tonal:!!tonal};
+}
+
+/* ---- separación en 4 pistas: troceado con solape y mezcla ponderada ----
+   run(Float32Array 2*SEG [L|R]) -> Float32Array 6*2*SEG (drums,bass,other,vocals,guitar,piano)
+   devuelve [batería, bajo, voz, otros], cada una [L,R] */
+const ST_SEG=343980;
+async function stemSeparate(L,R,run,prog,isCancel){
+  const SEG=ST_SEG,hop=Math.floor(SEG*.75),ov=SEG-hop,n=L.length;
+  const nch=Math.max(1,Math.ceil((n-SEG)/hop)+1);
+  const MAP=[[0],[1],[3],[2,4,5]];
+  const out=MAP.map(()=>[new Float32Array(n),new Float32Array(n)]),ws=new Float32Array(n);
+  for(let k=0;k<nch;k++){
+    if(isCancel&&isCancel())return null;
+    const st=k*hop,m=Math.min(SEG,n-st),inp=new Float32Array(2*SEG);
+    inp.set(L.subarray(st,st+m),0);inp.set(R.subarray(st,st+m),SEG);
+    const res=await run(inp);
+    for(let i=0;i<m;i++){
+      let w=1;if(k>0)w=Math.min(w,(i+1)/ov);if(k<nch-1)w=Math.min(w,(SEG-i)/ov);
+      ws[st+i]+=w;
+      for(let t=0;t<4;t++)for(let c=0;c<2;c++){let a=0;for(const s of MAP[t])a+=res[(s*2+c)*SEG+i];out[t][c][st+i]+=a*w}
+    }
+    if(prog)prog(k+1,nch);
+  }
+  for(let i=0;i<n;i++){const w=ws[i]||1;for(let t=0;t<4;t++){out[t][0][i]/=w;out[t][1][i]/=w}}
+  return out;
+}
+
 /*PURE-END*/
 
 /* ============ ESTADO ============ */
@@ -455,8 +568,8 @@ const newDeck=i=>({loopBars:2,markers:[],pool:[],len:2,grid:'16',dens:60,sync:40
   seed:(Math.random()*1e9)|0,auto:true,lock:false,mute:false,solo:false,mono:true,follow:false,vol:80,pan:0,src:'',cyc:0,sens:55,gap:70,pat:[],sw:56,swOn:false,gT:new Array(16).fill(0),gV:new Array(16).fill(1),gA:100,rfx:{on:false,trig:'hit',prob:60,amt:60,glide:40,back:true,bySlice:true,vary:false,sl:[],tg:{flt:true,dly:false,dub:false,rev:false,bit:false,drv:false,pan:false,gate:false}},
   fx:{flOn:false,flType:'lowpass',flF:70,flQ:20,btOn:false,bit:8,drOn:false,dr:30,dlOn:false,dlDiv:'8d',dlFb:40,dlMix:35,dbOn:false,dbDiv:'4d',dbFb:55,dbMix:35,rv:0,rvSz:50,cp:0}});
 function loadState(){
-  const base={lang:'es',bpm:90,swing:50,master:80,rvSize:50,sel:0,scenes:new Array(8).fill(null),decks:[0,1,2,3].map(newDeck)};
-  try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){if(s.lang==='en')base.lang='en';if(Array.isArray(s.scenes))base.scenes=s.scenes.slice(0,8).concat(new Array(8).fill(null)).slice(0,8);for(const k of['bpm','swing','master','rvSize','sel'])if(typeof s[k]==='number')base[k]=s[k];
+  const base={ord:false,lang:'es',bpm:90,swing:50,master:80,rvSize:50,sel:0,scenes:new Array(8).fill(null),decks:[0,1,2,3].map(newDeck)};
+  try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){if(s.lang==='en')base.lang='en';if(s.ord)base.ord=true;if(Array.isArray(s.scenes))base.scenes=s.scenes.slice(0,8).concat(new Array(8).fill(null)).slice(0,8);for(const k of['bpm','swing','master','rvSize','sel'])if(typeof s[k]==='number')base[k]=s[k];
     if(Array.isArray(s.decks))for(let i=0;i<4;i++)if(s.decks[i]){const d=newDeck(i),sd=s.decks[i];Object.assign(d,sd);d.fx=Object.assign(newDeck(i).fx,sd.fx||{});if(!(sd.fx&&sd.fx.rvSz!=null)&&typeof s.rvSize==='number')d.fx.rvSz=s.rvSize;{const rd=newDeck(i).rfx,rs=sd.rfx||{};d.rfx=Object.assign(rd,rs,{tg:Object.assign(rd.tg,rs.tg||{}),sl:Array.isArray(rs.sl)?rs.sl:[]})}if(!Array.isArray(d.gT)||d.gT.length!==16)d.gT=new Array(16).fill(0);if(!Array.isArray(d.gV)||d.gV.length!==16)d.gV=new Array(16).fill(1);base.decks[i]=d}}}catch(e){}
   return base;
 }
@@ -507,14 +620,14 @@ class Engine{
     n.gt=c.createGain();n.sum=c.createGain();n.pre.connect(n.gt);n.gt.connect(n.sum);
     if(!this.off){n.an=c.createAnalyser();n.an.fftSize=512}
     n.sck=c.createGain();n.cp=c.createDynamicsCompressor();n.cp.knee.value=8;n.cp.attack.value=.01;n.cp.release.value=.15;n.cp.threshold.value=0;n.cp.ratio.value=1;
-    n.pan=c.createStereoPanner();n.vol=c.createGain();n.sum.connect(n.sck);n.sck.connect(n.cp);n.cp.connect(n.pan);n.pan.connect(n.vol);n.vol.connect(this.out);if(n.an)n.vol.connect(n.an);
+    n.pan=c.createStereoPanner();n.vol=c.createGain();n.sum.connect(n.sck);n.sck.connect(n.pan);n.cpOn=false;n.pan.connect(n.vol);n.vol.connect(this.out);if(n.an)n.vol.connect(n.an);
     n.dlS=c.createGain();n.dlS.gain.value=0;n.dl=c.createDelay(3);n.dlT=c.createBiquadFilter();n.dlT.type='lowpass';n.dlT.frequency.value=4500;n.dlF=c.createGain();n.dlF.gain.value=.4;
     n.pre.connect(n.dlS);n.dlS.connect(n.dl);n.dl.connect(n.dlT);n.dlT.connect(n.sum);n.dlT.connect(n.dlF);n.dlF.connect(n.dl);
     n.dbS=c.createGain();n.dbS.gain.value=0;n.dbH=c.createBiquadFilter();n.dbH.type='highpass';n.dbH.frequency.value=220;
     n.dbD=c.createDelay(4);n.dbL=c.createBiquadFilter();n.dbL.type='lowpass';n.dbL.frequency.value=2400;
     n.dbW=c.createWaveShaper();n.dbW.curve=this.softCurve();n.dbF=c.createGain();n.dbF.gain.value=.5;
     n.pre.connect(n.dbS);n.dbS.connect(n.dbH);n.dbH.connect(n.dbD);n.dbD.connect(n.dbL);n.dbL.connect(n.dbW);n.dbW.connect(n.sum);n.dbW.connect(n.dbF);n.dbF.connect(n.dbD);
-    n.rvS=c.createGain();n.rvS.gain.value=0;n.rvC=c.createConvolver();n.rvO=c.createGain();n.rvO.gain.value=.7;n.rvSz=-1;n.vol.connect(n.rvS);n.rvS.connect(n.rvC);n.rvC.connect(n.rvO);n.rvO.connect(this.out);
+    n.rvS=c.createGain();n.rvS.gain.value=0;n.rvC=c.createConvolver();n.rvO=c.createGain();n.rvO.gain.value=.7;n.rvSz=-1;n.rvOn=false;n.vol.connect(n.rvS);n.rvC.connect(n.rvO);n.rvO.connect(this.out);
     return n;
   }
   softCurve(){if(this._sc)return this._sc;const a=new Float32Array(2048);for(let k=0;k<2048;k++){const x=k/1023.5-1;a[k]=Math.tanh(1.2*x)/1.2}return this._sc=a}
@@ -552,12 +665,17 @@ class Engine{
     st(n.dbF.gain,clamp(e.dbFb/100,0,.7),.03);
     st(n.dbS.gain,e.dbSend,.03);
     st(n.rvS.gain,e.rvSend,.03);
-    this.setRv(i,D.fx.rvSz==null?50:D.fx.rvSz);
-    const cp=D.fx.cp||0;st(n.cp.threshold,cp>0?-8-cp*.28:0,.03);st(n.cp.ratio,cp>0?2+cp*.06:1,.03);
+    const wantRv=e.rvSend>.002||!!(R.on&&R.tg&&R.tg.rev)||!!this.pad[i].rev;
+    if(wantRv&&!n.rvOn){this.setRv(i,D.fx.rvSz==null?50:D.fx.rvSz);n.rvS.connect(n.rvC);n.rvOn=true}
+    else if(!wantRv&&n.rvOn){try{n.rvS.disconnect(n.rvC)}catch(_){}n.rvOn=false}
+    if(n.rvOn)this.setRv(i,D.fx.rvSz==null?50:D.fx.rvSz);
+    const cp=D.fx.cp||0;
+    if((cp>0)!==n.cpOn){try{if(cp>0){n.sck.disconnect(n.pan);n.sck.connect(n.cp);n.cp.connect(n.pan)}else{n.sck.disconnect(n.cp);n.cp.disconnect(n.pan);n.sck.connect(n.pan)}n.cpOn=cp>0}catch(_){}}
+    st(n.cp.threshold,cp>0?-8-cp*.28:0,.03);st(n.cp.ratio,cp>0?2+cp*.06:1,.03);
   }
   irFor(size){
     this.irC=this.irC||{};if(this.irC[size])return this.irC[size];
-    const c=this.ctx,sr=c.sampleRate,dec=.4+size/100*3.2,len=Math.round(sr*dec),b=c.createBuffer(2,len,sr);
+    const c=this.ctx,sr=c.sampleRate,dec=.4+size/100*2.2,len=Math.round(sr*dec),b=c.createBuffer(2,len,sr);
     for(let ch=0;ch<2;ch++){const d=b.getChannelData(ch);let y=0,seed=ch*977+13;
       for(let k=0;k<len;k++){seed=(seed*1664525+1013904223)>>>0;const x=seed/2147483648-1,t=k/len,a=.25+.7*(1-t);y+=a*(x-y);d[k]=y*Math.pow(1-t,2.6)}}
     return this.irC[size]=b;
@@ -605,6 +723,7 @@ class Engine{
     src.start(tt,off);src.stop(tt+dur+.01);
     const vs=this.voices[i];for(let k=vs.length-1;k>=0;k--)if(vs[k].end<tt-1)vs.splice(k,1);
     vs.push({g,src,end:tt+dur,rate});
+    while(vs.length>20){const v=vs.shift();try{v.g.gain.cancelScheduledValues(tt);v.g.gain.setTargetAtTime(0,tt,.004);v.src.stop(tt+.03)}catch(e){}}
   }
   /* ---- pads táctiles ---- */
   padSet(i,name,x,y){
@@ -689,6 +808,7 @@ class Engine{
 
 /* ============ GENERACIÓN / PASOS ============ */
 function regen(d,newSeed){
+  if(S.ord){ordPat(d);save();return}
   const D=S.decks[d],A=AUD[d],L=D.len*16;
   if(newSeed)D.seed=(Math.random()*1e9)|0;
   D.cyc=0;
@@ -698,14 +818,14 @@ function regen(d,newSeed){
   D.pat=pat;dirty();save();
 }
 function dice(d){
-  const D=S.decks[d],A=AUD[d];if(!A)return;
+  const D=S.decks[d],A=AUD[d];if(!A||S.ord)return;
   const sg=segsOf(D.markers,A.buf.duration),rng=mulberry32((Math.random()*1e9)|0);
   for(let i=0;i<D.pat.length;i++)if(rng()<.25)D.pat[i]=genCell(D,sg,A.buf.duration,i,rng,false);
   dirty();save();
 }
 function cycleMut(st,aud,d){
   const D=st.decks[d];D.cyc=(D.cyc||0)+1;
-  if(D.mut>0&&aud[d]){const sg=segsOf(D.markers,aud[d].buf.duration),rng=mulberry32((D.seed+D.cyc*977)>>>0),f=D.mut/100*.9;
+  if(!st.ord&&D.mut>0&&aud[d]){const sg=segsOf(D.markers,aud[d].buf.duration),rng=mulberry32((D.seed+D.cyc*977)>>>0),f=D.mut/100*.9;
     for(let i=0;i<D.pat.length;i++)if(rng()<f)D.pat[i]=genCell(D,sg,aud[d].buf.duration,i,rng,false);}
 }
 /* un paso global para todos los loops. tb = tiempo de rejilla SIN swing. e = motor (o recolector MIDI) */
@@ -719,7 +839,7 @@ function stepAll(e,st,aud,gs,tb,sd,evq){
     if(!e.audible(d))continue;
     const swv=D.swOn?D.sw:st.swing,ga=D.gA/100;
     const ts=tb+((i&1)?(2*swv/100-1)*sd:0)+(D.gT[gi]||0)*ga*sd;
-    if(e.rfxStep)e.rfxStep(d,i,ts,sd,cell);
+    if(e.rfxStep&&!st.ord)e.rfxStep(d,i,ts,sd,cell);
     const rep=e.stutStep?e.stutStep(d,i,ts,sd,cell):false;
     if(!cell)continue;
     if(e.lastH&&!rep)e.lastH[d]=cell[0];
@@ -792,7 +912,7 @@ function syncScn(){
 }
 /* ---- deshacer / rehacer ---- */
 const H={u:[],r:[],last:null};
-function hsnap(){const o=Object.assign({},S);delete o.sel;delete o.lang;delete o.scenes;return JSON.stringify(o)}
+function hsnap(){const o=Object.assign({},S);delete o.sel;delete o.lang;delete o.scenes;delete o.ord;return JSON.stringify(o)}
 function histCommit(){
   const s=hsnap();
   if(H.last===null){H.last=s;return}
@@ -1098,16 +1218,36 @@ function initMic(){
   requestAnimationFrame(micMeter);
 }
 
+/* ---- modo ORDEN: sin azar, los cortes uno tras otro al ritmo del secuenciador ---- */
+const ORDBAK=[null,null,null,null];
+function ordPat(d){
+  const D=S.decks[d],A=AUD[d],L=D.len*16;
+  if(!A){D.pat=new Array(L).fill(null);return}
+  const pool=poolOf(D,D.markers.length);if(!pool.length){D.pat=new Array(L).fill(null);return}
+  const step=D.grid==='4'?4:D.grid==='8'?2:1,pat=[];let k=0;
+  for(let i=0;i<L;i++){if(i%step){pat.push(null);continue}
+    pat.push([{o:0,s:pool[k%pool.length],v:i%4===0?.95:.8,d:1,r:0,p:0,t:0,n:1}]);k++}
+  D.pat=pat;D.cyc=0;dirty();
+}
+function latUI(){let v=false;try{v=localStorage.getItem('crazyhead.lat')==='1'}catch(e){}const b=$('#latb');if(b){b.textContent=v?LL('Baja latencia (activo)','Low latency (on)'):LL('Modo estable (activo)','Stable mode (on)');b.classList.toggle('on',!v)}}
+function ordSet(on){
+  S.ord=!!on;
+  for(let d=0;d<4;d++){const D=S.decks[d];if(!AUD[d])continue;
+    if(on){ORDBAK[d]=D.pat;ordPat(d)}
+    else{const b=ORDBAK[d];if(b&&b.length===D.len*16)D.pat=b;else regen(d,false);ORDBAK[d]=null}}
+  save();dirty();syncUI();
+  toast(on?LL('Orden: cortes en secuencia, sin azar','Order: cuts in sequence, no randomness'):LL('Azar activado de nuevo','Randomness back on'));
+}
 /* ============ TRANSPORTE ============ */
-const Sch={run:false,gs:0,grid:0,w:null,iv:0,evq:[]};
+const Sch={run:false,gs:0,grid:0,w:null,iv:0,evq:[],la:.3};
 function mkWorker(){
   try{const w=new Worker(URL.createObjectURL(new Blob(['let t;onmessage=e=>{clearInterval(t);if(e.data==="go")t=setInterval(()=>postMessage(1),25)}'],{type:'text/javascript'})));w.onmessage=()=>Sch.tick();return w}catch(e){return null}
 }
 Sch.tick=function(){
   if(!Sch.run||!ctx)return;
   const sd=60/S.bpm/4,now=ctx.currentTime;
-  if(Sch.grid<now-.2){const k=Math.floor((now-Sch.grid)/sd);Sch.gs+=k;Sch.grid+=k*sd}
-  while(Sch.grid<now+.2){
+  if(Sch.grid<now-Sch.la){const k=Math.floor((now-Sch.grid)/sd);Sch.gs+=k;Sch.grid+=k*sd}
+  while(Sch.grid<now+Sch.la){
     if(Sch.gs%16===0&&(Q.scene!=null||Object.keys(Q.p).length))applyPend(Sch.grid);
     stepAll(eng,S,AUD,Sch.gs,Sch.grid,sd,Sch.evq);
     Sch.grid+=sd;Sch.gs++;
@@ -1147,6 +1287,226 @@ async function idbDel(k,st){st=st||'aud';try{const db=await idb();return await n
 async function idbAll(st){try{const db=await idb();return await new Promise(res=>{const q=db.transaction(st).objectStore(st).getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>res([])})}catch(e){return[]}}
 function guessBars(dur,ref){let best=2,bd=1e9;for(const b of[1,2,4,8]){const bp=b*4*60/dur;if(bp<65||bp>185)continue;const dd=Math.abs(bp-ref);if(dd<bd){bd=dd;best=b}}return bd<1e9?best:(dur<4?1:dur<8?2:4)}
 function anyLoaded(except){return AUD.some((a,i)=>a&&i!==except)}
+/* ============ TONO: detección y tono transpuesto ============ */
+const TN_ES=['Do','Do♯','Re','Re♯','Mi','Fa','Fa♯','Sol','Sol♯','La','La♯','Si'],TN_EN=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+function tnm(pc){return(S.lang==='en'?TN_EN:TN_ES)[((pc%12)+12)%12]}
+function keyTxt(t,minor){const en=S.lang==='en';return tnm(t)+' '+(minor?(en?'minor':'menor'):(en?'major':'mayor'))}
+function keyTxtRel(t,minor){const r=minor?(t+3)%12:(t+9)%12;return keyTxt(t,minor)+' ('+keyTxt(r,!minor)+')'}
+function centTxt(c){c=Math.round(c);return Math.abs(c)>=5?(' '+(c>0?'+':'')+c+'¢'):''}
+function followSt(d){const D=S.decks[d],A=AUD[d];if(!D.follow||!A)return 0;const ob=D.loopBars*4*60/A.buf.duration;return 12*Math.log2(S.bpm/ob)}
+function toneShift(d){const D=S.decks[d];return(D.tune||0)+(D.fine||0)/100+followSt(d)}
+function toneGet(d){
+  const A=AUD[d];if(!A)return null;if(A.tone)return A.tone;
+  if(!A.tp){A.tp=1;setTimeout(()=>{
+    try{const b=A.buf,chs=[];for(let c=0;c<b.numberOfChannels;c++)chs.push(b.getChannelData(c));A.tone=toneAnalyze(chs,b.sampleRate)}
+    catch(e){A.tone={mono:false,tonal:false,note:null,key:null,chroma:[],tn:0}}
+    A.tp=0;if(AUD[d]===A)toneUI();
+  },40)}
+  return null;
+}
+/* tono efectivo de un loop: {root,minor|null,tn,txt} o null */
+function toneInfo(d){
+  const T=toneGet(d),D=S.decks[d];if(!T)return null;
+  if(D.keyMan)return{root:D.keyMan.pc,minor:!!D.keyMan.minor,tn:T.tn||0,man:true};
+  if(T.mono&&T.note)return{root:T.note.pc,minor:null,tn:T.note.cents,note:T.note,mono:true};
+  if(T.tonal&&T.key)return{root:T.key.t,minor:T.key.minor,tn:T.tn||0};
+  return{none:true};
+}
+function toneCents(d){/* altura absoluta de la raíz, en cents (módulo 1200) tras Afinar/Fino */
+  const I=toneInfo(d);if(!I||I.none)return null;
+  return{I,c:I.root*100+I.tn,tot:I.root*100+I.tn+toneShift(d)*100};
+}
+function toneMatch(d,t){
+  const a=toneCents(d),b=toneCents(t);if(!a||!b)return;
+  let ra=a.I.root,rb=b.I.root;
+  if(a.I.minor!==null&&b.I.minor!==null&&a.I.minor!==b.I.minor){if(a.I.minor)ra=(ra+3)%12;if(b.I.minor)rb=(rb+3)%12}
+  const D=S.decks[d],tgt=rb*100+b.I.tn+toneShift(t)*100,own=ra*100+a.I.tn+(followSt(d)*100);
+  let need=((tgt-own)%1200+1200)%1200;if(need>600)need-=1200;
+  let tu=Math.round(need/100),fi=Math.round(need-tu*100);
+  if(fi>50){tu++;fi-=100}if(fi<-50){tu--;fi+=100}
+  D.tune=clamp(tu,-12,12)||0;D.fine=clamp(fi,-50,50)||0;
+  save();dirty();syncUI();toast('Tono igualado a '+NM[t]);
+}
+function toneUI(){
+  const box=$('#tbox');if(!box)return;
+  const d=S.sel,D=S.decks[d],A=AUD[d],en=S.lang==='en';
+  if(!A){box.innerHTML='<div class="small">'+(en?'No sample loaded':'Sin muestra cargada')+'</div>';return}
+  const T=toneGet(d),I=toneInfo(d);
+  if(!T){box.innerHTML='<div class="small">'+(en?'Analysing pitch…':'Analizando tono…')+'</div>';return}
+  const sh=toneShift(d);let h='';
+  if(I.none){h+=`<div class="small">${en?'No clear pitch (percussion or noise). You can set it by hand:':'Sin tono claro (percusión o ruido). Puedes indicarlo a mano:'}</div>`}
+  else{
+    let o,n;
+    if(I.mono){const nt=I.note;o=`${tnm(nt.pc)}${nt.oct}${centTxt(nt.cents)}`;
+      const x=(nt.pc+(nt.oct+1)*12)*100+nt.cents+sh*100,s=Math.round(x/100),c=x-s*100;n=`${tnm(((s%12)+12)%12)}${Math.floor(s/12)-1}${centTxt(c)}`}
+    else{const m=!!I.minor;o=keyTxtRel(I.root,m)+centTxt(I.tn);
+      const x=sh*100+I.tn,s=Math.round(x/100),c=x-s*100,r=((I.root+s)%12+12)%12;n=keyTxtRel(r,m)+centTxt(c)}
+    h+=`<div class="trow"><span class="small">${en?'Original':'Original'}</span><b>${o}</b>${I.man?'<span class="small"> ✎</span>':''}</div>`;
+    const same=Math.abs(sh)<.02;
+    h+=`<div class="trow now"><span class="small">${en?'Now':'Ahora'}</span><b>${same?(en?'unchanged':'sin cambio'):n}</b>${same?'':`<span class="small"> (${sh>0?'+':''}${sh.toFixed(Math.abs(sh-Math.round(sh))<.005?0:2)} st)</span>`}</div>`;
+  }
+  const others=[0,1,2,3].filter(i=>i!==d&&AUD[i]&&toneCents(i));
+  if(!I.none&&others.length)h+=`<div class="row"><span class="small">${en?'Match to':'Igualar a'}</span>${others.map(i=>`<button class="tm" data-tm="${i}" style="border-color:${COL[i]}">${NM[i]}</button>`).join('')}<button class="tm" data-tm="reset">${en?'Reset':'Quitar'}</button></div>`;
+  const km=D.keyMan;
+  h+=`<div class="row"><span class="small">${en?'Fix key':'Corregir tono'}</span><select id="tkey"><option value="">${en?'Auto':'Auto'}</option>${[0,1].map(m=>TN_ES.map((_,i)=>`<option value="${i}:${m}"${km&&km.pc===i&&!!km.minor===!!m?' selected':''}>${keyTxt(i,!!m)}</option>`).join('')).join('')}</select><button class="tm" data-tm="re">↻</button></div>`;
+  box.innerHTML=h;
+}
+function initTone(){
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('#tbox .tm');if(!b)return;const v=b.dataset.tm,D=cur();
+    if(v==='reset'){D.tune=0;D.fine=0;save();dirty();syncUI();return}
+    if(v==='re'){const A=AUD[S.sel];if(A){A.tone=null}toneUI();return}
+    toneMatch(S.sel,+v);
+  });
+  document.addEventListener('change',e=>{
+    if(e.target.id!=='tkey')return;const D=cur(),v=e.target.value;
+    if(!v)delete D.keyMan;else{const[p,m]=v.split(':');D.keyMan={pc:+p,minor:m==='1'}}
+    save();toneUI();
+  });
+}
+
+/* ============ STEMS (separar una canción en 4 loops) ============ */
+const ST={buf:null,name:'',a:0,b:0,pk:null,busy:false,cancel:false,model:null,dead:false,play:null,low:null};
+const ST_URL='https://huggingface.co/StemSplitio/htdemucs-6s-onnx/resolve/main/htdemucs_6s_fp16weights.onnx',ST_ORT='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/',ST_CACHE='sh-models-v1',ST_MAX=60;
+const LL=(es,en)=>S.lang==='en'?en:es;
+function stFmt(t){t=Math.max(0,t);return Math.floor(t/60)+':'+(t%60).toFixed(1).padStart(4,'0')}
+function buildStems(){
+  const lowDef=(()=>{try{const v=localStorage.getItem('crazyhead.stlow');if(v!==null)return v==='1'}catch(e){}return matchMedia('(pointer:coarse)').matches||(navigator.deviceMemory||8)<=4})();
+  ST.low=lowDef;
+  $('#stview').innerHTML=`<div class="stc">
+  <div class="row"><button id="stload">📂 Cargar canción</button><span class="small" id="stname"></span><input type="file" id="stfi" accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg" hidden></div>
+  <div class="small">Para canciones largas, arrastra sobre la onda para elegir una región (máx. 60 s). Se separa solo la región.</div>
+  <canvas id="stwf" style="width:100%;height:96px;background:var(--p2);border:1px solid var(--ln);border-radius:10px;touch-action:none;display:block;margin:6px 0"></canvas>
+  <div class="small" id="stinfo"></div>
+  <div class="row"><button id="stplay">▶ Oír región</button><button id="stall">Todo / 1.º min</button><span class="small">Compases</span><select id="stbars"><option>1</option><option>2</option><option selected>4</option><option>8</option></select><button id="stfit">Ajustar al BPM</button></div>
+  <div class="row"><button id="stgo" class="go">✂ Separar y cargar en A–D</button><button id="stcancel" style="display:none">Cancelar</button></div>
+  <div class="pbar"><i id="stpb"></i></div><div class="small" id="stmsg"></div>
+  <div class="small">Resultado: A = Batería · B = Bajo · C = Voz · D = Otros. Sustituye lo que haya cargado en A–D.</div>
+  <details class="stmod"><summary class="small">Modelo de IA</summary>
+   <div class="small" id="stmod"></div>
+   <div class="row"><label class="small"><input type="checkbox" id="stlow"> Modo de poca memoria</label></div>
+   <div class="row"><button id="stfile">Modelo desde archivo</button><input type="file" id="stmf" hidden><button id="stdel">Borrar modelo</button></div>
+   <div class="small">Modelo htdemucs 6 stems (≈136 MB), se descarga una vez y queda guardado en el dispositivo. Hace falta conexión la primera vez. Ordenador: ≈6 s por cada 7,8 s de audio; móvil, bastante más. Los stems de guitarra y piano se suman a «Otros».</div>
+  </details></div>`;
+  $('#stlow').checked=ST.low;
+  $('#stlow').onchange=e=>{ST.low=e.target.checked;try{localStorage.setItem('crazyhead.stlow',ST.low?'1':'0')}catch(_){}};
+  $('#stload').onclick=()=>$('#stfi').click();
+  $('#stfi').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)stLoad(f)};
+  $('#stplay').onclick=stPlay;
+  $('#stall').onclick=()=>{if(!ST.buf)return;ST.a=0;ST.b=Math.min(ST.buf.duration,ST_MAX);stDraw()};
+  $('#stfit').onclick=()=>{if(!ST.buf)return;const bars=+$('#stbars').value,len=Math.min(bars*240/S.bpm,ST.buf.duration);ST.b=Math.min(ST.buf.duration,ST.a+len);ST.a=Math.max(0,ST.b-len);stDraw()};
+  $('#stbars').onchange=stDraw;
+  $('#stgo').onclick=stRun;$('#stcancel').onclick=()=>{ST.cancel=true};
+  $('#stfile').onclick=()=>$('#stmf').click();
+  $('#stmf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;ST.model=await f.arrayBuffer();stModUI()};
+  $('#stdel').onclick=async()=>{ST.model=null;try{await caches.delete(ST_CACHE)}catch(e){}stModUI();toast(LL('Modelo borrado','Model deleted'))};
+  const cv=$('#stwf');let drag=null;
+  const xt=e=>{const r=cv.getBoundingClientRect();return clamp((e.clientX-r.left)/r.width,0,1)*(ST.buf?ST.buf.duration:0)};
+  cv.addEventListener('pointerdown',e=>{if(!ST.buf)return;cv.setPointerCapture(e.pointerId);const t=xt(e),px=cv.getBoundingClientRect().width/ST.buf.duration,ne=14/px;
+    if(Math.abs(t-ST.a)<ne&&Math.abs(t-ST.a)<=Math.abs(t-ST.b))drag='a';else if(Math.abs(t-ST.b)<ne)drag='b';else{drag='n';ST.a=ST.b=t;ST.o=t}stDraw()});
+  cv.addEventListener('pointermove',e=>{if(!drag||!ST.buf)return;const t=xt(e),D=ST.buf.duration;
+    if(drag==='n'){ST.a=Math.min(ST.o,t);ST.b=Math.max(ST.o,t);if(ST.b-ST.a>ST_MAX){if(t<ST.o)ST.b=ST.a+ST_MAX;else ST.a=ST.b-ST_MAX}}
+    else if(drag==='a'){ST.a=clamp(t,Math.max(0,ST.b-ST_MAX),ST.b-.5)}else{ST.b=clamp(t,ST.a+.5,Math.min(D,ST.a+ST_MAX))}
+    stDraw()});
+  const up=()=>{drag=null;stDraw()};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  stModUI();stDraw();
+}
+async function stModUI(){
+  const el=$('#stmod');if(!el)return;let have=!!ST.model;
+  if(!have){try{have=!!(await (await caches.open(ST_CACHE)).match(ST_URL))}catch(e){}}
+  el.textContent=have?LL('Modelo: listo ✓','Model: ready ✓'):LL('Modelo: no descargado (se descargará al separar)','Model: not downloaded (downloads when separating)');
+}
+async function stLoad(f){
+  try{
+    stMsg(LL('Leyendo…','Reading…'));
+    const ab=await f.arrayBuffer(),buf=await ctx.decodeAudioData(ab.slice(0));
+    stStop();ST.buf=buf;ST.name=f.name.replace(/\.[^.]+$/,'');
+    const ch=buf.getChannelData(0),NB=600,pk=new Float32Array(NB),per=Math.max(1,Math.floor(ch.length/NB));
+    for(let b=0;b<NB;b++){let m=0;const s=b*per,e=Math.min(ch.length,s+per);for(let i=s;i<e;i+=Math.max(1,per>>6)){const v=Math.abs(ch[i]);if(v>m)m=v}pk[b]=m}
+    ST.pk=pk;ST.a=0;ST.b=Math.min(buf.duration,buf.duration>ST_MAX?30:buf.duration);
+    $('#stname').textContent=f.name.slice(0,28);
+    $('#stbars').value=String(guessBars(ST.b-ST.a,S.bpm));
+    stMsg('');stDraw();
+  }catch(e){stMsg(LL('No se pudo leer el audio','Could not read the audio'))}
+}
+function stMsg(t){const m=$('#stmsg');if(m)m.textContent=t}
+function stDraw(){
+  const cv=$('#stwf');if(!cv)return;const W=Math.max(100,cv.clientWidth),H=96,dpr=devicePixelRatio||1;
+  if(cv.width!==Math.round(W*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+  const info=$('#stinfo');
+  if(!ST.buf){g.fillStyle='#888';g.font='13px sans-serif';g.fillText(LL('Carga una canción o un audio','Load a song or audio'),12,52);if(info)info.textContent='';return}
+  const D=ST.buf.duration,xa=ST.a/D*W,xb=ST.b/D*W;
+  g.fillStyle='rgba(255,255,255,.08)';g.fillRect(xa,0,xb-xa,H);
+  g.fillStyle='#9a8fb8';const n=ST.pk.length;
+  for(let i=0;i<n;i++){const x=i/n*W,h=Math.max(1,ST.pk[i]*H*.9);g.fillRect(x,(H-h)/2,Math.max(1,W/n-.5),h)}
+  g.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--c')||'#f80';g.fillRect(xa-1.5,0,3,H);g.fillRect(xb-1.5,0,3,H);
+  const len=ST.b-ST.a,bars=+$('#stbars').value,bpm=Math.round(bars*240/len),nch=Math.max(1,Math.ceil((len*44100-ST_SEG)/Math.floor(ST_SEG*.75))+1);
+  if(info)info.textContent=`${stFmt(ST.a)} → ${stFmt(ST.b)} · ${len.toFixed(1)} s · ${LL('con','with')} ${bars} ${LL('compases ≈','bars ≈')} ${bpm} BPM · ${nch} ${LL('trozos','chunks')}`;
+}
+function stStop(){if(ST.play){try{ST.play.stop()}catch(e){}ST.play=null;$('#stplay')&&($('#stplay').textContent=LL('▶ Oír región','▶ Play region'))}}
+function stPlay(){
+  if(!ST.buf)return;if(ST.play){stStop();return}
+  ctx.resume&&ctx.resume();
+  const s=ctx.createBufferSource();s.buffer=ST.buf;s.connect(ctx.destination);s.start(0,ST.a,ST.b-ST.a);s.onended=()=>{if(ST.play===s)stStop()};ST.play=s;$('#stplay').textContent=LL('■ Parar','■ Stop');
+}
+function stOrt(){
+  if(window.ort)return Promise.resolve(window.ort);
+  return new Promise((res,rej)=>{const s=document.createElement('script');s.src=ST_ORT+'ort.wasm.min.js';s.onload=()=>res(window.ort);s.onerror=()=>rej(new Error('ort'));document.head.appendChild(s)});
+}
+async function stModel(){
+  if(ST.model)return ST.model;
+  let cache=null;try{cache=await caches.open(ST_CACHE);const r=await cache.match(ST_URL);if(r){ST.model=await r.arrayBuffer();return ST.model}}catch(e){}
+  const r=await fetch(ST_URL);if(!r.ok)throw new Error('HTTP '+r.status);
+  const tot=+r.headers.get('content-length')||136e6,rd=r.body.getReader(),parts=[];let got=0;
+  for(;;){if(ST.cancel)throw new Error('cancel');const{done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;
+    stProg(got/tot*.4);stMsg(LL('Descargando modelo… ','Downloading model… ')+Math.round(got/1e6)+' / '+Math.round(tot/1e6)+' MB')}
+  const blob=new Blob(parts);ST.model=await blob.arrayBuffer();
+  try{if(cache)await cache.put(ST_URL,new Response(blob))}catch(e){}
+  return ST.model;
+}
+function stProg(f){const p=$('#stpb');if(p)p.style.width=Math.round(clamp(f,0,1)*100)+'%'}
+async function stRun(){
+  if(ST.busy)return;if(!ST.buf){toast(LL('Carga primero un audio','Load audio first'));return}
+  if(ST.dead){stMsg(LL('El motor falló: recarga la página y vuelve a intentarlo','The engine failed: reload the page and try again'));return}
+  if(ST.b-ST.a<1){toast(LL('Región demasiado corta','Region too short'));return}
+  if(AUD.some(Boolean)&&!confirm(LL('Esto sustituye los loops cargados en A–D. ¿Continuar?','This replaces the loops loaded in A–D. Continue?')))return;
+  ST.busy=true;ST.cancel=false;$('#stgo').disabled=true;$('#stcancel').style.display='';stProg(0);
+  let phase=LL('preparar el audio','preparing the audio');
+  try{
+    ctx.resume&&ctx.resume();
+    const len=Math.ceil((ST.b-ST.a)*44100),oc=new OfflineAudioContext(2,len,44100),src=oc.createBufferSource();src.buffer=ST.buf;src.connect(oc.destination);src.start(0,ST.a,ST.b-ST.a);
+    const mix=await oc.startRendering(),L=mix.getChannelData(0),R=mix.getChannelData(1);
+    phase=LL('cargar el modelo','loading the model');
+    const mb=await stModel();stModUI();
+    const ort=await stOrt();
+    ort.env.wasm.wasmPaths=ST_ORT;ort.env.wasm.numThreads=1;
+    stMsg(LL('Iniciando el modelo…','Starting the model…'));stProg(.4);await new Promise(r=>setTimeout(r,30));
+    const opts={executionProviders:['wasm'],enableCpuMemArena:false,enableMemPattern:false,executionMode:'sequential',graphOptimizationLevel:ST.low?'disabled':'all'};
+    const sess=await ort.InferenceSession.create(new Uint8Array(mb),opts);
+    const t0=Date.now();let cur=0;
+    const run=async inp=>{phase=LL(`separar el trozo ${cur+1}`,`separating chunk ${cur+1}`);const o=await sess.run({mix:new ort.Tensor('float32',inp,[1,2,ST_SEG])});return o[Object.keys(o)[0]].data};
+    const out=await stemSeparate(L,R,async inp=>{const r=await run(inp);return r},(k,N)=>{cur=k;const el=(Date.now()-t0)/1000,left=Math.round(el/k*(N-k));stProg(.4+.6*k/N);stMsg(LL(`Trozo ${k} de ${N} · quedan ≈ ${left} s`,`Chunk ${k} of ${N} · ≈ ${left} s left`))},()=>ST.cancel);
+    try{sess.release&&sess.release()}catch(e){}
+    if(!out){stMsg(LL('Cancelado','Cancelled'));return}
+    phase=LL('cargar los loops','loading the loops');
+    const bars=+$('#stbars').value,names=[LL('Batería','Drums'),LL('Bajo','Bass'),LL('Voz','Vocals'),LL('Otros','Other')];
+    for(let d=0;d<4;d++){AUD[d]=null}
+    for(let d=0;d<4;d++){
+      const buf=ctx.createBuffer(2,len,44100);buf.getChannelData(0).set(out[d][0]);buf.getChannelData(1).set(out[d][1]);
+      const name=ST.name.slice(0,14)+' · '+names[d],wav=wavEncode([out[d][0],out[d][1]],44100);
+      await idbPut('a'+d,{name,data:wav.buffer.slice(0)});
+      delete S.decks[d].keyMan;setBuffer(d,buf,name,'file',{bars});
+    }
+    eng&&eng.applyAll();save();setView('loops');syncUI();
+    toast(LL('Listo: A Batería · B Bajo · C Voz · D Otros','Done: A Drums · B Bass · C Vocals · D Other'));stMsg('');
+  }catch(e){
+    const m=String(e&&e.message||e);
+    if(m==='cancel'){stMsg(LL('Cancelado','Cancelled'))}
+    else{if(/abort/i.test(m))ST.dead=true;stMsg(LL('Error al ','Error while ')+phase+': '+m.slice(0,160)+(ST.dead?LL(' · Recarga la página.',' · Reload the page.'):''))}
+  }finally{ST.busy=false;ST.cancel=false;$('#stgo').disabled=false;$('#stcancel').style.display='none';stProg(0)}
+}
+
 function setBuffer(d,buf,name,srcTag,opts){
   const D=S.decks[d];AUD[d]={buf,name,rbuf:null};D.src=srcTag;
   D.loopBars=(opts&&opts.bars)||guessBars(buf.duration,S.bpm);
@@ -1154,6 +1514,7 @@ function setBuffer(d,buf,name,srcTag,opts){
   if(opts&&opts.keep){/* mantener marcadores guardados */}
   else{autoChop(d,true)}
   regen(d,true);syncUI();
+  setTimeout(()=>{try{if(AUD[d]&&AUD[d].buf===buf&&eng)eng.getR(d)}catch(e){}},600);
 }
 async function loadFile(d,file){
   try{
@@ -1208,6 +1569,7 @@ function buildDeck(){
     <button id="bremove">Quitar</button><button id="bmic">🎙 Grabar</button></div>
   <div class="row"><span class="small">Compases del loop</span>${SG('loopBars',[[1,'1'],[2,'2'],[4,'4'],[8,'8']],1)}<button id="bbpm">→ BPM</button><button id="bwarp">Ajustar al tempo</button></div>
   ${KG([knob('Afinar (semitonos)','tune',-12,12),knob('Fino (cents)','fine',-50,50)],'k2')}
+  <div id="tbox" class="tbox"></div>
   <div class="row">${T('Seguir tempo','follow')}<span class="small">«Seguir tempo» cambia el tono con el BPM</span></div>
 </div></details>
 
@@ -1277,8 +1639,8 @@ function buildDeck(){
 }
 /* ---- mandos circulares ---- */
 function knobApply(g,k,v){
-  if(g){S[k]=v;eng.applyAll()}
-  else{setp(cur(),k,v);if(k.startsWith('fx.')||k.startsWith('rfx.')||k==='vol'||k==='pan')eng.applyDeck(S.sel)}
+  if(g){S[k]=v;eng.applyAll();toneUI()}
+  else{setp(cur(),k,v);if(k==='tune'||k==='fine')toneUI();if(k.startsWith('fx.')||k.startsWith('rfx.')||k==='vol'||k==='pan')eng.applyDeck(S.sel)}
   save();dirty();
 }
 function initKnobs(){
@@ -1372,11 +1734,13 @@ function syncUI(){
   $('#zlab').textContent='zoom '+zoom+'×';
   const A=AUD[d];
   $('#linfo').textContent=A?`· ${A.name.slice(0,22)}`:'· vacío';
+  $('#ordb').classList.toggle('on',!!S.ord);
+  toneUI();
   $('#plab').textContent=`compás ${patBar+1}/${D.len}`;
   $('#seedl').textContent='semilla '+D.seed;
   const ch=$('#chips');ch.innerHTML='';
   if(A)D.markers.forEach((m,k)=>{const b=document.createElement('button');b.className='chip'+(D.pool[k]!==false?' on':'');b.style.setProperty('--k',skc(k,D.markers.length));b.textContent=k+1;
-    b.onclick=()=>{D.pool[k]=D.pool[k]===false;save();if(eng)auditSlice(d,k);syncUI()};ch.appendChild(b)});
+    b.onclick=()=>{D.pool[k]=D.pool[k]===false;if(S.ord)ordPat(d);save();if(eng)auditSlice(d,k);syncUI()};ch.appendChild(b)});
   syncExtra();
   $$('.ovrow').forEach((r,i)=>{const x=S.decks[i];r.classList.toggle('sel',i===d);
     r.querySelector('[data-act=mute]').classList.toggle('on',x.mute);r.querySelector('[data-act=solo]').classList.toggle('on',x.solo);r.querySelector('[data-act=lock]').classList.toggle('on',x.lock);r.querySelector('[data-act=fz]').classList.toggle('on',!!x.fz);r.querySelector('[data-act=mute]').classList.toggle('pend',!!Q.p[i+'mute']);r.querySelector('[data-act=solo]').classList.toggle('pend',!!Q.p[i+'solo']);
@@ -1478,16 +1842,19 @@ function drawOv(){
     x.globalAlpha=1;if(PH[i]>=0){x.fillStyle='#fff';x.fillRect(PH[i]*cw,0,Math.max(1.5,cw),h)}
   });
 }
+let frC=0,frCost=0;
 function frame(){
   requestAnimationFrame(frame);
   if(!playing&&!needs)return;
-  needs=false;
+  if(playing&&frCost>9&&(++frC%(frCost>18?4:2)))return;
+  needs=false;const t0=performance.now();
   if(playing&&ctx){const now=ctx.currentTime,q=Sch.evq;let k=0;
     for(;k<q.length;k++){const e=q[k];if(e.t>now)break;PH[e.d]=e.i;if(e.s>=0)FL[e.d]={s:e.s,t:performance.now()}}
     if(k)q.splice(0,k);
     if(followPh&&PH[S.sel]>=0){const b=Math.floor(PH[S.sel]/16);if(b!==patBar){patBar=b;const pl=$('#plab');if(pl)pl.textContent=tr(`compás ${patBar+1}/${cur().len}`)}}
   }
   drawOv();if(view==='loops'){drawPat();drawWf();drawGr()}else if(view==='mix')mixMeters();
+  frCost=frCost*.85+(performance.now()-t0)*.15;
 }
 
 /* ============ EXPORTAR ============ */
@@ -1538,7 +1905,7 @@ function deckNotes(d,bars){
   const sd=60/S2.bpm/4,tk=480/(60/S2.bpm),out=[];
   const col={audible:()=>true,hit(dd,t,h,sdur){if(dd!==d)return;const sg=segsOf(S2.decks[d].markers,AUD[d].buf.duration)[h.s];if(!sg)return;
     const rate=Math.pow(2,(h.p||0)/12);let dur=(sg.b-sg.a)/rate*h.d;if(h.n>1)dur=Math.min(dur,sdur/h.n*.95);dur=Math.min(dur,sdur*8);
-    out.push({tick:(t+h.o*sdur+(h.t||0)/1000)*tk,dur:Math.max(dur*tk,20),s:h.s,v:h.v*127})}};
+    out.push({tick:(t+h.o*sdur+(h.t||0)/1000)*tk,dur:Math.max(dur*tk,20),s:h.s,v:h.v*127,p:h.p||0,r:!!h.r})}};
   for(let gs=0;gs<bars*16;gs++)stepAll(col,S2,AUD,gs,gs*sd,sd,null);
   return{bpm:S2.bpm,notes:out};
 }
@@ -1570,6 +1937,80 @@ function monoWav(buf,a,b){
   for(let c=0;c<ch;c++){const x=buf.getChannelData(c);for(let k=0;k<n;k++)o[k]+=x[i0+k]/ch}
   const f=Math.min(n>>1,Math.round(sr*.004));for(let k=0;k<f;k++){o[n-1-k]*=k/f;o[k]*=k/f}
   return {data:wavEncode([o],sr),frames:n,sr};
+}
+/* ============ Exportar a Ableton Move (set .ablbundle) ============ */
+const MOVE_TPL={"$schema":"http://tech.ableton.com/schema/song/1.8.6/song.json","stepEditorResolution":"1/16","tempo":67.5,"globalGrooveAmount":0.0,"timeSignature":{"upper":4,"lower":4},"rootNote":8,"scale":"Hirajoshi","melodicLayout":"inKey","tracks":[{"kind":"midi","name":"","color":11,"isSelected":true,"clipSlots":[{"hasStop":true,"clip":null},{"hasStop":true,"clip":null},{"hasStop":true,"clip":null},{"hasStop":true,"clip":null},{"hasStop":true,"clip":null},{"hasStop":true,"clip":null},{"hasStop":true,"clip":null},{"hasStop":true,"clip":null}],"isNoteRepeatOn":false,"noteRepeatRate":"1/16","noteRepeatArpeggio":{"style":"chordRepeat"},"uiOctaveIndex":4,"midiInputMode":"auto","midiOutputEndpoint":null,"devices":[{"presetUri":"ableton:/packs/abl-core-library/Track%20Presets/Templates/Drum%20Kit.json","kind":"instrumentRack","name":"","lockId":1001,"lockSeal":-973461132,"parameters":{"Enabled":true,"Macro0":0.0,"Macro1":0.0,"Macro2":0.0,"Macro3":0.0,"Macro4":0.0,"Macro5":0.0,"Macro6":0.0,"Macro7":0.0},"chains":[{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumRack","name":"","lockId":1001,"lockSeal":830049224,"parameters":{"Enabled":true,"Macro0":0.0,"Macro1":0.0,"Macro2":0.0,"Macro3":0.0,"Macro4":0.0,"Macro5":0.0,"Macro6":0.0,"Macro7":0.0},"chains":[{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":{"value":1000.0,"presetValue":999.9998779296876},"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":{"value":0.019999999552965164,"presetValue":0.0},"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":{"value":10000.0,"presetValue":10000.0009765625},"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":{"value":0.30000001192092896,"presetValue":0.29999998211860657},"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":{"value":1000.0,"presetValue":999.9998168945312},"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":{"value":0.10000000149011612,"presetValue":0.09999999403953552},"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":{"value":60.0,"presetValue":59.99999237060547},"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":{"value":60.0,"presetValue":0.6000000238418579},"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":{"value":22000.0,"presetValue":21999.990234375},"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":{"value":0.5,"presetValue":0.3499999940395355},"Volume":{"value":-12.0,"presetValue":-11.999999046325684}},"deviceData":{"sampleUri":"Samples/00_PCM.wav"}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":36,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":{"value":1000.0,"presetValue":999.9998779296876},"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":{"value":0.019999999552965164,"presetValue":0.0},"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":{"value":10000.0,"presetValue":10000.0009765625},"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":{"value":0.30000001192092896,"presetValue":0.29999998211860657},"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":{"value":1000.0,"presetValue":999.9998168945312},"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":{"value":0.10000000149011612,"presetValue":0.09999999403953552},"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":{"value":60.0,"presetValue":59.99999237060547},"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":{"value":60.0,"presetValue":0.6000000238418579},"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":{"value":22000.0,"presetValue":21999.990234375},"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":{"value":0.5,"presetValue":0.3499999940395355},"Volume":{"value":-12.0,"presetValue":-11.999999046325684}},"deviceData":{"sampleUri":"Samples/02_PCM.wav"}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":37,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":{"value":1000.0,"presetValue":999.9998779296876},"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":{"value":0.019999999552965164,"presetValue":0.0},"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":{"value":10000.0,"presetValue":10000.0009765625},"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":{"value":0.30000001192092896,"presetValue":0.29999998211860657},"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":{"value":1000.0,"presetValue":999.9998168945312},"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":{"value":0.10000000149011612,"presetValue":0.09999999403953552},"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":{"value":60.0,"presetValue":59.99999237060547},"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":{"value":60.0,"presetValue":0.6000000238418579},"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":{"value":22000.0,"presetValue":21999.990234375},"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":{"value":0.5,"presetValue":0.3499999940395355},"Volume":{"value":-12.0,"presetValue":-11.999999046325684}},"deviceData":{"sampleUri":"Samples/03_PCM.wav"}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":38,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":39,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":40,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":41,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":42,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":43,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":44,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":45,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":46,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":47,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":48,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":49,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":50,"sendingNote":60,"chokeGroup":null}},{"name":"","color":0,"devices":[{"presetUri":null,"kind":"drumCell","name":"","parameters":{"Effect_EightBitFilterDecay":5.0,"Effect_EightBitResamplingRate":14080.0,"Effect_FmAmount":0.0,"Effect_FmFrequency":999.9998779296876,"Effect_LoopLength":0.30000001192092896,"Effect_LoopOffset":0.0,"Effect_NoiseAmount":0.0,"Effect_NoiseFrequency":10000.0009765625,"Effect_On":true,"Effect_PitchEnvelopeAmount":0.0,"Effect_PitchEnvelopeDecay":0.29999998211860657,"Effect_PunchAmount":0.0,"Effect_PunchTime":0.12015999853610992,"Effect_RingModAmount":0.0,"Effect_RingModFrequency":999.9998168945312,"Effect_StretchFactor":1.0,"Effect_StretchGrainSize":0.09999999403953552,"Effect_SubOscAmount":0.0,"Effect_SubOscFrequency":59.99999237060547,"Effect_Type":"Stretch","Enabled":true,"NotePitchBend":true,"Pan":0.0,"Voice_Detune":0.0,"Voice_Envelope_Attack":0.0010000000474974513,"Voice_Envelope_Decay":0.05000000074505806,"Voice_Envelope_Hold":0.6000000238418579,"Voice_Envelope_Mode":"A-H-D","Voice_Filter_Frequency":21999.990234375,"Voice_Filter_On":true,"Voice_Filter_PeakGain":1.0,"Voice_Filter_Resonance":0.0,"Voice_Filter_Type":"Lowpass","Voice_Gain":1.0,"Voice_ModulationAmount":0.0,"Voice_ModulationSource":"Velocity","Voice_ModulationTarget":"Filter","Voice_PitchToEnvelopeModulation":true,"Voice_PlaybackLength":1.0,"Voice_PlaybackStart":0.0,"Voice_Transpose":0,"Voice_VelocityToVolume":0.3499999940395355,"Volume":-11.999999046325684},"deviceData":{"sampleUri":null}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":true,"amount":-70.0}]},"drumZoneSettings":{"receivingNote":51,"sendingNote":60,"chokeGroup":null}}],"returnChains":[{"name":"","color":0,"devices":[{"presetUri":null,"kind":"reverb","name":"","parameters":{"AllPassGain":0.6000000238418579,"AllPassSize":0.4000000059604645,"BandFreq":829.999755859375,"BandHighOn":false,"BandLowOn":true,"BandWidth":5.849999904632568,"ChorusOn":true,"CutOn":true,"DecayTime":1200.0001220703125,"DiffuseDelay":0.5,"EarlyReflectModDepth":17.5,"EarlyReflectModFreq":0.29770001769065857,"Enabled":true,"FlatOn":true,"FreezeOn":false,"HighFilterType":"Shelf","MixDiffuse":1.0,"MixDirect":1.0,"MixReflect":1.0,"PreDelay":2.499999761581421,"RoomSize":99.99999237060548,"RoomType":"SuperEco","ShelfHiFreq":4500.00146484375,"ShelfHiGain":0.699999988079071,"ShelfHighOn":true,"ShelfLoFreq":90.0,"ShelfLoGain":1.0,"ShelfLowOn":true,"SizeModDepth":0.019999999552965164,"SizeModFreq":0.020000001415610313,"SizeSmoothing":"Fast","SpinOn":true,"StereoSeparation":100.0},"deviceData":{}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[{"isEnabled":false,"amount":-70.0}]}}]},{"presetUri":null,"kind":"saturator","name":"Saturator","parameters":{"BaseDrive":0.0,"BassShaperThreshold":-50.0,"ColorDepth":0.0,"ColorFrequency":1000.0,"ColorOn":true,"ColorWidth":0.30000001192092896,"DryWet":0.0,"Enabled":true,"Oversampling":false,"PostClip":"off","PostDrive":0.0,"PreDcFilter":false,"PreDrive":0.0,"Type":"Analog Clip","WsCurve":0.7890625,"WsDamp":0.0,"WsDepth":0.0234375,"WsDrive":1.0,"WsLin":0.171875,"WsPeriod":0.1328125},"deviceData":{}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[]}}]}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[]}}],"returnTracks":[],"masterTrack":{"color":3,"isSelected":false,"devices":[{"presetUri":"ableton:/packs/abl-core-library/Audio%20Effects/Dynamics/Punch%20Glue.json","kind":"audioEffectRack","name":"Punch Glue","lockId":1001,"lockSeal":-100211998,"parameters":{"Enabled":true,"Macro0":63.35280227661133,"Macro1":63.5,"Macro2":63.35280227661133,"Macro3":{"value":32.8900260925293,"customName":"Comp Hi Pass"},"Macro4":{"value":29.73539161682129,"customName":"Release"},"Macro5":{"value":101.88977014790208,"presetValue":44.9728889465332,"customName":"Threshold"},"Macro6":{"value":0.0,"presetValue":10.583333969116213},"Macro7":{"value":127.0,"customName":"Comp Dry/Wet"}},"chains":[{"name":"","color":0,"devices":[{"presetUri":null,"kind":"channelEq","name":"","parameters":{"Enabled":true,"Gain":1.0,"HighShelfGain":{"value":0.9999999403953552,"macroMapping":{"macroIndex":2,"rangeMin":0.18000000715255737,"rangeMax":5.599999904632568}},"HighpassOn":false,"LowShelfGain":{"value":0.9999999403953552,"macroMapping":{"macroIndex":0,"rangeMin":0.18000000715255737,"rangeMax":5.599999904632568}},"MidFrequency":579.9998779296875,"MidGain":{"value":1.0,"macroMapping":{"macroIndex":1,"rangeMin":0.25,"rangeMax":4.0}}},"deviceData":{}},{"presetUri":null,"kind":"compressor","name":"","parameters":{"Attack":1.0,"AutoReleaseControlOnOff":false,"DryWet":{"value":1.0,"macroMapping":{"macroIndex":7,"rangeMin":0.0,"rangeMax":1.0}},"Enabled":{"value":true,"macroMapping":{"macroIndex":7,"rangeMin":1.0,"rangeMax":127.0}},"ExpansionRatio":1.149999976158142,"Gain":{"value":0.0,"macroMapping":{"macroIndex":6,"rangeMin":0.0,"rangeMax":36.0}},"GainCompensation":false,"Knee":0.10000000149011612,"LogEnvelope":true,"Model":"RMS","Ratio":2.0,"Release":{"value":30.0,"macroMapping":{"macroIndex":4,"rangeMin":1.0,"rangeMax":1000.0}},"SideChainEq_Freq":{"value":80.0,"macroMapping":{"macroIndex":3,"rangeMin":30.0,"rangeMax":15000.0}},"SideChainEq_Gain":0.0,"SideChainEq_Mode":"High pass","SideChainEq_On":true,"SideChainEq_Q":0.4099999964237213,"Threshold":{"value":1.0,"macroMapping":{"macroIndex":5,"rangeMin":0.003162277629598975,"rangeMax":1.0}}},"deviceData":{}}],"mixer":{"pan":0.0,"solo-cue":false,"speakerOn":true,"volume":0.0,"sends":[]}}]},{"presetUri":"ableton:/packs/abl-core-library/Audio%20Effects/Saturator/Analog%20Clip.json","kind":"saturator","name":"Analog Clip","parameters":{"BaseDrive":0.0,"BassShaperThreshold":-50.0,"ColorDepth":0.0,"ColorFrequency":1000.0,"ColorOn":true,"ColorWidth":0.30000001192092896,"DryWet":{"value":0.0,"presetValue":1.0},"Enabled":true,"Oversampling":false,"PostClip":"off","PostDrive":-7.0,"PreDcFilter":false,"PreDrive":9.0,"Type":"Analog Clip","WsCurve":0.05000000074505806,"WsDamp":0.0,"WsDepth":0.0,"WsDrive":1.0,"WsLin":0.5,"WsPeriod":0.0},"deviceData":{}},{"presetUri":null,"kind":"limiter","name":"","parameters":{"AutoRelease":false,"Ceiling":-0.30000001192092896,"Enabled":true,"Gain":0.0,"LegacySmoothing":true,"LinkAmount":1.0,"LinkAmountMidSide":0.0,"Lookahead":"1.5 ms","Maximize":false,"MaximizeOutput":0.0,"MaximizeThreshold":0.0,"Mode":"Standard","Release":100.0,"Routing":"L/R"},"deviceData":{}}],"mixer":{"pan":0.0,"volume":0.0}},"scenes":[{"name":"","color":null},{"name":"","color":null},{"name":"","color":null},{"name":"","color":null},{"name":"","color":null},{"name":"","color":null},{"name":"","color":null},{"name":"","color":null}],"grooves":[],"metadata":{"usedFeatures":["Compressor Device","Compressor Side Chain EQ","Drum Sampler Pitch > Env"]}};
+async function resample48(data,sr){
+  if(sr===48000)return data;
+  const n=Math.max(16,Math.round(data.length*48000/sr)),oc=new OfflineAudioContext(1,n,48000),b=oc.createBuffer(1,data.length,sr);
+  b.getChannelData(0).set(data);const s=oc.createBufferSource();s.buffer=b;s.connect(oc.destination);s.start();
+  return (await oc.startRendering()).getChannelData(0).slice();
+}
+function moveSlice(buf,a,b,rev){
+  const sr=buf.sampleRate,i0=Math.floor(a*sr),i1=Math.max(i0+16,Math.min(buf.length,Math.floor(b*sr))),n=i1-i0,o=new Float32Array(n),ch=buf.numberOfChannels;
+  for(let c=0;c<ch;c++){const x=buf.getChannelData(c);for(let k=0;k<n;k++)o[k]+=x[i0+k]/ch}
+  if(rev)o.reverse();
+  const f=Math.min(n>>1,Math.round(sr*.004));for(let k=0;k<f;k++){o[n-1-k]*=k/f;o[k]*=k/f}
+  return o;
+}
+async function exportMove(){
+  if(!AUD.some(a=>a)){toast('No hay loops cargados');return}
+  const name=(prompt(tr('Nombre del set de Move'),(localStorage.getItem('crazyhead.pname')||'CrazyHead'))||'').trim().replace(/[\\/:*?"<>|]+/g,'-');
+  if(!name)return;
+  toast('Exportando para Move…',60000);
+  try{
+    const S2=cloneS(),set=JSON.parse(JSON.stringify(MOVE_TPL)),enc=new TextEncoder(),files=[],uris={},t0=set.tracks[0];
+    set.tempo=Math.round(S2.bpm*100)/100;
+    const COLS=[11,15,7,20],tracks=[];let dropped=0,variants=0;
+    for(let d=0;d<4;d++){
+      const tr0=JSON.parse(JSON.stringify(t0)),D=S2.decks[d],A=AUD[d];
+      tr0.isSelected=d===0;tr0.color=COLS[d];tr0.name='';
+      const rack=tr0.devices[0].chains[0].devices[0];rack.name='Loop '+NM[d];
+      const cellS=JSON.parse(JSON.stringify(rack.chains[0].devices[0])),cellE=JSON.parse(JSON.stringify(rack.chains[4].devices[0]));
+      rack.chains.forEach((c,i)=>{const e=JSON.parse(JSON.stringify(cellE));e.deviceData={sampleUri:null};c.devices[0]=e;c.drumZoneSettings.chokeGroup=null});
+      /* mezcla de la pista */
+      const vv=Math.max(.0001,Math.pow((D.vol||0)/100,1.5));tr0.mixer.volume=Math.max(-70,Math.round(20*Math.log10(vv)*100)/100);
+      tr0.mixer.pan=clamp((D.pan||0)/100,-1,1);tr0.mixer['solo-cue']=!!D.solo;tr0.mixer.speakerOn=!D.mute;
+      if(A){
+        const nn=deckNotes(d,D.len).notes,tune=Math.round(D.tune||0),segs=segsOf(D.markers,A.buf.duration);
+        const key=h=>h.s+'|'+Math.round(h.p||0)+'|'+(h.r?1:0),cnt=new Map(),sl=new Map();
+        for(const h of nn){cnt.set(key(h),(cnt.get(key(h))||0)+1);sl.set(h.s,(sl.get(h.s)||0)+1)}
+        /* 1.º un corte normal por cada corte usado (máx. 16); 2.º variantes (tono/invertido) por frecuencia */
+        const baseS=[...sl.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16).map(x=>x[0]).sort((a,b)=>a-b);
+        const cells=baseS.map(s=>({s,p:0,r:0,k:s+'|0|0'}));
+        const vars=[...cnt.entries()].filter(([k])=>{const[s,p,r]=k.split('|');return baseS.includes(+s)&&(+p!==0||+r)}).sort((a,b)=>b[1]-a[1]);
+        for(const[k]of vars){if(cells.length>=16)break;const[s,p,r]=k.split('|').map(Number);cells.push({s,p,r,k});variants++}
+        const slot=new Map(cells.map((c,i)=>[c.k,i])),wavs=new Map();
+        for(let i=0;i<cells.length;i++){
+          const c=cells[i],sg=segs[c.s],wk=c.s+'|'+c.r;
+          if(!wavs.has(wk)){
+            const mono=await resample48(moveSlice(A.buf,sg.a,sg.b,!!c.r),A.buf.sampleRate),file=`${NM[d]}${String(wavs.size+1).padStart(2,'0')}_corte${c.s+1}${c.r?'_rev':''}.wav`;
+            files.push({name:'Samples/'+file,data:wavEncode([mono],48000)});wavs.set(wk,file);
+            uris['Samples/'+encodeURIComponent(file)]='ableton:/user-library/Samples/CrazyHead/'+encodeURIComponent(file);
+          }
+          const cell=JSON.parse(JSON.stringify(cellS));cell.deviceData={sampleUri:'Samples/'+encodeURIComponent(wavs.get(wk))};
+          cell.parameters.Voice_Transpose=clamp(tune+c.p,-48,48);cell.parameters.Voice_Detune=clamp(D.fine||0,-50,50);
+          rack.chains[i].devices[0]=cell;rack.chains[i].drumZoneSettings.chokeGroup=D.mono?1+d:null;
+        }
+        /* clip: región en pulsos (1 pulso = negra) */
+        const beats=D.len*4,notes=[];
+        for(const h of nn){
+          let i=slot.get(h.s+'|'+Math.round(h.p||0)+'|'+(h.r?1:0));
+          if(i==null)i=slot.get(h.s+'|0|0');
+          if(i==null){dropped++;continue}
+          const st=Math.max(0,h.tick/480);if(st>=beats)continue;
+          notes.push({noteNumber:36+i,startTime:Math.round(st*1e6)/1e6,duration:Math.max(.02,Math.min(h.dur/480,beats-st)),velocity:clamp(Math.round(h.v),1,127),offVelocity:64});
+        }
+        notes.sort((a,b)=>a.startTime-b.startTime||a.noteNumber-b.noteNumber);
+        tr0.clipSlots[0]={hasStop:true,clip:{name:'Loop '+NM[d],color:COLS[d],isEnabled:true,region:{start:0,end:beats,loop:{start:0,end:beats,isEnabled:true}},grooveId:null,stepEditorScrollPosition:0,envelopes:[],notes}};
+      }
+      tracks.push(tr0);
+    }
+    set.tracks=tracks;
+    const all=[{name:'BundleInfo.json',data:enc.encode(JSON.stringify({originalSampleUris:uris},null,2))},{name:'Song.abl',data:enc.encode(JSON.stringify(set,null,2))},...files];
+    download(zipStore(all),name+'.ablbundle');
+    toast('Exportado: '+name+'.ablbundle'+(dropped?` (${dropped} golpes sin celda)`:''),5000);
+  }catch(e){console.error(e);toast('No se pudo exportar a Move')}
 }
 async function exportDaw(kind){
   if(!AUD.some(a=>a)){toast('No hay loops cargados');return}
@@ -1708,9 +2149,10 @@ function fxViewSync(){
   $$('.pad').forEach(el=>{const k=el.dataset.p;el.classList.toggle('hold',!!padHold[k]);$('.hd',el).classList.toggle('on',!!padHold[k])});
 }
 function setView(v){
-  view=v;$('#deck').style.display=v==='loops'?'':'none';$('#fxview').style.display=v==='fx'?'':'none';$('#mixview').style.display=v==='mix'?'':'none';
+  view=v;$('#deck').style.display=v==='loops'?'':'none';$('#fxview').style.display=v==='fx'?'':'none';$('#mixview').style.display=v==='mix'?'':'none';$('#stview').style.display=v==='st'?'':'none';$('#vSt').classList.toggle('on',v==='st');
   $('#vLoops').classList.toggle('on',v==='loops');$('#vFx').classList.toggle('on',v==='fx');$('#vMix').classList.toggle('on',v==='mix');
   if(v==='mix'){mixSync();needs=true}
+  if(v==='st')stDraw();
   if(v==='fx'){if(fxT!=='all')fxT=S.sel;fxViewSync()}else{fitWf();fitPat();fitGr()}
 }
 function syncExtra(){
@@ -1881,7 +2323,7 @@ const EN={
 'Loops':'Loops','FX pads':'FX pads','TODOS':'ALL','FILTRO':'FILTER','X freq · Y reson.':'X freq · Y reso.','X bits · Y mezcla':'X bits · Y mix','X cantidad · Y mezcla':'X amount · Y mix',
 'X tiempo · Y realim.':'X time · Y feedback','X cantidad':'X amount','X ritmo · Y corto':'X rate · Y short','TAPE STOP':'TAPE STOP','X duración':'X length','DUB DELAY':'DUB DELAY',
 'Soltar todos los HOLD':'Release all HOLDs','FX aleatorios':'Random FX','(ajustes en cada loop → FX aleatorios)':'(settings in each loop → Random FX)',
-'Loop y cortes':'Loop and cuts','Tipo…':'Type…','Muestra · tono y tempo':'Sample · pitch and tempo','Afinar (semitonos)':'Tune (semitones)','Fino (cents)':'Fine (cents)','«Seguir tempo» cambia el tono con el BPM':'“Follow tempo” changes pitch with the BPM','Forma de onda y cortes':'Waveform and cuts','Mixer':'Mixer','Pan':'Pan','Reverb':'Reverb','Los faders cambian el volumen de cada loop; el pan y el envío de reverb están debajo. M = mute, S = solo (con el secuenciador sonando se aplican al siguiente compás).':'Faders set each loop’s volume; pan and reverb send are below. M = mute, S = solo (while the sequencer plays they apply on the next bar).','SampledHead':'SampledHead','Enviar loops y mezcla':'Send loops and mix','Enviar cortes como kit':'Send cuts as kit','Manda a SampledHead la mezcla y los 4 loops, o los cortes de cada loop como pads (A→banco A… hasta 16 por loop). Desde allí puedes exportarlos como kit a MPC, Move, SP-404, Koala o Ableton.':'Sends the mix and the 4 loops to SampledHead, or each loop’s cuts as pads (A→bank A… up to 16 per loop). From there you can export them as a kit to MPC, Move, SP-404, Koala or Ableton.','Preparando…':'Preparing…','No se pudo enviar al sampler':'Could not send to the sampler','Abre SampledHead para recogerlos (Más → Recoger de CrazyHead)':'Open SampledHead to pick them up (More → Pick up from CrazyHead)','Escenas':'Scenes','Guardar escena':'Save scene','@Guardar escena':'@Save scene','@Deshacer':'@Undo','@Rehacer':'@Redo','@Grabar la salida':'@Record output','@Congelar':'@Freeze','Congelar':'Freeze','Loop congelado':'Loop frozen','Loop descongelado':'Loop unfrozen','Escena vacía: pulsa 💾 y luego el número':'Empty scene: tap 💾 then the number','Pulsa el número donde guardar':'Tap the number to save into','Nada que deshacer':'Nothing to undo','Nada que rehacer':'Nothing to redo','Deshecho':'Undone','Rehecho':'Redone','Grabando la salida…':'Recording the output…','Grabación vacía':'Empty recording','Grabación guardada':'Recording saved','Loops intercambiados':'Loops swapped','Loop copiado':'Loop copied','Ya está al tempo':'Already at tempo','Diferencia de tempo demasiado grande (máx. ×2)':'Tempo difference too large (max ×2)','Ajustando al tempo…':'Matching tempo…','Loops':'Loops','Copiar':'Copy','Intercambiar':'Swap','Cancelar':'Cancel','Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.':'Copy duplicates the loop with all its settings and sequence. Swap exchanges the two loops.','Grabar loop':'Record loop','Compases':'Bars','Metrónomo':'Metronome','Cuenta atrás':'Count-in','⏺ Grabar':'⏺ Record','■ Parar':'■ Stop','🎙 Grabar':'🎙 Record','Pulsa «Grabar»':'Press “Record”','Arrastra los marcadores blancos para elegir el inicio y el final.':'Drag the white markers to choose the start and end.','▶ Oír':'▶ Play','✂ Recortar':'✂ Trim','Normalizar':'Normalize','Fundidos':'Fades','Invertir':'Reverse','Original':'Original','Usar como loop':'Use as loop','Si el secuenciador está sonando, la grabación empieza en el siguiente compás y sigue su tempo. Mejor con auriculares para que el micrófono no recoja los altavoces.':'If the sequencer is playing, recording starts on the next bar and follows its tempo. Headphones recommended so the mic does not pick up the speakers.','No se pudo acceder al micrófono':'Could not access the microphone','Esperando el compás…':'Waiting for the bar…','Grabando…':'Recording…','Ajustar al tempo':'Match tempo','Tamaño rev.':'Reverb size','Compresor':'Compressor','Sidechain (bombeo)':'Sidechain (pumping)','Se agacha con los golpes de':'Ducks with hits from','Cantidad':'Amount','Suelta ms':'Release ms','⏺ REC':'⏺ REC','Loop ajustado a':'Loop matched to','Afinar':'Tune','📂 Cargar':'📂 Load','Sonido incluido…':'Built-in sound…','Baterías':'Drums','Teclas (Rhodes)':'Keys (Rhodes)','Bajos':'Basses',
+'Loop y cortes':'Loop and cuts','Tipo…':'Type…','Ableton Move · set con 4 pistas (.ablbundle)':'Ableton Move · 4-track set (.ablbundle)','Nombre del set de Move':'Move set name','Exportando para Move…':'Exporting for Move…','No se pudo exportar a Move':'Could not export to Move','Muestra · tono y tempo':'Sample · pitch and tempo','Afinar (semitonos)':'Tune (semitones)','Fino (cents)':'Fine (cents)','«Seguir tempo» cambia el tono con el BPM':'“Follow tempo” changes pitch with the BPM','Forma de onda y cortes':'Waveform and cuts','Mixer':'Mixer','Pan':'Pan','Reverb':'Reverb','Los faders cambian el volumen de cada loop; el pan y el envío de reverb están debajo. M = mute, S = solo (con el secuenciador sonando se aplican al siguiente compás).':'Faders set each loop’s volume; pan and reverb send are below. M = mute, S = solo (while the sequencer plays they apply on the next bar).','SampledHead':'SampledHead','Enviar loops y mezcla':'Send loops and mix','Enviar cortes como kit':'Send cuts as kit','Manda a SampledHead la mezcla y los 4 loops, o los cortes de cada loop como pads (A→banco A… hasta 16 por loop). Desde allí puedes exportarlos como kit a MPC, Move, SP-404, Koala o Ableton.':'Sends the mix and the 4 loops to SampledHead, or each loop’s cuts as pads (A→bank A… up to 16 per loop). From there you can export them as a kit to MPC, Move, SP-404, Koala or Ableton.','Preparando…':'Preparing…','No se pudo enviar al sampler':'Could not send to the sampler','Abre SampledHead para recogerlos (Más → Recoger de CrazyHead)':'Open SampledHead to pick them up (More → Pick up from CrazyHead)','Escenas':'Scenes','Guardar escena':'Save scene','@Guardar escena':'@Save scene','@Deshacer':'@Undo','@Rehacer':'@Redo','@Grabar la salida':'@Record output','@Congelar':'@Freeze','Congelar':'Freeze','Loop congelado':'Loop frozen','Loop descongelado':'Loop unfrozen','Escena vacía: pulsa 💾 y luego el número':'Empty scene: tap 💾 then the number','Pulsa el número donde guardar':'Tap the number to save into','Nada que deshacer':'Nothing to undo','Nada que rehacer':'Nothing to redo','Deshecho':'Undone','Rehecho':'Redone','Grabando la salida…':'Recording the output…','Grabación vacía':'Empty recording','Grabación guardada':'Recording saved','Loops intercambiados':'Loops swapped','Loop copiado':'Loop copied','Ya está al tempo':'Already at tempo','Diferencia de tempo demasiado grande (máx. ×2)':'Tempo difference too large (max ×2)','Ajustando al tempo…':'Matching tempo…','Loops':'Loops','Copiar':'Copy','Intercambiar':'Swap','Cancelar':'Cancel','Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.':'Copy duplicates the loop with all its settings and sequence. Swap exchanges the two loops.','Grabar loop':'Record loop','Compases':'Bars','Metrónomo':'Metronome','Cuenta atrás':'Count-in','⏺ Grabar':'⏺ Record','■ Parar':'■ Stop','🎙 Grabar':'🎙 Record','Pulsa «Grabar»':'Press “Record”','Arrastra los marcadores blancos para elegir el inicio y el final.':'Drag the white markers to choose the start and end.','▶ Oír':'▶ Play','✂ Recortar':'✂ Trim','Normalizar':'Normalize','Fundidos':'Fades','Invertir':'Reverse','Original':'Original','Usar como loop':'Use as loop','Si el secuenciador está sonando, la grabación empieza en el siguiente compás y sigue su tempo. Mejor con auriculares para que el micrófono no recoja los altavoces.':'If the sequencer is playing, recording starts on the next bar and follows its tempo. Headphones recommended so the mic does not pick up the speakers.','No se pudo acceder al micrófono':'Could not access the microphone','Esperando el compás…':'Waiting for the bar…','Grabando…':'Recording…','Ajustar al tempo':'Match tempo','Tamaño rev.':'Reverb size','Compresor':'Compressor','Sidechain (bombeo)':'Sidechain (pumping)','Se agacha con los golpes de':'Ducks with hits from','Cantidad':'Amount','Suelta ms':'Release ms','⏺ REC':'⏺ REC','Loop ajustado a':'Loop matched to','Afinar':'Tune','@Orden: los cortes suenan uno tras otro, sin azar':'@Order: cuts play one after another, no randomness','Rendimiento':'Performance','Estable (por defecto) usa más búfer de audio: menos cortes con muchos efectos, a cambio de unos milisegundos más de latencia. Baja latencia responde antes pero puede cortarse. Al cambiarlo hay que recargar la página.':'Stable (default) uses a bigger audio buffer: fewer dropouts with many effects, at the cost of a few ms more latency. Low latency responds sooner but may crackle. Reload the page after changing it.','Modo estable':'Stable mode','Stems':'Stems','📂 Cargar canción':'📂 Load song','Para canciones largas, arrastra sobre la onda para elegir una región (máx. 60 s). Se separa solo la región.':'For long songs, drag on the waveform to choose a region (max 60 s). Only the region is separated.','▶ Oír región':'▶ Play region','Todo / 1.º min':'All / first min','Ajustar al BPM':'Fit to BPM','✂ Separar y cargar en A–D':'✂ Separate and load into A–D','Resultado: A = Batería · B = Bajo · C = Voz · D = Otros. Sustituye lo que haya cargado en A–D.':'Result: A = Drums · B = Bass · C = Vocals · D = Other. Replaces what is loaded in A–D.','Modelo de IA':'AI model','Modo de poca memoria':'Low-memory mode','Modelo desde archivo':'Model from file','Borrar modelo':'Delete model','Modelo htdemucs 6 stems (≈136 MB), se descarga una vez y queda guardado en el dispositivo. Hace falta conexión la primera vez. Ordenador: ≈6 s por cada 7,8 s de audio; móvil, bastante más. Los stems de guitarra y piano se suman a «Otros».':'htdemucs 6-stem model (≈136 MB), downloaded once and kept on the device. A connection is needed the first time. Computer: ≈6 s per 7.8 s of audio; phones, much more. Guitar and piano stems are added to “Other”.','Cargar canción':'Load song','📂 Cargar':'📂 Load','Sonido incluido…':'Built-in sound…','Baterías':'Drums','Teclas (Rhodes)':'Keys (Rhodes)','Bajos':'Basses',
 'Rhodes · arpegio':'Rhodes · arpeggio','Bajo · sub boom bap':'Bass · sub boom bap','Bajo · funk 16avos':'Bass · funk 16ths','Bajo · dub':'Bass · dub','Bajo · walking':'Bass · walking',
 'Quitar':'Remove','Compases del loop':'Loop bars','＋ Marcar':'＋ Mark','▶ Oír':'▶ Listen','Borrar corte':'Delete cut','Cortes':'Cuts','Detectar golpes':'Detect hits','Imán':'Snap','En rejilla':'To grid',
 'Sensibilidad':'Sensitivity','Separación':'Min gap','Secuencia aleatoria':'Random sequence','Seguir':'Follow','🎲 Regenerar':'🎲 Regenerate','Dado':'Dice','Largo':'Length','Rejilla':'Grid',
@@ -1904,7 +2346,7 @@ const EN={
 };
 const EP=[[/^compás (\d+)\/(\d+)$/,'bar $1/$2'],[/^semilla (\d+)$/,'seed $1'],[/^· vacío$/,'· empty'],[/^Cargado: (.*)$/,'Loaded: $1'],[/^(\d+) cortes$/,'$1 cuts'],
  [/^Regenerados (\d+) loops$/,'Regenerated $1 loops'],[/^Listo \((\d+) cortes de más no entran en 16 pads\)$/,'Done ($1 extra cuts don\'t fit in 16 pads)'],
- [/^Cargando…$/,'Loading…'],[/^Loop ([A-D]) seleccionado$/,'Loop $1 selected'],[/^Enviado al sampler: (\d+) sonidos?$/,'Sent to the sampler: $1 sound(s)'],[/^Escena (\d+) en el próximo compás$/,'Scene $1 on the next bar'],[/^Escena (\d+) guardada$/,'Scene $1 saved'],[/^Loop ajustado a (.*) BPM$/,'Loop matched to $1 BPM'],[/^Listo \((\d+) cortes de más no caben en 16 pads por loop\)$/,'Done ($1 extra cuts do not fit in 16 pads per loop)'],[/^Recibido de SampledHead: (\d+) loops?$/,'Received from SampledHead: $1 loop(s)'],[/^No se pudo leer el audio de SampledHead$/,'Could not read the audio from SampledHead'],[/^Cargados (\d+) loops en A–(\w)$/,'Loaded $1 loops into A–$2'],[/^Cargados 4 loops \((\d+) de más sin usar\)$/,'Loaded 4 loops ($1 extra unused)'],[/^Zip no válido$/,'Invalid zip'],[/^No hay audio en los archivos$/,'No audio in the files'],[/^Proyecto guardado$/,'Project saved'],[/^Archivo exportado$/,'File exported'],[/^Archivo no válido$/,'Invalid file'],[/^Error al cargar$/,'Load error'],[/^Se sustituirá el proyecto actual\. ¿Continuar\?$/,'This replaces the current project. Continue?'],[/^¿Borrar este proyecto guardado\?$/,'Delete this saved project?'],[/^Ya existe un proyecto con ese nombre\. ¿Sobrescribir\?$/,'A project with that name exists. Overwrite?'],[/^Listo$/,'Done'],[/^Renderizando…$/,'Rendering…'],[/^MIDI listo$/,'MIDI ready'],[/^Error al renderizar$/,'Render error'],
+ [/^Cargando…$/,'Loading…'],[/^Exportado: (.*)\.ablbundle \((\d+) golpes sin celda\)$/,'Exported: $1.ablbundle ($2 hits without a cell)'],[/^Exportado: (.*)\.ablbundle$/,'Exported: $1.ablbundle'],[/^Loop ([A-D]) seleccionado$/,'Loop $1 selected'],[/^Enviado al sampler: (\d+) sonidos?$/,'Sent to the sampler: $1 sound(s)'],[/^Escena (\d+) en el próximo compás$/,'Scene $1 on the next bar'],[/^Escena (\d+) guardada$/,'Scene $1 saved'],[/^Loop ajustado a (.*) BPM$/,'Loop matched to $1 BPM'],[/^Listo \((\d+) cortes de más no caben en 16 pads por loop\)$/,'Done ($1 extra cuts do not fit in 16 pads per loop)'],[/^Recibido de SampledHead: (\d+) loops?$/,'Received from SampledHead: $1 loop(s)'],[/^No se pudo leer el audio de SampledHead$/,'Could not read the audio from SampledHead'],[/^Cargados (\d+) loops en A–(\w)$/,'Loaded $1 loops into A–$2'],[/^Cargados 4 loops \((\d+) de más sin usar\)$/,'Loaded 4 loops ($1 extra unused)'],[/^Zip no válido$/,'Invalid zip'],[/^No hay audio en los archivos$/,'No audio in the files'],[/^Proyecto guardado$/,'Project saved'],[/^Archivo exportado$/,'File exported'],[/^Archivo no válido$/,'Invalid file'],[/^Error al cargar$/,'Load error'],[/^Se sustituirá el proyecto actual\. ¿Continuar\?$/,'This replaces the current project. Continue?'],[/^¿Borrar este proyecto guardado\?$/,'Delete this saved project?'],[/^Ya existe un proyecto con ese nombre\. ¿Sobrescribir\?$/,'A project with that name exists. Overwrite?'],[/^Listo$/,'Done'],[/^Renderizando…$/,'Rendering…'],[/^MIDI listo$/,'MIDI ready'],[/^Error al renderizar$/,'Render error'],
  [/^No hay loops cargados$/,'No loops loaded'],[/^Nada que regenerar$/,'Nothing to regenerate'],[/^Carga un loop primero$/,'Load a loop first'],[/^Pocos golpes para medir el groove$/,'Too few hits to measure the groove'],
  [/^Groove copiado a los 4 loops$/,'Groove copied to all 4 loops'],[/^Groove copiado del loop$/,'Groove copied from loop'],[/^¿Borrar todos los loops y ajustes\?$/,'Delete all loops and settings?']];
 function tr(s){if(S.lang!=='en')return s;const t=s.trim();if(!t)return s;
@@ -1945,8 +2387,13 @@ const GUIDE={es:`
 <details><summary>Grabar y editar tu loop</summary><div class="g"><ul><li><b>🎙 Grabar</b> (en Loop y cortes) abre la grabadora: elige los compases, con <b>metrónomo</b> y <b>cuenta atrás</b> opcionales. Si el secuenciador suena, empieza en el siguiente compás y sigue su tempo (mejor con auriculares).</li><li>Después arrastra los marcadores blancos y usa <b>Recortar, Normalizar, Fundidos, Invertir</b>; <b>Original</b> deshace. <b>Usar como loop</b> lo carga en el loop elegido, ya cortado por golpes.</li><li><b>Ajustar al tempo</b> estira o encoge el loop al BPM del proyecto <b>sin cambiar el tono</b> (hasta ×2). Funciona mejor con diferencias pequeñas; con golpes muy secos puede suavizarlos.</li><li><b>Afinar</b> y <b>Fino</b> (tarjeta <b>Muestra · tono y tempo</b>, la primera de cada loop) cambian el tono de todo el loop: ±12 semitonos y ±50 cents. Ahí mismo están cargar, grabar, compases y ajustar al tempo.</li><li><b>Mixer</b> (pestaña junto a FX pads): faders con medidor para A–D y Master, pan, envío de reverb, M y S. Toca el nombre del canal para seleccionarlo; doble toque en un fader lo devuelve a 80.</li></ul></div></details>
 <details><summary>Exportar</summary><div class="g"><ul><li><b>WAV mezcla</b> / <b>por loop</b>, con efectos.</li><li><b>MIDI</b>: un canal por loop; nota 36 = corte 1.</li><li><b>Ableton Live</b>: ZIP con un <b>Drum Rack (.adg)</b> por loop, sus cortes en WAV (en Samples/Imported) y la secuencia en .mid. Descomprime todo en una carpeta, arrastra el .adg a una pista MIDI (corte 1 = C1) y el .mid a esa pista.</li><li><b>Koala</b>: un <b>proyecto .koala</b> con los 4 loops en los bancos A–D (máx. 16 cortes usados por loop) y sus 4 secuencias (1–4) con el BPM de CrazyHead. Ábrelo desde Koala.</li></ul></div></details>
 <details><summary>Desde SampledHead</summary><div class="g"><b>Envío directo:</b> en SampledHead pulsa «Enviar a CrazyHead» (Looper, generador o pad). Abre CrazyHead y carga el audio en A–D con su BPM (pide confirmación si ya tenías loops). Hace falta el mismo dominio y navegador. <br><b>Por archivo:</b> En SampledHead exporta las pistas del Looper o del generador (baterías, teclas, bajo) como <b>WAV por pistas (ZIP)</b> o una mezcla/break como WAV. En CrazyHead, <b>⋮ → Importar</b> (o arrastra los archivos a la página): se reparten en A–D por orden de nombre. Con un solo archivo usa <b>Cargar</b> en el loop elegido.</div></details>
+<details><summary>Exportar a Ableton Move</summary><div class="g">Menú ⋮ → <b>Ableton Move · set con 4 pistas</b> crea un <code>.ablbundle</code> (súbelo con Move Manager): cada loop A–D es una pista con un Drum Rack de 16 celdas (sus cortes) y un clip con su secuencia en la primera escena; volumen, pan, mute y solo pasan a la pista. Los cambios de <b>tono</b> de golpes sueltos van como celdas con otra afinación, el <b>reverse</b> como celdas con el corte invertido, los trinados como varias notas y <b>Afinar/Fino</b> en cada celda. El Move solo tiene 16 celdas por pista: se guarda un corte normal de cada uno y las variantes más usadas; el resto vuelve al corte normal. No pasan los FX pads, el stutter, el sidechain, la reverb ni el compresor.</div></details>
 <details><summary>Hacia SampledHead</summary><div class="g">En el menú ⋮ → <b>SampledHead</b>: <b>Enviar loops y mezcla</b> manda la mezcla y los 4 loops a pads libres del sampler; <b>Enviar cortes como kit</b> manda los cortes de cada loop (máx. 16) como pads: A en el banco A, B en el B… En SampledHead: Más → <b>Recoger de CrazyHead</b>. Desde ahí exportas kits a MPC, Move, SP-404, Koala o Ableton. Si el Looper de SampledHead te manda un loop, CrazyHead usa <b>los cortes exactos</b> de lo que tocaste en vez de detectarlos.</div></details>
 <details><summary>Proyectos</summary><div class="g">La app guarda sola lo último que hiciste. En <b>⋮ → Proyectos</b> puedes guardar versiones con nombre, cargarlas, y <b>exportar</b> un archivo <b>.crazyhead</b> (ajustes, secuencias y audio) como copia de seguridad o para otro dispositivo; <b>importar</b> lo carga de nuevo. Cargar un proyecto sustituye el actual.</div></details>
+<details><summary>Tono y tonalidad de la muestra</summary><div class="g">Al cargar un sample se analiza su tono. Si es una sola nota (bajo, melodía) se muestra la <b>nota</b> (La2 +12¢); si es armónico se muestra la <b>tonalidad</b> con su relativa (La menor (Do mayor)). <b>Ahora</b> indica cómo queda tras <b>Afinar / Fino</b> (y «Seguir tempo»). <b>Igualar a A/B/C/D</b> ajusta Afinar y Fino para que el loop quede en el mismo tono que otro. Si el análisis falla, <b>Corregir tono</b> te deja indicarlo a mano. En percusión o ruido dice «sin tono claro». Es una estimación: compruébala de oído.</div></details>
+<details><summary>Stems: separar una canción</summary><div class="g">Pestaña <b>Stems</b>: carga una canción, arrastra sobre la onda para elegir una región (máx. 60 s; para canciones largas elige un trozo), indica los compases y pulsa <b>Separar y cargar en A–D</b>. Resultado: A Batería · B Bajo · C Voz · D Otros (guitarra y piano van a Otros) y el BPM se ajusta a la región. La primera vez descarga un modelo de IA (≈136 MB) que se guarda en el dispositivo; en móvil es lento y puede quedarse sin memoria (usa «Modo de poca memoria» o regiones cortas). Sustituye lo que hubiera en A–D.</div></details>
+<details><summary>Modo Orden (sin azar)</summary><div class="g">El botón <b>123</b> de arriba detiene el azar: cada loop toca sus cortes <b>uno tras otro</b> (1, 2, 3…) a un golpe por paso, al tempo del secuenciador, y vuelve a empezar al terminar los cortes. Respeta los cortes activados (chips), la rejilla (1/4, 1/8, 1/16) y la longitud. Mientras está activo no actúan Regenerar, Dado, Mutación ni los efectos aleatorios. Al desactivarlo vuelve tu patrón anterior (si recargaste la página, se regenera con la misma semilla).</div></details>
+<details><summary>Rendimiento y cortes de audio</summary><div class="g">Si con muchos efectos el audio se corta: usa el <b>Modo estable</b> (⋮ → Rendimiento, activo por defecto; más búfer, unos ms más de latencia), apaga efectos que no uses (el reverb y el compresor solo consumen cuando están activos), baja el número de loops con reverb largo y cierra otras pestañas/apps. Con el dibujo pesado la app reduce sola los fotogramas.</div></details>
 <details><summary>Atajos y límites</summary><div class="g">Ordenador: Espacio = play/stop · 1–4 = elegir loop · R = regenerar. Todo se guarda en el dispositivo. Funciona sin conexión una vez cargada.</div></details>`,
 en:`
 <details open><summary>What is CrazyHead</summary><div class="g">Load up to <b>4 loops</b> (A–D); the app <b>chops them at the hits</b> and generates an <b>independent random sequence</b> for each. Everything plays at the same BPM, but each loop has its own length, groove and effects.</div></details>
@@ -1960,8 +2407,13 @@ en:`
 <details><summary>Record and edit your own loop</summary><div class="g"><ul><li><b>🎙 Record</b> (in Loop and cuts) opens the recorder: choose the bars, with optional <b>metronome</b> and <b>count-in</b>. If the sequencer is playing it starts on the next bar and follows its tempo (headphones recommended).</li><li>Then drag the white markers and use <b>Trim, Normalize, Fades, Reverse</b>; <b>Original</b> undoes. <b>Use as loop</b> loads it into the selected loop, chopped by hits.</li><li><b>Match tempo</b> stretches or shrinks the loop to the project BPM <b>without changing pitch</b> (up to ×2). Best for small differences; very dry hits may get softened.</li><li><b>Tune</b> and <b>Fine</b> (card <b>Sample · pitch and tempo</b>, the first one in each loop) change the pitch of the whole loop: ±12 semitones and ±50 cents. Load, record, bars and match tempo are there too.</li><li><b>Mixer</b> (tab next to FX pads): faders with meters for A–D and Master, pan, reverb send, M and S. Tap a channel name to select it; double-tap a fader to reset it to 80.</li></ul></div></details>
 <details><summary>Export</summary><div class="g"><ul><li><b>WAV mix</b> / <b>per loop</b>, with effects.</li><li><b>MIDI</b>: one channel per loop; note 36 = cut 1.</li><li><b>Ableton Live</b>: ZIP with one <b>Drum Rack (.adg)</b> per loop, its cuts as WAV (in Samples/Imported) and the sequence as .mid. Unzip everything into one folder, drag the .adg onto a MIDI track (cut 1 = C1) and the .mid onto that track.</li><li><b>Koala</b>: a <b>.koala project</b> with the 4 loops in banks A–D (max. 16 used cuts per loop) and their 4 sequences (1–4) at CrazyHead's BPM. Open it from Koala.</li></ul></div></details>
 <details><summary>From SampledHead</summary><div class="g"><b>Direct send:</b> in SampledHead tap “Send to CrazyHead” (Looper, generator or pad). It opens CrazyHead and loads the audio into A–D with its BPM (asks first if you already have loops). Same domain and browser required. <br><b>By file:</b> In SampledHead export the Looper or generator tracks (drums, keys, bass) as <b>WAV per track (ZIP)</b>, or a mix/break as WAV. In CrazyHead use <b>⋮ → Import</b> (or drag the files onto the page): they are spread over A–D in name order. With a single file use <b>Load</b> on the chosen loop.</div></details>
+<details><summary>Export to Ableton Move</summary><div class="g">Menu ⋮ → <b>Ableton Move · 4-track set</b> creates an <code>.ablbundle</code> (upload it with Move Manager): each loop A–D becomes a track with a 16-cell Drum Rack (its cuts) and a clip with its sequence in the first scene; volume, pan, mute and solo carry over. <b>Pitch</b> changes on single hits go as cells with another tuning, <b>reverse</b> as cells with the reversed cut, ratchets as several notes and <b>Tune/Fine</b> on every cell. Move only has 16 cells per track: one plain cut of each is kept plus the most used variants; the rest fall back to the plain cut. FX pads, stutter, sidechain, reverb and compressor are not included.</div></details>
 <details><summary>To SampledHead</summary><div class="g">In the ⋮ menu → <b>SampledHead</b>: <b>Send loops and mix</b> sends the mix and the 4 loops to free sampler pads; <b>Send cuts as kit</b> sends each loop's cuts (max 16) as pads: A in bank A, B in bank B… In SampledHead: More → <b>Pick up from CrazyHead</b>. From there you can export kits to MPC, Move, SP-404, Koala or Ableton. If SampledHead's Looper sends you a loop, CrazyHead uses <b>the exact cuts</b> of what you played instead of detecting them.</div></details>
 <details><summary>Projects</summary><div class="g">The app autosaves your last state. In <b>⋮ → Projects</b> you can save named versions, load them, and <b>export</b> a <b>.crazyhead</b> file (settings, sequences and audio) as a backup or for another device; <b>import</b> loads it back. Loading a project replaces the current one.</div></details>
+<details><summary>Sample pitch and key</summary><div class="g">When a sample loads its pitch is analysed. A single note (bass, melody) shows the <b>note</b> (A2 +12¢); harmonic material shows the <b>key</b> with its relative (A minor (C major)). <b>Now</b> shows the result after <b>Tune / Fine</b> (and “Follow tempo”). <b>Match to A/B/C/D</b> sets Tune and Fine so the loop sits in the same key as another one. If the analysis is wrong, <b>Fix key</b> lets you set it by hand. Percussion or noise reads “No clear pitch”. It is an estimate: check by ear.</div></details>
+<details><summary>Stems: split a song</summary><div class="g"><b>Stems</b> tab: load a song, drag on the waveform to choose a region (max 60 s; for long songs pick a part), set the bars and tap <b>Separate and load into A–D</b>. Result: A Drums · B Bass · C Vocals · D Other (guitar and piano go to Other) and the BPM is set from the region. The first time it downloads an AI model (≈136 MB) that is kept on the device; on phones it is slow and may run out of memory (use “Low-memory mode” or short regions). It replaces whatever is in A–D.</div></details>
+<details><summary>Order mode (no randomness)</summary><div class="g">The <b>123</b> button at the top stops the randomness: each loop plays its cuts <b>one after another</b> (1, 2, 3…), one hit per step, at the sequencer tempo, and starts over when the cuts run out. It respects the enabled cuts (chips), the grid (1/4, 1/8, 1/16) and the length. While active, Regenerate, Dice, Mutation and random effects do nothing. Turning it off brings your previous pattern back (if you reloaded the page, it is regenerated from the same seed).</div></details>
+<details><summary>Performance and audio dropouts</summary><div class="g">If audio crackles with many effects: use <b>Stable mode</b> (⋮ → Performance, on by default; bigger buffer, a few ms more latency), switch off effects you do not use (reverb and compressor only cost CPU while active), use fewer loops with long reverb and close other tabs/apps. With heavy drawing the app lowers its frame rate by itself.</div></details>
 <details><summary>Shortcuts and limits</summary><div class="g">Computer: Space = play/stop · 1–4 = pick loop · R = regenerate. Everything is saved on your device. Works offline once loaded.</div></details>`};
 
 /* ============ ARRANQUE ============ */
@@ -1971,11 +2423,13 @@ function initTop(){
   $('#bm').onclick=()=>setB(S.bpm-1);$('#bp').onclick=()=>setB(S.bpm+1);
   $('#bpm').onchange=e=>setB(+e.target.value||90);
   let taps=[];$('#tap').onclick=()=>{const n=performance.now();if(taps.length&&n-taps[taps.length-1]>2000)taps=[];taps.push(n);if(taps.length>1){taps=taps.slice(-5);const iv=[];for(let i=1;i<taps.length;i++)iv.push(taps[i]-taps[i-1]);setB(60000/(iv.reduce((a,b)=>a+b)/iv.length))}};
+  $('#latb').onclick=()=>{let v=false;try{v=localStorage.getItem('crazyhead.lat')==='1'}catch(e){}try{localStorage.setItem('crazyhead.lat',v?'0':'1')}catch(e){}latUI();toast(LL('Recarga la página para aplicar','Reload the page to apply'))};latUI();
+  $('#ordb').onclick=()=>ordSet(!S.ord);
   $('#genall').onclick=()=>{let k=0;for(let d=0;d<4;d++)if(AUD[d]&&!S.decks[d].lock){regen(d,true);k++}toast(k?'Regenerados '+k+' loops':'Nada que regenerar');syncUI()};
   $('#menu').onclick=()=>$('#sheet').classList.add('show');
   $('#sclose').onclick=()=>$('#sheet').classList.remove('show');
   $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')e.target.classList.remove('show')});
-  $('#exwav').onclick=()=>exportWav(false);$('#exstem').onclick=()=>exportWav(true);$('#exmid').onclick=exportMidi;$('#tosh1').onclick=()=>sendSampler('loops');$('#tosh2').onclick=()=>sendSampler('kit');$('#exabl').onclick=()=>exportDaw('ableton');$('#exkoa').onclick=()=>exportDaw('koala');
+  $('#exwav').onclick=()=>exportWav(false);$('#exstem').onclick=()=>exportWav(true);$('#exmid').onclick=exportMidi;$('#tosh1').onclick=()=>sendSampler('loops');$('#tosh2').onclick=()=>sendSampler('kit');$('#exmove').onclick=exportMove;$('#exabl').onclick=()=>exportDaw('ableton');$('#exkoa').onclick=()=>exportDaw('koala');
   $('#clearall').onclick=()=>{if(!confirm(tr('¿Borrar todos los loops y ajustes?')))return;if(playing)stop();try{localStorage.removeItem(KEY)}catch(e){}for(let d=0;d<4;d++)idbDel('a'+d);location.reload()};
   $('#file').onchange=e=>{const f=e.target.files[0];if(f)loadFile(S.sel,f)};
   document.addEventListener('keydown',e=>{
@@ -2000,11 +2454,12 @@ async function restore(){
   }
 }
 (async function main(){
-  ctx=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});
+  let lowLat=false;try{lowLat=localStorage.getItem('crazyhead.lat')==='1'}catch(e){}
+  ctx=new (window.AudioContext||window.webkitAudioContext)({latencyHint:lowLat?'interactive':'playback'});Sch.la=lowLat?.2:.3;
   ctx.onstatechange=()=>{if(playing&&ctx.state!=='running'&&!document.hidden)ctx.resume().catch(()=>{})};
   await restore();
   eng=new Engine(ctx,S,AUD,false);
-  buildOv();buildScn();initOvDrag();initCopy();buildDeck();initMic();buildMenuKnobs();initKnobs();buildFx();initTop();$('#rec').onclick=recToggle;initProj();initMany();initBridge();initLang();$('#vMix').onclick=()=>setView('mix');buildMix();$('#vLoops').onclick=()=>setView('loops');$('#vFx').onclick=()=>setView('fx');syncUI();fitWf();fitPat();fitGr();
+  buildOv();buildScn();initOvDrag();initCopy();buildDeck();buildStems();initTone();initMic();buildMenuKnobs();initKnobs();buildFx();initTop();$('#rec').onclick=recToggle;initProj();initMany();initBridge();initLang();$('#vMix').onclick=()=>setView('mix');$('#vSt').onclick=()=>setView('st');buildMix();$('#vLoops').onclick=()=>setView('loops');$('#vFx').onclick=()=>setView('fx');syncUI();fitWf();fitPat();fitGr();
   requestAnimationFrame(frame);H.last=hsnap();syncScn();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
