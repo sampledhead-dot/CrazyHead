@@ -109,6 +109,15 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 #mgo.run{background:#ff2a55;border-color:#ff2a55;color:#fff}.go{background:var(--c);color:#111;font-weight:800}
 @media (min-width:900px){.wrap{max-width:1240px}#deck{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}#cLoop{grid-column:1/-1}#ov{display:grid;grid-template-columns:1fr 1fr;gap:6px}.ovrow{margin:0}.sheet .box{max-width:640px}}
 @media (orientation:landscape) and (max-height:520px){.wrap{max-width:none}#deck{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}#cLoop{grid-column:1/-1}#ov{display:grid;grid-template-columns:1fr 1fr;gap:5px}.ovrow{margin:0}.sheet .box{max-height:94vh}}
+.mix{display:flex;gap:6px;margin-top:6px}.mxc{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--p);border:1px solid var(--ln);border-radius:12px;padding:8px 4px}
+.mxc.sel{border-color:var(--k);box-shadow:0 0 0 1px var(--k) inset}.mxc.empty{opacity:.55}.mxc b{color:var(--k);cursor:pointer}
+.mxfm{display:flex;gap:6px;align-items:stretch}.mxm{position:relative;width:8px;height:180px;background:#120629;border-radius:4px;overflow:hidden}
+.mxm i{position:absolute;bottom:0;left:0;right:0;height:0;background:linear-gradient(0deg,#4dff9a,#ffd028 70%,#ff3d7a)}
+.fd{position:relative;width:38px;height:180px;background:#120629;border-radius:8px;touch-action:none;cursor:ns-resize}.fd i{position:absolute;bottom:0;left:0;right:0;background:var(--k);opacity:.3;border-radius:8px}.fd u{position:absolute;left:-3px;right:-3px;height:16px;margin-bottom:-8px;background:var(--k);border-radius:6px;border:2px solid #170a38;box-shadow:0 1px 4px #0008}
+.mxp,.mxr{width:92%;margin:0;accent-color:var(--k)}.mxv{font-variant-numeric:tabular-nums;color:var(--mu);font-size:12px}
+.mxb{display:flex;gap:4px;width:100%;padding:0 3px}.mxb button{flex:1;min-height:34px;padding:2px;font-weight:700}
+.mxb button.on{background:var(--k);color:#111}.mxb button.pend{outline:2px dashed #fff;outline-offset:-2px}.mxmaster{flex:.9}
+@media (min-width:900px){.mix{max-width:760px;margin-left:auto;margin-right:auto}}
 </style>
 </head>
 <body>
@@ -128,8 +137,9 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 <div class="wrap">
   <div id="ov"></div>
   <div id="scn" class="scn"></div>
-  <div class="views"><button id="vLoops" class="on">Loops</button><button id="vFx">FX pads</button><button id="rec" style="flex:0 0 78px" aria-label="Grabar la salida" title="Grabar la salida">⏺ REC</button></div>
+  <div class="views"><button id="vLoops" class="on">Loops</button><button id="vFx">FX pads</button><button id="vMix">Mixer</button><button id="rec" style="flex:0 0 78px" aria-label="Grabar la salida" title="Grabar la salida">⏺ REC</button></div>
   <div id="fxview" style="display:none"></div>
+  <div id="mixview" style="display:none"></div>
   <div id="deck"></div>
 </div>
 
@@ -441,7 +451,7 @@ function wsola(chs,ratio,sr){
 
 /* ============ ESTADO ============ */
 const KEY='crazyhead.v1',COL=['#ffd028','#ff8a00','#ff3d7a','#b57bff'],NM='ABCD';
-const newDeck=i=>({loopBars:2,markers:[],pool:[],len:2,grid:'16',dens:60,sync:40,fid:60,ratch:15,dbl:10,vmin:60,vmax:115,glen:0,rev:8,pitP:0,pitR:5,hum:0,mut:0,tune:0,sc:0,scSrc:0,scR:150,fz:null,
+const newDeck=i=>({loopBars:2,markers:[],pool:[],len:2,grid:'16',dens:60,sync:40,fid:60,ratch:15,dbl:10,vmin:60,vmax:115,glen:0,rev:8,pitP:0,pitR:5,hum:0,mut:0,tune:0,fine:0,sc:0,scSrc:0,scR:150,fz:null,
   seed:(Math.random()*1e9)|0,auto:true,lock:false,mute:false,solo:false,mono:true,follow:false,vol:80,pan:0,src:'',cyc:0,sens:55,gap:70,pat:[],sw:56,swOn:false,gT:new Array(16).fill(0),gV:new Array(16).fill(1),gA:100,rfx:{on:false,trig:'hit',prob:60,amt:60,glide:40,back:true,bySlice:true,vary:false,sl:[],tg:{flt:true,dly:false,dub:false,rev:false,bit:false,drv:false,pan:false,gate:false}},
   fx:{flOn:false,flType:'lowpass',flF:70,flQ:20,btOn:false,bit:8,drOn:false,dr:30,dlOn:false,dlDiv:'8d',dlFb:40,dlMix:35,dbOn:false,dbDiv:'4d',dbFb:55,dbMix:35,rv:0,rvSz:50,cp:0}});
 function loadState(){
@@ -472,7 +482,7 @@ class Engine{
     this.comp=c.createDynamicsCompressor();
     this.comp.threshold.value=-6;this.comp.knee.value=4;this.comp.ratio.value=12;this.comp.attack.value=.003;this.comp.release.value=.12;
     this.mg=c.createGain();
-    this.out.connect(this.comp);this.comp.connect(this.mg);this.mg.connect(c.destination);
+    this.out.connect(this.comp);this.comp.connect(this.mg);this.mg.connect(c.destination);if(!this.off){this.man=c.createAnalyser();this.man.fftSize=512;this.mg.connect(this.man)}
     this.rv=c.createConvolver();this.rvOut=c.createGain();this.rvOut.gain.value=.7;this.rv.connect(this.rvOut);this.rvOut.connect(this.out);
     this.rvSize=-1;this.bitC={};this.drC={};
     this.dk=[0,1,2,3].map(i=>this.build(i));
@@ -495,8 +505,9 @@ class Engine{
     n.fl.connect(n.bt);n.bt.connect(n.bg);n.bg.connect(n.pre);
     n.fl.connect(n.dr);n.dr.connect(n.drg);n.drg.connect(n.pre);
     n.gt=c.createGain();n.sum=c.createGain();n.pre.connect(n.gt);n.gt.connect(n.sum);
+    if(!this.off){n.an=c.createAnalyser();n.an.fftSize=512}
     n.sck=c.createGain();n.cp=c.createDynamicsCompressor();n.cp.knee.value=8;n.cp.attack.value=.01;n.cp.release.value=.15;n.cp.threshold.value=0;n.cp.ratio.value=1;
-    n.pan=c.createStereoPanner();n.vol=c.createGain();n.sum.connect(n.sck);n.sck.connect(n.cp);n.cp.connect(n.pan);n.pan.connect(n.vol);n.vol.connect(this.out);
+    n.pan=c.createStereoPanner();n.vol=c.createGain();n.sum.connect(n.sck);n.sck.connect(n.cp);n.cp.connect(n.pan);n.pan.connect(n.vol);n.vol.connect(this.out);if(n.an)n.vol.connect(n.an);
     n.dlS=c.createGain();n.dlS.gain.value=0;n.dl=c.createDelay(3);n.dlT=c.createBiquadFilter();n.dlT.type='lowpass';n.dlT.frequency.value=4500;n.dlF=c.createGain();n.dlF.gain.value=.4;
     n.pre.connect(n.dlS);n.dlS.connect(n.dl);n.dl.connect(n.dlT);n.dlT.connect(n.sum);n.dlT.connect(n.dlF);n.dlF.connect(n.dl);
     n.dbS=c.createGain();n.dbS.gain.value=0;n.dbH=c.createBiquadFilter();n.dbH.type='highpass';n.dbH.frequency.value=220;
@@ -581,7 +592,7 @@ class Engine{
     const D=this.S.decks[i],A=this.AUD[i];if(!A||!A.buf)return;
     const sg=segsOf(D.markers,A.buf.duration)[h.s];if(!sg)return;
     const ob=D.loopBars*4*60/A.buf.duration;
-    const rate=Math.pow(2,((h.p||0)+(D.tune||0))/12)*(D.follow?this.S.bpm/ob:1);
+    const rate=Math.pow(2,((h.p||0)+(D.tune||0)+(D.fine||0)/100)/12)*(D.follow?this.S.bpm/ob:1);
     if(!(rate>.05&&rate<16))return;
     let dur=(sg.b-sg.a)/rate*h.d;if(h.n>1)dur=Math.min(dur,stepDur/h.n*.95);dur=Math.max(dur,.02);
     let tt=t+h.o*stepDur+(h.t||0)/1000;const now=this.ctx.currentTime;if(tt<now)tt=now;
@@ -914,6 +925,56 @@ async function sendSampler(kind){
     if(u)window.open(u,'_blank');else toast('Abre SampledHead para recogerlos (Más → Recoger de CrazyHead)',4000);
   }catch(e){toast('No se pudo enviar al sampler')}
 }
+/* ---- Mixer (1.7.1) ---- */
+function buildMix(){
+  const ch=i=>`<div class="mxc" data-d="${i}" style="--k:${COL[i]}"><b>${NM[i]}</b>
+    <div class="mxfm"><div class="mxm"><i></i></div><div class="fd mxf" role="slider" aria-label="Volumen ${NM[i]}"><i></i><u></u></div></div>
+    <span class="mxv"></span>
+    <label class="small">Pan</label><input type="range" class="mxp" min="-100" max="100" aria-label="Pan ${NM[i]}">
+    <label class="small">Reverb</label><input type="range" class="mxr" min="0" max="100" aria-label="Reverb ${NM[i]}">
+    <div class="mxb"><button data-act="mute">M</button><button data-act="solo">S</button></div></div>`;
+  $('#mixview').innerHTML=`<div class="mix">${[0,1,2,3].map(ch).join('')}
+    <div class="mxc mxmaster" style="--k:#fff4e0"><b>MASTER</b><div class="mxfm"><div class="mxm"><i></i></div><div class="fd mxf" id="mxmas" role="slider" aria-label="Master"><i></i><u></u></div></div><span class="mxv" id="mxmasv"></span></div></div>
+    <p class="small">Los faders cambian el volumen de cada loop; el pan y el envío de reverb están debajo. M = mute, S = solo (con el secuenciador sonando se aplican al siguiente compás).</p>`;
+  $$('#mixview .mxc[data-d]').forEach(c=>{
+    const d=+c.dataset.d;
+    const on=(sel,fn)=>$(sel,c).addEventListener('input',e=>{fn(S.decks[d],+e.target.value);eng&&eng.applyDeck(d);save();mixSync()});
+    on('.mxp',(D,v)=>D.pan=v);on('.mxr',(D,v)=>D.fx.rv=v);
+    fdBind($('.mxf',c),v=>{S.decks[d].vol=v;eng&&eng.applyDeck(d);save();mixSync()});
+    $$('.mxb button',c).forEach(b=>b.onclick=()=>qToggle(d,b.dataset.act));
+    $('b',c).onclick=()=>{S.sel=d;syncUI();toast('Loop '+NM[d]+' seleccionado')};
+  });
+  fdBind($('#mxmas'),v=>{S.master=v;eng&&eng.applyAll();save();mixSync()});
+  $$('#mixview input[type=range]').forEach(r=>r.addEventListener('dblclick',()=>{const c=r.closest('.mxc'),D=S.decks[+c.dataset.d];if(r.classList.contains('mxp'))D.pan=0;else D.fx.rv=0;eng&&eng.applyAll();save();mixSync()}));
+}
+function fdBind(el,fn){
+  let on=false;const val=e=>{const r=el.getBoundingClientRect();return Math.round(clamp(100*(1-(e.clientY-r.top)/r.height),0,100))};
+  el.addEventListener('pointerdown',e=>{on=true;el.setPointerCapture(e.pointerId);fn(val(e))});
+  el.addEventListener('pointermove',e=>{if(on)fn(val(e))});
+  const up=()=>on=false;el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('dblclick',()=>fn(80));
+}
+function fdSet(el,v){el.querySelector('i').style.height=v+'%';el.querySelector('u').style.bottom=v+'%';el.setAttribute('aria-valuenow',v)}
+function mixSync(){
+  $$('#mixview .mxc[data-d]').forEach(c=>{
+    const d=+c.dataset.d,D=S.decks[d];
+    fdSet($('.mxf',c),D.vol);$('.mxp',c).value=D.pan;$('.mxr',c).value=D.fx.rv;$('.mxv',c).textContent=D.vol;
+    c.classList.toggle('sel',d===S.sel);c.classList.toggle('empty',!AUD[d]);
+    const m=$('[data-act=mute]',c),so=$('[data-act=solo]',c);
+    m.classList.toggle('on',!!D.mute);so.classList.toggle('on',!!D.solo);m.classList.toggle('pend',!!Q.p[d+'mute']);so.classList.toggle('pend',!!Q.p[d+'solo']);
+  });
+  const mm=$('#mxmas');if(mm){fdSet(mm,S.master);$('#mxmasv').textContent=S.master}
+}
+const MXL=[0,0,0,0,0],MXB=new Float32Array(512);
+function mixMeters(){
+  if(!eng||!eng.dk[0].an)return;
+  const els=$$('#mixview .mxm i'),an=[...eng.dk.map(n=>n.an),eng.man];
+  an.forEach((a,k)=>{
+    let pk=0;if(playing){a.getFloatTimeDomainData(MXB);for(let i=0;i<MXB.length;i++){const v=Math.abs(MXB[i]);if(v>pk)pk=v}}
+    MXL[k]=Math.max(pk,MXL[k]*.88);if(els[k])els[k].style.height=Math.min(100,Math.sqrt(MXL[k])*100)+'%';
+  });
+  if(!playing&&MXL.some(v=>v>.002))needs=true;
+}
 /* ============ Grabar con el micrófono + editor básico ============ */
 const MR={data:null,orig:null,sr:44100,a:0,b:1,rec:false,chunks:[],stream:null,node:null,src:null,sink:null,lvl:0,t:0,drag:-1,play:null};
 function micOpen(){
@@ -1141,11 +1202,16 @@ const SG=(k,o,n)=>`<div class="sg" data-k="${k}" ${n?'data-n="1"':''}>${o.map(x=
 const DLY=[['4','1/4'],['8d','1/8.'],['8','1/8'],['16','1/16'],['4t','1/4T']],DUB=[['2','1/2'],['4d','1/4.'],['4','1/4'],['8d','1/8.']];
 function buildDeck(){
   $('#deck').innerHTML=`
-<details class="card" open id="cLoop"><summary>Loop y cortes <span class="small" id="linfo" style="font-weight:400"></span></summary><div class="in">
+<details class="card" open id="cSmp"><summary>Muestra · tono y tempo</summary><div class="in">
   <div class="row"><button id="bload">📂 Cargar</button>
     <select id="democat" aria-label="Tipo"><option value="">Tipo…</option>${['Baterías','Teclas (Rhodes)','Bajos'].map(g=>`<option>${g}</option>`).join('')}</select><select id="demosel" aria-label="Sonido"><option value="">Sonido incluido…</option></select>
     <button id="bremove">Quitar</button><button id="bmic">🎙 Grabar</button></div>
   <div class="row"><span class="small">Compases del loop</span>${SG('loopBars',[[1,'1'],[2,'2'],[4,'4'],[8,'8']],1)}<button id="bbpm">→ BPM</button><button id="bwarp">Ajustar al tempo</button></div>
+  ${KG([knob('Afinar (semitonos)','tune',-12,12),knob('Fino (cents)','fine',-50,50)],'k2')}
+  <div class="row">${T('Seguir tempo','follow')}<span class="small">«Seguir tempo» cambia el tono con el BPM</span></div>
+</div></details>
+
+<details class="card" open id="cLoop"><summary>Forma de onda y cortes <span class="small" id="linfo" style="font-weight:400"></span></summary><div class="in">
   <div class="wfw" id="wfw"><canvas id="wf"></canvas></div>
   <div class="row"><button id="zout">−</button><button id="zin">＋</button><span class="small" id="zlab">zoom 1×</span>
     <button class="tg" id="mmark">＋ Marcar</button><button class="tg" id="mlisten">▶ Oír</button><button id="mdel">Borrar corte</button></div>
@@ -1164,8 +1230,7 @@ function buildDeck(){
   <div class="row"><span class="small">Largo</span>${SG('len',[[1,'1'],[2,'2'],[4,'4'],[8,'8']],1)}<span class="small">Rejilla</span>${SG('grid',[['4','1/4'],['8','1/8'],['16','1/16'],['32','1/32']])}</div>
   ${KG([knob('Densidad','dens',0,100),knob('Síncopa','sync',0,100),knob('Trinados','ratch',0,100),knob('Fidelidad','fid',0,100),
         knob('Doble corte','dbl',0,100),knob('Inverso','rev',0,100),knob('Largo azar','glen',0,100),knob('Memoria ↔ Vivo','mut',0,100)])}
-  ${KG([knob('Afinar','tune',-12,12)],'k2')}
-  <div class="row">${T('Bloquear','lock')}${T('Auto','auto')}${T('Mono','mono')}${T('Seguir tempo','follow')}<span class="small" id="seedl"></span></div>
+  <div class="row">${T('Bloquear','lock')}${T('Auto','auto')}${T('Mono','mono')}<span class="small" id="seedl"></span></div>
   <details class="adv"><summary>Avanzado</summary>
     ${KG([knob('Vel. mín.','vmin',1,127),knob('Vel. máx.','vmax',1,127),knob('Tono azar','pitP',0,100),knob('Tono ±','pitR',1,12),knob('Retraso','hum',0,60)])}
   </details>
@@ -1295,6 +1360,7 @@ function afterChange(k){
 }
 function outUp(el){const o=$('[data-o="'+el.dataset.k+'"]');if(o)o.textContent=el.value+(o.dataset.u||'')}
 function syncUI(){
+  if(typeof mixSync==='function'&&$('#mixview')&&$('#mixview').firstChild)mixSync();
   const D=cur(),d=S.sel,root=$('#deck');
   root.style.setProperty('--c',COL[d]);document.documentElement.style.setProperty('--c',COL[d]);
   $$('.kn[data-k]',root).forEach(el=>{const v=getp(D,el.dataset.k);if(v!==undefined)knobSet(el,v)});
@@ -1421,7 +1487,7 @@ function frame(){
     if(k)q.splice(0,k);
     if(followPh&&PH[S.sel]>=0){const b=Math.floor(PH[S.sel]/16);if(b!==patBar){patBar=b;const pl=$('#plab');if(pl)pl.textContent=tr(`compás ${patBar+1}/${cur().len}`)}}
   }
-  drawOv();if(view==='loops'){drawPat();drawWf();drawGr()}
+  drawOv();if(view==='loops'){drawPat();drawWf();drawGr()}else if(view==='mix')mixMeters();
 }
 
 /* ============ EXPORTAR ============ */
@@ -1642,8 +1708,9 @@ function fxViewSync(){
   $$('.pad').forEach(el=>{const k=el.dataset.p;el.classList.toggle('hold',!!padHold[k]);$('.hd',el).classList.toggle('on',!!padHold[k])});
 }
 function setView(v){
-  view=v;$('#deck').style.display=v==='loops'?'':'none';$('#fxview').style.display=v==='fx'?'':'none';
-  $('#vLoops').classList.toggle('on',v==='loops');$('#vFx').classList.toggle('on',v==='fx');
+  view=v;$('#deck').style.display=v==='loops'?'':'none';$('#fxview').style.display=v==='fx'?'':'none';$('#mixview').style.display=v==='mix'?'':'none';
+  $('#vLoops').classList.toggle('on',v==='loops');$('#vFx').classList.toggle('on',v==='fx');$('#vMix').classList.toggle('on',v==='mix');
+  if(v==='mix'){mixSync();needs=true}
   if(v==='fx'){if(fxT!=='all')fxT=S.sel;fxViewSync()}else{fitWf();fitPat();fitGr()}
 }
 function syncExtra(){
@@ -1814,7 +1881,7 @@ const EN={
 'Loops':'Loops','FX pads':'FX pads','TODOS':'ALL','FILTRO':'FILTER','X freq · Y reson.':'X freq · Y reso.','X bits · Y mezcla':'X bits · Y mix','X cantidad · Y mezcla':'X amount · Y mix',
 'X tiempo · Y realim.':'X time · Y feedback','X cantidad':'X amount','X ritmo · Y corto':'X rate · Y short','TAPE STOP':'TAPE STOP','X duración':'X length','DUB DELAY':'DUB DELAY',
 'Soltar todos los HOLD':'Release all HOLDs','FX aleatorios':'Random FX','(ajustes en cada loop → FX aleatorios)':'(settings in each loop → Random FX)',
-'Loop y cortes':'Loop and cuts','Tipo…':'Type…','SampledHead':'SampledHead','Enviar loops y mezcla':'Send loops and mix','Enviar cortes como kit':'Send cuts as kit','Manda a SampledHead la mezcla y los 4 loops, o los cortes de cada loop como pads (A→banco A… hasta 16 por loop). Desde allí puedes exportarlos como kit a MPC, Move, SP-404, Koala o Ableton.':'Sends the mix and the 4 loops to SampledHead, or each loop’s cuts as pads (A→bank A… up to 16 per loop). From there you can export them as a kit to MPC, Move, SP-404, Koala or Ableton.','Preparando…':'Preparing…','No se pudo enviar al sampler':'Could not send to the sampler','Abre SampledHead para recogerlos (Más → Recoger de CrazyHead)':'Open SampledHead to pick them up (More → Pick up from CrazyHead)','Escenas':'Scenes','Guardar escena':'Save scene','@Guardar escena':'@Save scene','@Deshacer':'@Undo','@Rehacer':'@Redo','@Grabar la salida':'@Record output','@Congelar':'@Freeze','Congelar':'Freeze','Loop congelado':'Loop frozen','Loop descongelado':'Loop unfrozen','Escena vacía: pulsa 💾 y luego el número':'Empty scene: tap 💾 then the number','Pulsa el número donde guardar':'Tap the number to save into','Nada que deshacer':'Nothing to undo','Nada que rehacer':'Nothing to redo','Deshecho':'Undone','Rehecho':'Redone','Grabando la salida…':'Recording the output…','Grabación vacía':'Empty recording','Grabación guardada':'Recording saved','Loops intercambiados':'Loops swapped','Loop copiado':'Loop copied','Ya está al tempo':'Already at tempo','Diferencia de tempo demasiado grande (máx. ×2)':'Tempo difference too large (max ×2)','Ajustando al tempo…':'Matching tempo…','Loops':'Loops','Copiar':'Copy','Intercambiar':'Swap','Cancelar':'Cancel','Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.':'Copy duplicates the loop with all its settings and sequence. Swap exchanges the two loops.','Grabar loop':'Record loop','Compases':'Bars','Metrónomo':'Metronome','Cuenta atrás':'Count-in','⏺ Grabar':'⏺ Record','■ Parar':'■ Stop','🎙 Grabar':'🎙 Record','Pulsa «Grabar»':'Press “Record”','Arrastra los marcadores blancos para elegir el inicio y el final.':'Drag the white markers to choose the start and end.','▶ Oír':'▶ Play','✂ Recortar':'✂ Trim','Normalizar':'Normalize','Fundidos':'Fades','Invertir':'Reverse','Original':'Original','Usar como loop':'Use as loop','Si el secuenciador está sonando, la grabación empieza en el siguiente compás y sigue su tempo. Mejor con auriculares para que el micrófono no recoja los altavoces.':'If the sequencer is playing, recording starts on the next bar and follows its tempo. Headphones recommended so the mic does not pick up the speakers.','No se pudo acceder al micrófono':'Could not access the microphone','Esperando el compás…':'Waiting for the bar…','Grabando…':'Recording…','Ajustar al tempo':'Match tempo','Tamaño rev.':'Reverb size','Compresor':'Compressor','Sidechain (bombeo)':'Sidechain (pumping)','Se agacha con los golpes de':'Ducks with hits from','Cantidad':'Amount','Suelta ms':'Release ms','⏺ REC':'⏺ REC','Loop ajustado a':'Loop matched to','Afinar':'Tune','📂 Cargar':'📂 Load','Sonido incluido…':'Built-in sound…','Baterías':'Drums','Teclas (Rhodes)':'Keys (Rhodes)','Bajos':'Basses',
+'Loop y cortes':'Loop and cuts','Tipo…':'Type…','Muestra · tono y tempo':'Sample · pitch and tempo','Afinar (semitonos)':'Tune (semitones)','Fino (cents)':'Fine (cents)','«Seguir tempo» cambia el tono con el BPM':'“Follow tempo” changes pitch with the BPM','Forma de onda y cortes':'Waveform and cuts','Mixer':'Mixer','Pan':'Pan','Reverb':'Reverb','Los faders cambian el volumen de cada loop; el pan y el envío de reverb están debajo. M = mute, S = solo (con el secuenciador sonando se aplican al siguiente compás).':'Faders set each loop’s volume; pan and reverb send are below. M = mute, S = solo (while the sequencer plays they apply on the next bar).','SampledHead':'SampledHead','Enviar loops y mezcla':'Send loops and mix','Enviar cortes como kit':'Send cuts as kit','Manda a SampledHead la mezcla y los 4 loops, o los cortes de cada loop como pads (A→banco A… hasta 16 por loop). Desde allí puedes exportarlos como kit a MPC, Move, SP-404, Koala o Ableton.':'Sends the mix and the 4 loops to SampledHead, or each loop’s cuts as pads (A→bank A… up to 16 per loop). From there you can export them as a kit to MPC, Move, SP-404, Koala or Ableton.','Preparando…':'Preparing…','No se pudo enviar al sampler':'Could not send to the sampler','Abre SampledHead para recogerlos (Más → Recoger de CrazyHead)':'Open SampledHead to pick them up (More → Pick up from CrazyHead)','Escenas':'Scenes','Guardar escena':'Save scene','@Guardar escena':'@Save scene','@Deshacer':'@Undo','@Rehacer':'@Redo','@Grabar la salida':'@Record output','@Congelar':'@Freeze','Congelar':'Freeze','Loop congelado':'Loop frozen','Loop descongelado':'Loop unfrozen','Escena vacía: pulsa 💾 y luego el número':'Empty scene: tap 💾 then the number','Pulsa el número donde guardar':'Tap the number to save into','Nada que deshacer':'Nothing to undo','Nada que rehacer':'Nothing to redo','Deshecho':'Undone','Rehecho':'Redone','Grabando la salida…':'Recording the output…','Grabación vacía':'Empty recording','Grabación guardada':'Recording saved','Loops intercambiados':'Loops swapped','Loop copiado':'Loop copied','Ya está al tempo':'Already at tempo','Diferencia de tempo demasiado grande (máx. ×2)':'Tempo difference too large (max ×2)','Ajustando al tempo…':'Matching tempo…','Loops':'Loops','Copiar':'Copy','Intercambiar':'Swap','Cancelar':'Cancel','Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.':'Copy duplicates the loop with all its settings and sequence. Swap exchanges the two loops.','Grabar loop':'Record loop','Compases':'Bars','Metrónomo':'Metronome','Cuenta atrás':'Count-in','⏺ Grabar':'⏺ Record','■ Parar':'■ Stop','🎙 Grabar':'🎙 Record','Pulsa «Grabar»':'Press “Record”','Arrastra los marcadores blancos para elegir el inicio y el final.':'Drag the white markers to choose the start and end.','▶ Oír':'▶ Play','✂ Recortar':'✂ Trim','Normalizar':'Normalize','Fundidos':'Fades','Invertir':'Reverse','Original':'Original','Usar como loop':'Use as loop','Si el secuenciador está sonando, la grabación empieza en el siguiente compás y sigue su tempo. Mejor con auriculares para que el micrófono no recoja los altavoces.':'If the sequencer is playing, recording starts on the next bar and follows its tempo. Headphones recommended so the mic does not pick up the speakers.','No se pudo acceder al micrófono':'Could not access the microphone','Esperando el compás…':'Waiting for the bar…','Grabando…':'Recording…','Ajustar al tempo':'Match tempo','Tamaño rev.':'Reverb size','Compresor':'Compressor','Sidechain (bombeo)':'Sidechain (pumping)','Se agacha con los golpes de':'Ducks with hits from','Cantidad':'Amount','Suelta ms':'Release ms','⏺ REC':'⏺ REC','Loop ajustado a':'Loop matched to','Afinar':'Tune','📂 Cargar':'📂 Load','Sonido incluido…':'Built-in sound…','Baterías':'Drums','Teclas (Rhodes)':'Keys (Rhodes)','Bajos':'Basses',
 'Rhodes · arpegio':'Rhodes · arpeggio','Bajo · sub boom bap':'Bass · sub boom bap','Bajo · funk 16avos':'Bass · funk 16ths','Bajo · dub':'Bass · dub','Bajo · walking':'Bass · walking',
 'Quitar':'Remove','Compases del loop':'Loop bars','＋ Marcar':'＋ Mark','▶ Oír':'▶ Listen','Borrar corte':'Delete cut','Cortes':'Cuts','Detectar golpes':'Detect hits','Imán':'Snap','En rejilla':'To grid',
 'Sensibilidad':'Sensitivity','Separación':'Min gap','Secuencia aleatoria':'Random sequence','Seguir':'Follow','🎲 Regenerar':'🎲 Regenerate','Dado':'Dice','Largo':'Length','Rejilla':'Grid',
@@ -1837,7 +1904,7 @@ const EN={
 };
 const EP=[[/^compás (\d+)\/(\d+)$/,'bar $1/$2'],[/^semilla (\d+)$/,'seed $1'],[/^· vacío$/,'· empty'],[/^Cargado: (.*)$/,'Loaded: $1'],[/^(\d+) cortes$/,'$1 cuts'],
  [/^Regenerados (\d+) loops$/,'Regenerated $1 loops'],[/^Listo \((\d+) cortes de más no entran en 16 pads\)$/,'Done ($1 extra cuts don\'t fit in 16 pads)'],
- [/^Cargando…$/,'Loading…'],[/^Enviado al sampler: (\d+) sonidos?$/,'Sent to the sampler: $1 sound(s)'],[/^Escena (\d+) en el próximo compás$/,'Scene $1 on the next bar'],[/^Escena (\d+) guardada$/,'Scene $1 saved'],[/^Loop ajustado a (.*) BPM$/,'Loop matched to $1 BPM'],[/^Listo \((\d+) cortes de más no caben en 16 pads por loop\)$/,'Done ($1 extra cuts do not fit in 16 pads per loop)'],[/^Recibido de SampledHead: (\d+) loops?$/,'Received from SampledHead: $1 loop(s)'],[/^No se pudo leer el audio de SampledHead$/,'Could not read the audio from SampledHead'],[/^Cargados (\d+) loops en A–(\w)$/,'Loaded $1 loops into A–$2'],[/^Cargados 4 loops \((\d+) de más sin usar\)$/,'Loaded 4 loops ($1 extra unused)'],[/^Zip no válido$/,'Invalid zip'],[/^No hay audio en los archivos$/,'No audio in the files'],[/^Proyecto guardado$/,'Project saved'],[/^Archivo exportado$/,'File exported'],[/^Archivo no válido$/,'Invalid file'],[/^Error al cargar$/,'Load error'],[/^Se sustituirá el proyecto actual\. ¿Continuar\?$/,'This replaces the current project. Continue?'],[/^¿Borrar este proyecto guardado\?$/,'Delete this saved project?'],[/^Ya existe un proyecto con ese nombre\. ¿Sobrescribir\?$/,'A project with that name exists. Overwrite?'],[/^Listo$/,'Done'],[/^Renderizando…$/,'Rendering…'],[/^MIDI listo$/,'MIDI ready'],[/^Error al renderizar$/,'Render error'],
+ [/^Cargando…$/,'Loading…'],[/^Loop ([A-D]) seleccionado$/,'Loop $1 selected'],[/^Enviado al sampler: (\d+) sonidos?$/,'Sent to the sampler: $1 sound(s)'],[/^Escena (\d+) en el próximo compás$/,'Scene $1 on the next bar'],[/^Escena (\d+) guardada$/,'Scene $1 saved'],[/^Loop ajustado a (.*) BPM$/,'Loop matched to $1 BPM'],[/^Listo \((\d+) cortes de más no caben en 16 pads por loop\)$/,'Done ($1 extra cuts do not fit in 16 pads per loop)'],[/^Recibido de SampledHead: (\d+) loops?$/,'Received from SampledHead: $1 loop(s)'],[/^No se pudo leer el audio de SampledHead$/,'Could not read the audio from SampledHead'],[/^Cargados (\d+) loops en A–(\w)$/,'Loaded $1 loops into A–$2'],[/^Cargados 4 loops \((\d+) de más sin usar\)$/,'Loaded 4 loops ($1 extra unused)'],[/^Zip no válido$/,'Invalid zip'],[/^No hay audio en los archivos$/,'No audio in the files'],[/^Proyecto guardado$/,'Project saved'],[/^Archivo exportado$/,'File exported'],[/^Archivo no válido$/,'Invalid file'],[/^Error al cargar$/,'Load error'],[/^Se sustituirá el proyecto actual\. ¿Continuar\?$/,'This replaces the current project. Continue?'],[/^¿Borrar este proyecto guardado\?$/,'Delete this saved project?'],[/^Ya existe un proyecto con ese nombre\. ¿Sobrescribir\?$/,'A project with that name exists. Overwrite?'],[/^Listo$/,'Done'],[/^Renderizando…$/,'Rendering…'],[/^MIDI listo$/,'MIDI ready'],[/^Error al renderizar$/,'Render error'],
  [/^No hay loops cargados$/,'No loops loaded'],[/^Nada que regenerar$/,'Nothing to regenerate'],[/^Carga un loop primero$/,'Load a loop first'],[/^Pocos golpes para medir el groove$/,'Too few hits to measure the groove'],
  [/^Groove copiado a los 4 loops$/,'Groove copied to all 4 loops'],[/^Groove copiado del loop$/,'Groove copied from loop'],[/^¿Borrar todos los loops y ajustes\?$/,'Delete all loops and settings?']];
 function tr(s){if(S.lang!=='en')return s;const t=s.trim();if(!t)return s;
@@ -1875,7 +1942,7 @@ const GUIDE={es:`
 <details><summary>FX aleatorios</summary><div class="g"><ul><li>Activa los efectos que quieres que se muevan solos y cuándo: <b>Golpe</b>, 1/16, 1/8, 1/4 o <b>Compás</b>.</li><li><b>Valor por corte</b>: cada corte recibe siempre el mismo valor de efecto.</li><li><b>Volver a la base</b> devuelve el efecto a su valor tras cada disparo (recomendado). Los delays se apagan solos al parar.</li></ul></div></details>
 <details><summary>Groove</summary><div class="g">Arrastra los puntos de arriba (adelantar / atrasar cada 1/16) y las barras de abajo (acento). <b>Groove</b> es cuánto se aplica; <b>Swing</b> mueve los 1/16 pares. Hay presets y <b>Copiar del loop</b> mide el groove de tu audio.</div></details>
 <details><summary>Directo: escenas, congelar y grabar</summary><div class="g"><ul><li><b>M / S</b> (mute / solo) con el secuenciador sonando se aplican <b>al siguiente compás</b>; el botón parpadea en blanco hasta entonces.</li><li><b>❄ Congelar</b>: bloquea el loop y detiene sus mutaciones y regeneraciones; vuelve a pulsarlo para devolverlo a como estaba.</li><li><b>Escenas 1–8</b>: pulsa 💾 y un número para guardar el estado de los 4 loops (mute, mezcla, efectos, secuencias). Pulsa un número para recuperarla (en el siguiente compás si suena).</li><li><b>↶ ↷</b> deshacer y rehacer los últimos 40 cambios de ajustes y secuencias (no deshace cargar un audio nuevo). En ordenador: Ctrl+Z.</li><li><b>⏺ REC</b> graba lo que suena, <b>FX pads incluidos</b>, y descarga un WAV al parar.</li><li><b>Sidechain</b> (Efectos del loop): el loop se «agacha» con cada golpe del loop elegido (por ejemplo un bajo con el bombo). Hay también reverb con tamaño propio y compresor por loop.</li><li><b>Copiar / intercambiar</b>: mantén pulsada la letra de un loop (A–D) y arrástrala sobre otro.</li></ul></div></details>
-<details><summary>Grabar y editar tu loop</summary><div class="g"><ul><li><b>🎙 Grabar</b> (en Loop y cortes) abre la grabadora: elige los compases, con <b>metrónomo</b> y <b>cuenta atrás</b> opcionales. Si el secuenciador suena, empieza en el siguiente compás y sigue su tempo (mejor con auriculares).</li><li>Después arrastra los marcadores blancos y usa <b>Recortar, Normalizar, Fundidos, Invertir</b>; <b>Original</b> deshace. <b>Usar como loop</b> lo carga en el loop elegido, ya cortado por golpes.</li><li><b>Ajustar al tempo</b> estira o encoge el loop al BPM del proyecto <b>sin cambiar el tono</b> (hasta ×2). Funciona mejor con diferencias pequeñas; con golpes muy secos puede suavizarlos.</li><li><b>Afinar</b> cambia el tono de todo el loop ±12 semitonos.</li></ul></div></details>
+<details><summary>Grabar y editar tu loop</summary><div class="g"><ul><li><b>🎙 Grabar</b> (en Loop y cortes) abre la grabadora: elige los compases, con <b>metrónomo</b> y <b>cuenta atrás</b> opcionales. Si el secuenciador suena, empieza en el siguiente compás y sigue su tempo (mejor con auriculares).</li><li>Después arrastra los marcadores blancos y usa <b>Recortar, Normalizar, Fundidos, Invertir</b>; <b>Original</b> deshace. <b>Usar como loop</b> lo carga en el loop elegido, ya cortado por golpes.</li><li><b>Ajustar al tempo</b> estira o encoge el loop al BPM del proyecto <b>sin cambiar el tono</b> (hasta ×2). Funciona mejor con diferencias pequeñas; con golpes muy secos puede suavizarlos.</li><li><b>Afinar</b> y <b>Fino</b> (tarjeta <b>Muestra · tono y tempo</b>, la primera de cada loop) cambian el tono de todo el loop: ±12 semitonos y ±50 cents. Ahí mismo están cargar, grabar, compases y ajustar al tempo.</li><li><b>Mixer</b> (pestaña junto a FX pads): faders con medidor para A–D y Master, pan, envío de reverb, M y S. Toca el nombre del canal para seleccionarlo; doble toque en un fader lo devuelve a 80.</li></ul></div></details>
 <details><summary>Exportar</summary><div class="g"><ul><li><b>WAV mezcla</b> / <b>por loop</b>, con efectos.</li><li><b>MIDI</b>: un canal por loop; nota 36 = corte 1.</li><li><b>Ableton Live</b>: ZIP con un <b>Drum Rack (.adg)</b> por loop, sus cortes en WAV (en Samples/Imported) y la secuencia en .mid. Descomprime todo en una carpeta, arrastra el .adg a una pista MIDI (corte 1 = C1) y el .mid a esa pista.</li><li><b>Koala</b>: un <b>proyecto .koala</b> con los 4 loops en los bancos A–D (máx. 16 cortes usados por loop) y sus 4 secuencias (1–4) con el BPM de CrazyHead. Ábrelo desde Koala.</li></ul></div></details>
 <details><summary>Desde SampledHead</summary><div class="g"><b>Envío directo:</b> en SampledHead pulsa «Enviar a CrazyHead» (Looper, generador o pad). Abre CrazyHead y carga el audio en A–D con su BPM (pide confirmación si ya tenías loops). Hace falta el mismo dominio y navegador. <br><b>Por archivo:</b> En SampledHead exporta las pistas del Looper o del generador (baterías, teclas, bajo) como <b>WAV por pistas (ZIP)</b> o una mezcla/break como WAV. En CrazyHead, <b>⋮ → Importar</b> (o arrastra los archivos a la página): se reparten en A–D por orden de nombre. Con un solo archivo usa <b>Cargar</b> en el loop elegido.</div></details>
 <details><summary>Hacia SampledHead</summary><div class="g">En el menú ⋮ → <b>SampledHead</b>: <b>Enviar loops y mezcla</b> manda la mezcla y los 4 loops a pads libres del sampler; <b>Enviar cortes como kit</b> manda los cortes de cada loop (máx. 16) como pads: A en el banco A, B en el B… En SampledHead: Más → <b>Recoger de CrazyHead</b>. Desde ahí exportas kits a MPC, Move, SP-404, Koala o Ableton. Si el Looper de SampledHead te manda un loop, CrazyHead usa <b>los cortes exactos</b> de lo que tocaste en vez de detectarlos.</div></details>
@@ -1890,7 +1957,7 @@ en:`
 <details><summary>Random FX</summary><div class="g"><ul><li>Switch on the effects you want to move by themselves and when: <b>Hit</b>, 1/16, 1/8, 1/4 or <b>Bar</b>.</li><li><b>Value per cut</b>: each cut always receives the same effect value.</li><li><b>Back to base</b> returns the effect to its value after each trigger (recommended). Delays clear themselves when you stop.</li></ul></div></details>
 <details><summary>Groove</summary><div class="g">Drag the dots on top (push / pull each 1/16) and the bars below (accent). <b>Groove</b> is how much is applied; <b>Swing</b> shifts the even 1/16s. There are presets and <b>Copy from loop</b> measures the groove of your audio.</div></details>
 <details><summary>Live: scenes, freeze and record</summary><div class="g"><ul><li><b>M / S</b> (mute / solo) while the sequencer plays take effect <b>on the next bar</b>; the button blinks white until then.</li><li><b>❄ Freeze</b>: locks the loop and stops its mutations and regenerations; press again to restore it.</li><li><b>Scenes 1–8</b>: tap 💾 then a number to store the state of all 4 loops (mute, mix, effects, sequences). Tap a number to recall it (on the next bar while playing).</li><li><b>↶ ↷</b> undo and redo the last 40 setting and sequence changes (loading a new audio can't be undone). On computer: Ctrl+Z.</li><li><b>⏺ REC</b> records what you hear, <b>FX pads included</b>, and downloads a WAV when stopped.</li><li><b>Sidechain</b> (Loop effects): the loop ducks with every hit of the chosen loop (e.g. a bass with the kick). There is also a per-loop reverb size and compressor.</li><li><b>Copy / swap</b>: press and hold a loop letter (A–D) and drag it onto another.</li></ul></div></details>
-<details><summary>Record and edit your own loop</summary><div class="g"><ul><li><b>🎙 Record</b> (in Loop and cuts) opens the recorder: choose the bars, with optional <b>metronome</b> and <b>count-in</b>. If the sequencer is playing it starts on the next bar and follows its tempo (headphones recommended).</li><li>Then drag the white markers and use <b>Trim, Normalize, Fades, Reverse</b>; <b>Original</b> undoes. <b>Use as loop</b> loads it into the selected loop, chopped by hits.</li><li><b>Match tempo</b> stretches or shrinks the loop to the project BPM <b>without changing pitch</b> (up to ×2). Best for small differences; very dry hits may get softened.</li><li><b>Tune</b> shifts the whole loop ±12 semitones.</li></ul></div></details>
+<details><summary>Record and edit your own loop</summary><div class="g"><ul><li><b>🎙 Record</b> (in Loop and cuts) opens the recorder: choose the bars, with optional <b>metronome</b> and <b>count-in</b>. If the sequencer is playing it starts on the next bar and follows its tempo (headphones recommended).</li><li>Then drag the white markers and use <b>Trim, Normalize, Fades, Reverse</b>; <b>Original</b> undoes. <b>Use as loop</b> loads it into the selected loop, chopped by hits.</li><li><b>Match tempo</b> stretches or shrinks the loop to the project BPM <b>without changing pitch</b> (up to ×2). Best for small differences; very dry hits may get softened.</li><li><b>Tune</b> and <b>Fine</b> (card <b>Sample · pitch and tempo</b>, the first one in each loop) change the pitch of the whole loop: ±12 semitones and ±50 cents. Load, record, bars and match tempo are there too.</li><li><b>Mixer</b> (tab next to FX pads): faders with meters for A–D and Master, pan, reverb send, M and S. Tap a channel name to select it; double-tap a fader to reset it to 80.</li></ul></div></details>
 <details><summary>Export</summary><div class="g"><ul><li><b>WAV mix</b> / <b>per loop</b>, with effects.</li><li><b>MIDI</b>: one channel per loop; note 36 = cut 1.</li><li><b>Ableton Live</b>: ZIP with one <b>Drum Rack (.adg)</b> per loop, its cuts as WAV (in Samples/Imported) and the sequence as .mid. Unzip everything into one folder, drag the .adg onto a MIDI track (cut 1 = C1) and the .mid onto that track.</li><li><b>Koala</b>: a <b>.koala project</b> with the 4 loops in banks A–D (max. 16 used cuts per loop) and their 4 sequences (1–4) at CrazyHead's BPM. Open it from Koala.</li></ul></div></details>
 <details><summary>From SampledHead</summary><div class="g"><b>Direct send:</b> in SampledHead tap “Send to CrazyHead” (Looper, generator or pad). It opens CrazyHead and loads the audio into A–D with its BPM (asks first if you already have loops). Same domain and browser required. <br><b>By file:</b> In SampledHead export the Looper or generator tracks (drums, keys, bass) as <b>WAV per track (ZIP)</b>, or a mix/break as WAV. In CrazyHead use <b>⋮ → Import</b> (or drag the files onto the page): they are spread over A–D in name order. With a single file use <b>Load</b> on the chosen loop.</div></details>
 <details><summary>To SampledHead</summary><div class="g">In the ⋮ menu → <b>SampledHead</b>: <b>Send loops and mix</b> sends the mix and the 4 loops to free sampler pads; <b>Send cuts as kit</b> sends each loop's cuts (max 16) as pads: A in bank A, B in bank B… In SampledHead: More → <b>Pick up from CrazyHead</b>. From there you can export kits to MPC, Move, SP-404, Koala or Ableton. If SampledHead's Looper sends you a loop, CrazyHead uses <b>the exact cuts</b> of what you played instead of detecting them.</div></details>
@@ -1937,7 +2004,7 @@ async function restore(){
   ctx.onstatechange=()=>{if(playing&&ctx.state!=='running'&&!document.hidden)ctx.resume().catch(()=>{})};
   await restore();
   eng=new Engine(ctx,S,AUD,false);
-  buildOv();buildScn();initOvDrag();initCopy();buildDeck();initMic();buildMenuKnobs();initKnobs();buildFx();initTop();$('#rec').onclick=recToggle;initProj();initMany();initBridge();initLang();$('#vLoops').onclick=()=>setView('loops');$('#vFx').onclick=()=>setView('fx');syncUI();fitWf();fitPat();fitGr();
+  buildOv();buildScn();initOvDrag();initCopy();buildDeck();initMic();buildMenuKnobs();initKnobs();buildFx();initTop();$('#rec').onclick=recToggle;initProj();initMany();initBridge();initLang();$('#vMix').onclick=()=>setView('mix');buildMix();$('#vLoops').onclick=()=>setView('loops');$('#vFx').onclick=()=>setView('fx');syncUI();fitWf();fitPat();fitGr();
   requestAnimationFrame(frame);H.last=hsnap();syncScn();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
