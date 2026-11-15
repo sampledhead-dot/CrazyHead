@@ -109,6 +109,8 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 .scn button.full{border-color:var(--c);color:var(--c)}.scn button.cur{background:var(--c);color:#111}.scn button.pend{outline:2px dashed #fff}.scn button.sv{background:#ff3d7a;color:#111}.scn button:disabled{opacity:.35}
 .ovrow button.pend{outline:2px dashed #fff;outline-offset:-2px}.ovrow.drag{opacity:.7;transform:scale(1.02)}.ovrow.drop{box-shadow:0 0 0 2px #fff inset}
 #rec.run{background:#ff2a55;border-color:#ff2a55;color:#fff}
+.mnum{width:88px;min-height:34px;background:var(--p2);color:#fff;border:1px solid var(--ln);border-radius:8px;padding:0 6px}
+#mic .sg button.on{background:var(--c);color:#111}
 .mlv{height:8px;background:#120629;border-radius:4px;overflow:hidden;margin:6px 0}.mlv i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd028,#ff3d7a)}
 #mgo.run{background:#ff2a55;border-color:#ff2a55;color:#fff}.go{background:var(--c);color:#111;font-weight:800}
 @media (min-width:900px){.wrap{max-width:1240px}#deck{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}#cLoop{grid-column:1/-1}#ov{display:grid;grid-template-columns:1fr 1fr;gap:6px}.ovrow{margin:0}.sheet .box{max-width:640px}}
@@ -122,10 +124,12 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 .mxb{display:flex;gap:4px;width:100%;padding:0 3px}.mxb button{flex:1;min-height:34px;padding:2px;font-weight:700}
 .mxb button.on{background:var(--k);color:#111}.mxb button.pend{outline:2px dashed #fff;outline-offset:-2px}.mxmaster{flex:.9}
 @media (min-width:900px){.mix{max-width:760px;margin-left:auto;margin-right:auto}}
+#rptfab{display:none;position:fixed;left:8px;bottom:8px;z-index:90;padding:8px 12px;border-radius:10px;border:1px solid #ff3d7a;background:#3a0f2a;color:#fff;font-size:13px;font-weight:700}
+#appfoot{text-align:center;padding:14px 0 30px;font-size:12px;color:var(--mu);opacity:.75}
 </style>
 </head>
 <body>
-<div id="splash"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48Y2xpcFBhdGggaWQ9ImNsIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjAiLz48L2NsaXBQYXRoPgo8cmFkaWFsR3JhZGllbnQgaWQ9ImJnIiBjeD0iNTAlIiBjeT0iNDIlIiByPSI3NSUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzhhMzVmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzZhMTRlOCIvPjwvcmFkaWFsR3JhZGllbnQ+PGZpbHRlciBpZD0id3YiIHg9Ii0xNSUiIHk9Ii0xNSUiIHdpZHRoPSIxMzAlIiBoZWlnaHQ9IjEzMCUiPjxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjAxMCAwLjAxMyIgbnVtT2N0YXZlcz0iMSIgc2VlZD0iNSIgcmVzdWx0PSJuIi8+PGZlRGlzcGxhY2VtZW50TWFwIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9Im4iIHNjYWxlPSI1NCIgeENoYW5uZWxTZWxlY3Rvcj0iUiIgeUNoYW5uZWxTZWxlY3Rvcj0iRyIgcmVzdWx0PSJkIi8+PGZlR2F1c3NpYW5CbHVyIGluPSJkIiBzdGREZXZpYXRpb249IjEuNCIgcmVzdWx0PSJiIi8+PGZlQ29tcG9uZW50VHJhbnNmZXIgaW49ImIiPjxmZUZ1bmNBIHR5cGU9ImxpbmVhciIgc2xvcGU9IjkiIGludGVyY2VwdD0iLTMuNiIvPjwvZmVDb21wb25lbnRUcmFuc2Zlcj48L2ZpbHRlcj4KPGZpbHRlciBpZD0id3IiIHg9Ii0xMCUiIHk9Ii0xMCUiIHdpZHRoPSIxMjAlIiBoZWlnaHQ9IjEyMCUiPjxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjAwNiIgbnVtT2N0YXZlcz0iMSIgc2VlZD0iMyIgcmVzdWx0PSJuIi8+PGZlRGlzcGxhY2VtZW50TWFwIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9Im4iIHNjYWxlPSIzNCIgeENoYW5uZWxTZWxlY3Rvcj0iUiIgeUNoYW5uZWxTZWxlY3Rvcj0iRyIvPjwvZmlsdGVyPjwvZGVmcz4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsKSI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjYmcpIi8+PGcgZmlsdGVyPSJ1cmwoI3dyKSI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjM2IiByPSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTMxMWM0IiBzdHJva2Utd2lkdGg9IjUiLz48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyMzYiIHI9IjQ1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUzMTFjNCIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjM2IiByPSI3NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTMxMWM0IiBzdHJva2Utd2lkdGg9IjUiLz48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyMzYiIHI9IjkwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTA1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTIwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTM1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTUwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTY1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTgwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTk1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjEwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjI1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjU1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjcwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjg1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzAwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzE1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzMwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzQ1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzYwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzc1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzkwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iNDA1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDI1Nikgc2NhbGUoMS4xMikgdHJhbnNsYXRlKC0yNTYgLTI1NikiPgo8ZyBmaWx0ZXI9InVybCgjd3YpIj48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyMzYiIHI9IjEzNSIgZmlsbD0iI2ZmN2ExZiIvPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzAuMCAzMTAuOCkgcm90YXRlKC0xMzEuMCkiPjxwYXRoIGQ9Ik0xLjMgLTU2LjhRMTcuMiAtNTYuOCAyOC41IC00Ni4zUTM5LjggLTM1LjggNDMuNiAtMTcuN0gxOS43UTE3IC0yNC43IDEyLjEgLTI4LjRRNy4yIC0zMiAxIC0zMlEtOSAtMzIgLTE1LjMgLTIzLjNRLTIxLjUgLTE0LjUgLTIxLjUgMC4xUS0yMS41IDE0LjcgLTE1LjMgMjMuNFEtOSAzMi4yIDEgMzIuMlE3LjIgMzIuMiAxMi4xIDI4LjVRMTcgMjQuOSAxOS43IDE3LjlINDMuNlEzOS44IDM2IDI4LjUgNDYuNFExNy4yIDU2LjggMS4zIDU2LjhRLTExLjcgNTYuOCAtMjEuOSA0OS42US0zMi4yIDQyLjMgLTM3LjkgMjkuNVEtNDMuNiAxNi42IC00My42IDAuMVEtNDMuNiAtMTYuNCAtMzcuOSAtMjkuNFEtMzIuMiAtNDIuMyAtMjEuOSAtNDkuNlEtMTEuNyAtNTYuOCAxLjMgLTU2LjhaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMS4zIC01Ni44UTE3LjIgLTU2LjggMjguNSAtNDYuM1EzOS44IC0zNS44IDQzLjYgLTE3LjdIMTkuN1ExNyAtMjQuNyAxMi4xIC0yOC40UTcuMiAtMzIgMSAtMzJRLTkgLTMyIC0xNS4zIC0yMy4zUS0yMS41IC0xNC41IC0yMS41IDAuMVEtMjEuNSAxNC43IC0xNS4zIDIzLjRRLTkgMzIuMiAxIDMyLjJRNy4yIDMyLjIgMTIuMSAyOC41UTE3IDI0LjkgMTkuNyAxNy45SDQzLjZRMzkuOCAzNiAyOC41IDQ2LjRRMTcuMiA1Ni44IDEuMyA1Ni44US0xMS43IDU2LjggLTIxLjkgNDkuNlEtMzIuMiA0Mi4zIC0zNy45IDI5LjVRLTQzLjYgMTYuNiAtNDMuNiAwLjFRLTQzLjYgLTE2LjQgLTM3LjkgLTI5LjRRLTMyLjIgLTQyLjMgLTIxLjkgLTQ5LjZRLTExLjcgLTU2LjggMS4zIC01Ni44WiIgZmlsbD0iI2ZmYjAwMCIgc3Ryb2tlPSIjZmZiMDAwIiBzdHJva2Utd2lkdGg9IjciIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0My4yIDI1Mi40KSByb3RhdGUoLTk4LjIpIj48cGF0aCBkPSJNMTAuNSA1NS44IC04LjEgMTMuN0gtMTMuM1Y1NS44SC0zNVYtNTUuOEgxLjVRMTIgLTU1LjggMTkuNCAtNTEuMlEyNi45IC00Ni41IDMwLjYgLTM4LjVRMzQuMyAtMzAuNSAzNC4zIC0yMC43UTM0LjMgLTkuNSAyOS4yIC0wLjhRMjQuMiA3LjkgMTQuNCAxMS42TDM1IDU1LjhaTS0xMy4zIC01LjZIMC4yUTYuMiAtNS42IDkuMiAtOS4yUTEyLjEgLTEyLjkgMTIuMSAtMTkuNVExMi4xIC0yNS45IDkuMiAtMjkuNVE2LjIgLTMzLjIgMC4yIC0zMy4ySC0xMy4zWiIgZmlsbD0iIzBhMGExMiIgc3Ryb2tlPSIjMGEwYTEyIiBzdHJva2Utd2lkdGg9IjE1IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEwLjUgNTUuOCAtOC4xIDEzLjdILTEzLjNWNTUuOEgtMzVWLTU1LjhIMS41UTEyIC01NS44IDE5LjQgLTUxLjJRMjYuOSAtNDYuNSAzMC42IC0zOC41UTM0LjMgLTMwLjUgMzQuMyAtMjAuN1EzNC4zIC05LjUgMjkuMiAtMC44UTI0LjIgNy45IDE0LjQgMTEuNkwzNSA1NS44Wk0tMTMuMyAtNS42SDAuMlE2LjIgLTUuNiA5LjIgLTkuMlExMi4xIC0xMi45IDEyLjEgLTE5LjVRMTIuMSAtMjUuOSA5LjIgLTI5LjVRNi4yIC0zMy4yIDAuMiAtMzMuMkgtMTMuM1oiIGZpbGw9IiNmZjhhMDAiIHN0cm9rZT0iI2ZmOGEwMCIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNTIuMyAxODguNykgcm90YXRlKC02NS41KSI+PHBhdGggZD0iTTE2LjUgMzYuMUgtMTYuOEwtMjIuMSA1NS44SC00NC45TC0xMi42IC01NS44SDEyLjZMNDQuOSA1NS44SDIxLjlaTTEwLjkgMTUuMSAtMC4xIC0yNS43IC0xMS4xIDE1LjFaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMTYuNSAzNi4xSC0xNi44TC0yMi4xIDU1LjhILTQ0LjlMLTEyLjYgLTU1LjhIMTIuNkw0NC45IDU1LjhIMjEuOVpNMTAuOSAxNS4xIC0wLjEgLTI1LjcgLTExLjEgMTUuMVoiIGZpbGw9IiNmZmQwMjgiIHN0cm9rZT0iI2ZmZDAyOCIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxOTQuMyAxNDAuMSkgcm90YXRlKC0zMi44KSI+PHBhdGggZD0iTS02LjkgMzMuNUgzMS41VjU1LjhILTMxLjVWMzUuMUw2LjYgLTMzLjVILTMxLjVWLTU1LjhIMzEuNVYtMzUuMVoiIGZpbGw9IiMwYTBhMTIiIHN0cm9rZT0iIzBhMGExMiIgc3Ryb2tlLXdpZHRoPSIxNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0tNi45IDMzLjVIMzEuNVY1NS44SC0zMS41VjM1LjFMNi42IC0zMy41SC0zMS41Vi01NS44SDMxLjVWLTM1LjFaIiBmaWxsPSIjZmY5YTFhIiBzdHJva2U9IiNmZjlhMWEiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2LjAgMTIyLjApIHJvdGF0ZSgwLjApIj48cGF0aCBkPSJNNDEuNyAtNTUuOCAxMC45IDE4LjlWNTUuOEgtMTAuOVYxOC45TC00MS43IC01NS44SC0xNy4xTDAuMiAtOS4xTDE3LjMgLTU1LjhaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNNDEuNyAtNTUuOCAxMC45IDE4LjlWNTUuOEgtMTAuOVYxOC45TC00MS43IC01NS44SC0xNy4xTDAuMiAtOS4xTDE3LjMgLTU1LjhaIiBmaWxsPSIjZmZjMjMzIiBzdHJva2U9IiNmZmMyMzMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzE3LjcgMTQwLjEpIHJvdGF0ZSgzMi44KSI+PHBhdGggZD0iTTM4LjYgLTU1LjhWNTUuOEgxNi45VjkuOEgtMTYuOVY1NS44SC0zOC42Vi01NS44SC0xNi45Vi0xMi4xSDE2LjlWLTU1LjhaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMzguNiAtNTUuOFY1NS44SDE2LjlWOS44SC0xNi45VjU1LjhILTM4LjZWLTU1LjhILTE2LjlWLTEyLjFIMTYuOVYtNTUuOFoiIGZpbGw9IiNmZjNkN2EiIHN0cm9rZT0iI2ZmM2Q3YSIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNTkuNyAxODguNykgcm90YXRlKDY1LjUpIj48cGF0aCBkPSJNLTUuNiAtMzRWLTExLjRIMjMuNVY5LjVILTUuNlYzNEgyNy4zVjU1LjhILTI3LjNWLTU1LjhIMjcuM1YtMzRaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNLTUuNiAtMzRWLTExLjRIMjMuNVY5LjVILTUuNlYzNEgyNy4zVjU1LjhILTI3LjNWLTU1LjhIMjcuM1YtMzRaIiBmaWxsPSIjZmY1YTJhIiBzdHJva2U9IiNmZjVhMmEiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzY4LjggMjUyLjQpIHJvdGF0ZSg5OC4yKSI+PHBhdGggZD0iTTE2LjUgMzYuMUgtMTYuOEwtMjIuMSA1NS44SC00NC45TC0xMi42IC01NS44SDEyLjZMNDQuOSA1NS44SDIxLjlaTTEwLjkgMTUuMSAtMC4xIC0yNS43IC0xMS4xIDE1LjFaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMTYuNSAzNi4xSC0xNi44TC0yMi4xIDU1LjhILTQ0LjlMLTEyLjYgLTU1LjhIMTIuNkw0NC45IDU1LjhIMjEuOVpNMTAuOSAxNS4xIC0wLjEgLTI1LjcgLTExLjEgMTUuMVoiIGZpbGw9IiNmZjJmNmEiIHN0cm9rZT0iI2ZmMmY2YSIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNDIuMCAzMTAuOCkgcm90YXRlKDEzMS4wKSI+PHBhdGggZD0iTTQwLjEgMFE0MC4xIDE2LjQgMzQuMyAyOS4xUTI4LjUgNDEuOCAxNy45IDQ4LjhRNy4zIDU1LjggLTYuNyA1NS44SC00MC4xVi01NS44SC02LjdRNy40IC01NS44IDE4IC00OC44UTI4LjUgLTQxLjggMzQuMyAtMjkuMlE0MC4xIC0xNi41IDQwLjEgMFpNMTggMFExOCAtMTUuNCAxMS4xIC0yNFE0LjMgLTMyLjYgLTguMSAtMzIuNkgtMTguNFYzMi4ySC04LjFRNC4zIDMyLjIgMTEuMSAyMy44UTE4IDE1LjQgMTggMFoiIGZpbGw9IiMwYTBhMTIiIHN0cm9rZT0iIzBhMGExMiIgc3Ryb2tlLXdpZHRoPSIxNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik00MC4xIDBRNDAuMSAxNi40IDM0LjMgMjkuMVEyOC41IDQxLjggMTcuOSA0OC44UTcuMyA1NS44IC02LjcgNTUuOEgtNDAuMVYtNTUuOEgtNi43UTcuNCAtNTUuOCAxOCAtNDguOFEyOC41IC00MS44IDM0LjMgLTI5LjJRNDAuMSAtMTYuNSA0MC4xIDBaTTE4IDBRMTggLTE1LjQgMTEuMSAtMjRRNC4zIC0zMi42IC04LjEgLTMyLjZILTE4LjRWMzIuMkgtOC4xUTQuMyAzMi4yIDExLjEgMjMuOFExOCAxNS40IDE4IDBaIiBmaWxsPSIjZmY2YTJhIiBzdHJva2U9IiNmZjZhMmEiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz48L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNikiPjxwYXRoIGQ9Ik0yMDYgMjE0IFEyMDYgMTg4IDI1NiAxODggUTMwNiAxODggMzA2IDIxNCBMMzA2IDM1MiBRMzA2IDM2MiAyOTYgMzYyIEwyMTYgMzYyIFEyMDYgMzYyIDIwNiAzNTJaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iNiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8ZWxsaXBzZSBjeD0iMjI1IiBjeT0iMjIyIiByeD0iNiIgcnk9IjgiIGZpbGw9IiNmZmU5MmIiLz48ZWxsaXBzZSBjeD0iMjQ3IiBjeT0iMjIyIiByeD0iNiIgcnk9IjgiIGZpbGw9IiNmZmU5MmIiLz48ZWxsaXBzZSBjeD0iMjY5IiBjeT0iMjIyIiByeD0iNiIgcnk9IjgiIGZpbGw9IiNmZmU5MmIiLz48ZWxsaXBzZSBjeD0iMjkxIiBjeT0iMjIyIiByeD0iNiIgcnk9IjgiIGZpbGw9IiNmZmU5MmIiLz4KPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjYyIiByPSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZlOTJiIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1kYXNoYXJyYXk9IjI2IDgiLz4KPHBhdGggZD0iTTI1MCAyNTIgcS04IDEwIDAgMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZTkyYiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPHJlY3QgeD0iMjIzIiB5PSIzMDgiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyNDAiIHk9IjMwOCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjI1NyIgeT0iMzA4IiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjc0IiB5PSIzMDgiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyMjMiIHk9IjMyMiIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjI0MCIgeT0iMzIyIiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjU3IiB5PSIzMjIiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyNzQiIHk9IjMyMiIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjIyMyIgeT0iMzM2IiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjQwIiB5PSIzMzYiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyNTciIHk9IjMzNiIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjI3NCIgeT0iMzM2IiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjIzIiB5PSIzNTAiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyNDAiIHk9IjM1MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjI1NyIgeT0iMzUwIiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjc0IiB5PSIzNTAiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48L2c+CjwvZz48L2c+PC9zdmc+" alt="CrazyHead"><h1>CrazyHead</h1><div class="ver">v1.15</div><div class="by">By SampledHead</div></div>
+<div id="splash"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48Y2xpcFBhdGggaWQ9ImNsIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjAiLz48L2NsaXBQYXRoPgo8cmFkaWFsR3JhZGllbnQgaWQ9ImJnIiBjeD0iNTAlIiBjeT0iNDIlIiByPSI3NSUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzhhMzVmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzZhMTRlOCIvPjwvcmFkaWFsR3JhZGllbnQ+PGZpbHRlciBpZD0id3YiIHg9Ii0xNSUiIHk9Ii0xNSUiIHdpZHRoPSIxMzAlIiBoZWlnaHQ9IjEzMCUiPjxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjAxMCAwLjAxMyIgbnVtT2N0YXZlcz0iMSIgc2VlZD0iNSIgcmVzdWx0PSJuIi8+PGZlRGlzcGxhY2VtZW50TWFwIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9Im4iIHNjYWxlPSI1NCIgeENoYW5uZWxTZWxlY3Rvcj0iUiIgeUNoYW5uZWxTZWxlY3Rvcj0iRyIgcmVzdWx0PSJkIi8+PGZlR2F1c3NpYW5CbHVyIGluPSJkIiBzdGREZXZpYXRpb249IjEuNCIgcmVzdWx0PSJiIi8+PGZlQ29tcG9uZW50VHJhbnNmZXIgaW49ImIiPjxmZUZ1bmNBIHR5cGU9ImxpbmVhciIgc2xvcGU9IjkiIGludGVyY2VwdD0iLTMuNiIvPjwvZmVDb21wb25lbnRUcmFuc2Zlcj48L2ZpbHRlcj4KPGZpbHRlciBpZD0id3IiIHg9Ii0xMCUiIHk9Ii0xMCUiIHdpZHRoPSIxMjAlIiBoZWlnaHQ9IjEyMCUiPjxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjAwNiIgbnVtT2N0YXZlcz0iMSIgc2VlZD0iMyIgcmVzdWx0PSJuIi8+PGZlRGlzcGxhY2VtZW50TWFwIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9Im4iIHNjYWxlPSIzNCIgeENoYW5uZWxTZWxlY3Rvcj0iUiIgeUNoYW5uZWxTZWxlY3Rvcj0iRyIvPjwvZmlsdGVyPjwvZGVmcz4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsKSI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjYmcpIi8+PGcgZmlsdGVyPSJ1cmwoI3dyKSI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjM2IiByPSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTMxMWM0IiBzdHJva2Utd2lkdGg9IjUiLz48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyMzYiIHI9IjQ1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUzMTFjNCIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjM2IiByPSI3NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTMxMWM0IiBzdHJva2Utd2lkdGg9IjUiLz48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyMzYiIHI9IjkwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTA1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTIwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTM1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTUwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTY1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTgwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMTk1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjEwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjI1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjU1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjcwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMjg1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzAwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzE1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzMwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzQ1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzYwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzc1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iMzkwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzNiIgcj0iNDA1IiBmaWxsPSJub25lIiBzdHJva2U9IiM1MzExYzQiIHN0cm9rZS13aWR0aD0iNSIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDI1Nikgc2NhbGUoMS4xMikgdHJhbnNsYXRlKC0yNTYgLTI1NikiPgo8ZyBmaWx0ZXI9InVybCgjd3YpIj48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyMzYiIHI9IjEzNSIgZmlsbD0iI2ZmN2ExZiIvPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzAuMCAzMTAuOCkgcm90YXRlKC0xMzEuMCkiPjxwYXRoIGQ9Ik0xLjMgLTU2LjhRMTcuMiAtNTYuOCAyOC41IC00Ni4zUTM5LjggLTM1LjggNDMuNiAtMTcuN0gxOS43UTE3IC0yNC43IDEyLjEgLTI4LjRRNy4yIC0zMiAxIC0zMlEtOSAtMzIgLTE1LjMgLTIzLjNRLTIxLjUgLTE0LjUgLTIxLjUgMC4xUS0yMS41IDE0LjcgLTE1LjMgMjMuNFEtOSAzMi4yIDEgMzIuMlE3LjIgMzIuMiAxMi4xIDI4LjVRMTcgMjQuOSAxOS43IDE3LjlINDMuNlEzOS44IDM2IDI4LjUgNDYuNFExNy4yIDU2LjggMS4zIDU2LjhRLTExLjcgNTYuOCAtMjEuOSA0OS42US0zMi4yIDQyLjMgLTM3LjkgMjkuNVEtNDMuNiAxNi42IC00My42IDAuMVEtNDMuNiAtMTYuNCAtMzcuOSAtMjkuNFEtMzIuMiAtNDIuMyAtMjEuOSAtNDkuNlEtMTEuNyAtNTYuOCAxLjMgLTU2LjhaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMS4zIC01Ni44UTE3LjIgLTU2LjggMjguNSAtNDYuM1EzOS44IC0zNS44IDQzLjYgLTE3LjdIMTkuN1ExNyAtMjQuNyAxMi4xIC0yOC40UTcuMiAtMzIgMSAtMzJRLTkgLTMyIC0xNS4zIC0yMy4zUS0yMS41IC0xNC41IC0yMS41IDAuMVEtMjEuNSAxNC43IC0xNS4zIDIzLjRRLTkgMzIuMiAxIDMyLjJRNy4yIDMyLjIgMTIuMSAyOC41UTE3IDI0LjkgMTkuNyAxNy45SDQzLjZRMzkuOCAzNiAyOC41IDQ2LjRRMTcuMiA1Ni44IDEuMyA1Ni44US0xMS43IDU2LjggLTIxLjkgNDkuNlEtMzIuMiA0Mi4zIC0zNy45IDI5LjVRLTQzLjYgMTYuNiAtNDMuNiAwLjFRLTQzLjYgLTE2LjQgLTM3LjkgLTI5LjRRLTMyLjIgLTQyLjMgLTIxLjkgLTQ5LjZRLTExLjcgLTU2LjggMS4zIC01Ni44WiIgZmlsbD0iI2ZmYjAwMCIgc3Ryb2tlPSIjZmZiMDAwIiBzdHJva2Utd2lkdGg9IjciIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0My4yIDI1Mi40KSByb3RhdGUoLTk4LjIpIj48cGF0aCBkPSJNMTAuNSA1NS44IC04LjEgMTMuN0gtMTMuM1Y1NS44SC0zNVYtNTUuOEgxLjVRMTIgLTU1LjggMTkuNCAtNTEuMlEyNi45IC00Ni41IDMwLjYgLTM4LjVRMzQuMyAtMzAuNSAzNC4zIC0yMC43UTM0LjMgLTkuNSAyOS4yIC0wLjhRMjQuMiA3LjkgMTQuNCAxMS42TDM1IDU1LjhaTS0xMy4zIC01LjZIMC4yUTYuMiAtNS42IDkuMiAtOS4yUTEyLjEgLTEyLjkgMTIuMSAtMTkuNVExMi4xIC0yNS45IDkuMiAtMjkuNVE2LjIgLTMzLjIgMC4yIC0zMy4ySC0xMy4zWiIgZmlsbD0iIzBhMGExMiIgc3Ryb2tlPSIjMGEwYTEyIiBzdHJva2Utd2lkdGg9IjE1IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEwLjUgNTUuOCAtOC4xIDEzLjdILTEzLjNWNTUuOEgtMzVWLTU1LjhIMS41UTEyIC01NS44IDE5LjQgLTUxLjJRMjYuOSAtNDYuNSAzMC42IC0zOC41UTM0LjMgLTMwLjUgMzQuMyAtMjAuN1EzNC4zIC05LjUgMjkuMiAtMC44UTI0LjIgNy45IDE0LjQgMTEuNkwzNSA1NS44Wk0tMTMuMyAtNS42SDAuMlE2LjIgLTUuNiA5LjIgLTkuMlExMi4xIC0xMi45IDEyLjEgLTE5LjVRMTIuMSAtMjUuOSA5LjIgLTI5LjVRNi4yIC0zMy4yIDAuMiAtMzMuMkgtMTMuM1oiIGZpbGw9IiNmZjhhMDAiIHN0cm9rZT0iI2ZmOGEwMCIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNTIuMyAxODguNykgcm90YXRlKC02NS41KSI+PHBhdGggZD0iTTE2LjUgMzYuMUgtMTYuOEwtMjIuMSA1NS44SC00NC45TC0xMi42IC01NS44SDEyLjZMNDQuOSA1NS44SDIxLjlaTTEwLjkgMTUuMSAtMC4xIC0yNS43IC0xMS4xIDE1LjFaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMTYuNSAzNi4xSC0xNi44TC0yMi4xIDU1LjhILTQ0LjlMLTEyLjYgLTU1LjhIMTIuNkw0NC45IDU1LjhIMjEuOVpNMTAuOSAxNS4xIC0wLjEgLTI1LjcgLTExLjEgMTUuMVoiIGZpbGw9IiNmZmQwMjgiIHN0cm9rZT0iI2ZmZDAyOCIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxOTQuMyAxNDAuMSkgcm90YXRlKC0zMi44KSI+PHBhdGggZD0iTS02LjkgMzMuNUgzMS41VjU1LjhILTMxLjVWMzUuMUw2LjYgLTMzLjVILTMxLjVWLTU1LjhIMzEuNVYtMzUuMVoiIGZpbGw9IiMwYTBhMTIiIHN0cm9rZT0iIzBhMGExMiIgc3Ryb2tlLXdpZHRoPSIxNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0tNi45IDMzLjVIMzEuNVY1NS44SC0zMS41VjM1LjFMNi42IC0zMy41SC0zMS41Vi01NS44SDMxLjVWLTM1LjFaIiBmaWxsPSIjZmY5YTFhIiBzdHJva2U9IiNmZjlhMWEiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2LjAgMTIyLjApIHJvdGF0ZSgwLjApIj48cGF0aCBkPSJNNDEuNyAtNTUuOCAxMC45IDE4LjlWNTUuOEgtMTAuOVYxOC45TC00MS43IC01NS44SC0xNy4xTDAuMiAtOS4xTDE3LjMgLTU1LjhaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNNDEuNyAtNTUuOCAxMC45IDE4LjlWNTUuOEgtMTAuOVYxOC45TC00MS43IC01NS44SC0xNy4xTDAuMiAtOS4xTDE3LjMgLTU1LjhaIiBmaWxsPSIjZmZjMjMzIiBzdHJva2U9IiNmZmMyMzMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzE3LjcgMTQwLjEpIHJvdGF0ZSgzMi44KSI+PHBhdGggZD0iTTM4LjYgLTU1LjhWNTUuOEgxNi45VjkuOEgtMTYuOVY1NS44SC0zOC42Vi01NS44SC0xNi45Vi0xMi4xSDE2LjlWLTU1LjhaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMzguNiAtNTUuOFY1NS44SDE2LjlWOS44SC0xNi45VjU1LjhILTM4LjZWLTU1LjhILTE2LjlWLTEyLjFIMTYuOVYtNTUuOFoiIGZpbGw9IiNmZjNkN2EiIHN0cm9rZT0iI2ZmM2Q3YSIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNTkuNyAxODguNykgcm90YXRlKDY1LjUpIj48cGF0aCBkPSJNLTUuNiAtMzRWLTExLjRIMjMuNVY5LjVILTUuNlYzNEgyNy4zVjU1LjhILTI3LjNWLTU1LjhIMjcuM1YtMzRaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNLTUuNiAtMzRWLTExLjRIMjMuNVY5LjVILTUuNlYzNEgyNy4zVjU1LjhILTI3LjNWLTU1LjhIMjcuM1YtMzRaIiBmaWxsPSIjZmY1YTJhIiBzdHJva2U9IiNmZjVhMmEiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzY4LjggMjUyLjQpIHJvdGF0ZSg5OC4yKSI+PHBhdGggZD0iTTE2LjUgMzYuMUgtMTYuOEwtMjIuMSA1NS44SC00NC45TC0xMi42IC01NS44SDEyLjZMNDQuOSA1NS44SDIxLjlaTTEwLjkgMTUuMSAtMC4xIC0yNS43IC0xMS4xIDE1LjFaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iMTUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMTYuNSAzNi4xSC0xNi44TC0yMi4xIDU1LjhILTQ0LjlMLTEyLjYgLTU1LjhIMTIuNkw0NC45IDU1LjhIMjEuOVpNMTAuOSAxNS4xIC0wLjEgLTI1LjcgLTExLjEgMTUuMVoiIGZpbGw9IiNmZjJmNmEiIHN0cm9rZT0iI2ZmMmY2YSIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNDIuMCAzMTAuOCkgcm90YXRlKDEzMS4wKSI+PHBhdGggZD0iTTQwLjEgMFE0MC4xIDE2LjQgMzQuMyAyOS4xUTI4LjUgNDEuOCAxNy45IDQ4LjhRNy4zIDU1LjggLTYuNyA1NS44SC00MC4xVi01NS44SC02LjdRNy40IC01NS44IDE4IC00OC44UTI4LjUgLTQxLjggMzQuMyAtMjkuMlE0MC4xIC0xNi41IDQwLjEgMFpNMTggMFExOCAtMTUuNCAxMS4xIC0yNFE0LjMgLTMyLjYgLTguMSAtMzIuNkgtMTguNFYzMi4ySC04LjFRNC4zIDMyLjIgMTEuMSAyMy44UTE4IDE1LjQgMTggMFoiIGZpbGw9IiMwYTBhMTIiIHN0cm9rZT0iIzBhMGExMiIgc3Ryb2tlLXdpZHRoPSIxNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik00MC4xIDBRNDAuMSAxNi40IDM0LjMgMjkuMVEyOC41IDQxLjggMTcuOSA0OC44UTcuMyA1NS44IC02LjcgNTUuOEgtNDAuMVYtNTUuOEgtNi43UTcuNCAtNTUuOCAxOCAtNDguOFEyOC41IC00MS44IDM0LjMgLTI5LjJRNDAuMSAtMTYuNSA0MC4xIDBaTTE4IDBRMTggLTE1LjQgMTEuMSAtMjRRNC4zIC0zMi42IC04LjEgLTMyLjZILTE4LjRWMzIuMkgtOC4xUTQuMyAzMi4yIDExLjEgMjMuOFExOCAxNS40IDE4IDBaIiBmaWxsPSIjZmY2YTJhIiBzdHJva2U9IiNmZjZhMmEiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz48L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNikiPjxwYXRoIGQ9Ik0yMDYgMjE0IFEyMDYgMTg4IDI1NiAxODggUTMwNiAxODggMzA2IDIxNCBMMzA2IDM1MiBRMzA2IDM2MiAyOTYgMzYyIEwyMTYgMzYyIFEyMDYgMzYyIDIwNiAzNTJaIiBmaWxsPSIjMGEwYTEyIiBzdHJva2U9IiMwYTBhMTIiIHN0cm9rZS13aWR0aD0iNiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8ZWxsaXBzZSBjeD0iMjI1IiBjeT0iMjIyIiByeD0iNiIgcnk9IjgiIGZpbGw9IiNmZmU5MmIiLz48ZWxsaXBzZSBjeD0iMjQ3IiBjeT0iMjIyIiByeD0iNiIgcnk9IjgiIGZpbGw9IiNmZmU5MmIiLz48ZWxsaXBzZSBjeD0iMjY5IiBjeT0iMjIyIiByeD0iNiIgcnk9IjgiIGZpbGw9IiNmZmU5MmIiLz48ZWxsaXBzZSBjeD0iMjkxIiBjeT0iMjIyIiByeD0iNiIgcnk9IjgiIGZpbGw9IiNmZmU5MmIiLz4KPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjYyIiByPSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZlOTJiIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1kYXNoYXJyYXk9IjI2IDgiLz4KPHBhdGggZD0iTTI1MCAyNTIgcS04IDEwIDAgMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZTkyYiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPHJlY3QgeD0iMjIzIiB5PSIzMDgiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyNDAiIHk9IjMwOCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjI1NyIgeT0iMzA4IiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjc0IiB5PSIzMDgiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyMjMiIHk9IjMyMiIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjI0MCIgeT0iMzIyIiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjU3IiB5PSIzMjIiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyNzQiIHk9IjMyMiIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjIyMyIgeT0iMzM2IiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjQwIiB5PSIzMzYiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyNTciIHk9IjMzNiIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjI3NCIgeT0iMzM2IiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjIzIiB5PSIzNTAiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48cmVjdCB4PSIyNDAiIHk9IjM1MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI2ZmZTkyYiIvPjxyZWN0IHg9IjI1NyIgeT0iMzUwIiB3aWR0aD0iMTMiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjZmZlOTJiIi8+PHJlY3QgeD0iMjc0IiB5PSIzNTAiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNmZmU5MmIiLz48L2c+CjwvZz48L2c+PC9zdmc+" alt="CrazyHead"><h1>CrazyHead</h1><div class="ver">v1.16</div><div class="by">By SampledHead</div></div>
 <div class="top"><div class="wrap">
   <button id="play" aria-label="Reproducir / parar">▶</button>
   <div class="bpmbox">
@@ -147,6 +151,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <div id="stview" style="display:none"></div>
   <div id="deck"></div>
 </div>
+<div id="appfoot"></div>
 
 <div class="sheet" id="sheet"><div class="box">
   <button class="x" id="sclose">✕</button>
@@ -177,6 +182,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <div class="row"><button id="bproj">📁 Proyectos</button><button id="newproj">🆕 Nuevo proyecto</button></div>
   <div class="sub">Rendimiento</div>
   <div class="row"><button id="latb">Modo estable</button></div>
+  <div class="row"><button id="rptbtn">Descargar informe (.txt)</button></div>
   <p class="small">Estable (por defecto) usa más búfer de audio: menos cortes con muchos efectos, a cambio de unos milisegundos más de latencia. Baja latencia responde antes pero puede cortarse. Al cambiarlo hay que recargar la página.</p>
   <div class="sub">Idioma / Language</div>
   <div class="langs"><button data-lang="es">🇪🇸 Español</button><button data-lang="en">🇬🇧 English</button></div>
@@ -190,25 +196,70 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <div class="row"><button id="pexp">Exportar archivo</button><button id="pimp">Importar archivo</button></div>
   <div class="small">El archivo .crazyhead lleva ajustes, secuencias y audio. Sirve de copia de seguridad o para pasarlo a otro dispositivo.</div>
   <input type="file" id="pfile" accept=".crazyhead,application/octet-stream" hidden></div></div>
-<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.15 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
+<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.16 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
 <div class="sheet" id="cpsheet"><div class="box"><h3>Loops</h3><p class="small" style="font-size:15px;font-weight:700" id="cptxt"></p>
   <div class="row"><button id="cpcopy">Copiar</button><button id="cpswap">Intercambiar</button><button id="cpno">Cancelar</button></div>
   <p class="small">Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.</p></div></div>
-<div class="sheet" id="mic"><div class="box"><button class="x" id="mclose">✕</button><h3>Grabar loop <span id="mtgt"></span></h3>
-  <div class="row"><span class="small">Compases</span><select id="mbars"><option>1</option><option>2</option><option>4</option><option>8</option></select>
-    <button class="tg on" id="mmet">Metrónomo</button><button class="tg on" id="mcnt">Cuenta atrás</button></div>
-  <div class="mlv"><i id="mlvl"></i></div>
-  <div class="row"><button id="mgo">⏺ Grabar</button><span class="small" id="mstat"></span><span class="small" id="minfo"></span></div>
-  <canvas id="mwf" style="width:100%;height:110px;display:block;border-radius:8px;touch-action:none"></canvas>
-  <div class="small">Arrastra los marcadores blancos para elegir el inicio y el final.</div>
-  <div class="row"><button id="mplay">▶ Oír</button><button id="mtrim">✂ Recortar</button><button id="mnorm">Normalizar</button><button id="mfade">Fundidos</button><button id="mrev">Invertir</button><button id="mundo">Original</button></div>
-  <div class="row"><button id="muse" class="go">Usar como loop</button></div>
-  <p class="small">Si el secuenciador está sonando, la grabación empieza en el siguiente compás y sigue su tempo. Mejor con auriculares para que el micrófono no recoja los altavoces.</p></div></div>
+<div class="sheet" id="mic"><div class="box"><button class="x" id="mclose">✕</button><h3>Grabar muestra <span id="mtgt"></span></h3>
+  <div class="row"><span class="small">Entrada</span><select id="mdev" style="max-width:62%"></select><button id="mref" title="Actualizar lista">↻</button></div>
+  <div class="row"><span class="small">Canales</span><select id="mch"><option value="1">Mono</option><option value="2">Estéreo</option></select>
+    <span class="small">Ganancia</span><input type="range" id="mgain" min="0" max="300" value="100" style="flex:1;min-width:90px"><span class="small" id="mgl">100%</span>
+    <button class="tg" id="mmon" title="Oír la entrada (usa auriculares)">🎧 Monitor</button></div>
+  <div class="row"><span class="small">Modo</span><div class="sg" id="mmode"><button data-v="free" class="on">Libre</button><button data-v="bars">Por compases</button></div>
+    <span id="mfree" class="row" style="margin:0"><button class="tg" id="mthr" title="Empieza a grabar cuando entra sonido">Esperar sonido</button></span>
+    <span id="mbarsw" class="row" style="margin:0;display:none"><select id="mbars"><option>1</option><option>2</option><option>4</option><option>8</option></select><button class="tg on" id="mmet">Metrónomo</button><button class="tg on" id="mcnt">Cuenta atrás</button></span></div>
+  <div class="mlv"><i id="mlvl"></i></div><div class="small" id="mdb">—</div>
+  <div class="row"><button id="mgo">⏺ Grabar</button><span class="small" id="mstat"></span><span class="small" id="mtime"></span><span style="flex:1"></span><button id="mopen">📂 Abrir audio</button></div>
+  <canvas id="mwf" style="width:100%;height:170px;display:block;border:1px solid var(--ln);border-radius:10px 10px 0 0;touch-action:none;background:#120629"></canvas>
+  <canvas id="mov" style="width:100%;height:36px;display:block;border:1px solid var(--ln);border-top:0;border-radius:0 0 10px 10px;touch-action:none;background:#120629;margin-bottom:6px"></canvas>
+  <div class="small">Arrastra sobre la onda para elegir inicio y final, o mueve los bordes. Rueda o pellizco = zoom; el mapa de abajo desplaza.</div>
+  <div class="row"><button id="mzo">−</button><button id="mzi">＋</button><button id="mzr">Ver selección</button><button id="mza">Ver todo</button>
+    <span class="small">Inicio</span><input id="mna" type="number" step="0.001" min="0" class="mnum"><span class="small">Fin</span><input id="mnb" type="number" step="0.001" min="0" class="mnum">
+    <button class="tg on" id="mzc" title="Ajusta los bordes al cruce por cero más cercano (evita clics)">Cruce por cero</button></div>
+  <div class="row"><button id="mplay">▶ Oír selección</button><button class="tg" id="mloop">Bucle</button><button id="msil">Quitar silencios</button><button id="mtrim">✂ Recortar</button><button id="mnorm">Normalizar</button></div>
+  <div class="row"><span class="small">Fundido</span><input id="mfms" type="number" min="1" max="2000" value="10" class="mnum" style="width:64px"><span class="small">ms</span><button id="mfin">Entrada</button><button id="mfout">Salida</button><button id="mrev">Invertir</button><button id="mmono">A mono</button><button id="mundo">↶ Deshacer</button></div>
+  <div class="sub">Pasar al secuenciador</div>
+  <div class="row"><span class="small">Cargar en</span><button class="go" data-use="0">A</button><button class="go" data-use="1">B</button><button class="go" data-use="2">C</button><button class="go" data-use="3">D</button><button id="mwav">💾 Guardar WAV</button></div>
+  <p class="small" id="minfo"></p>
+  <p class="small">Si eliges «Por compases» y el secuenciador está sonando, la grabación empieza en el siguiente compás y sigue su tempo. Con la entrada de línea desactiva el monitor y usa auriculares para evitar el acople. En «Libre» el máximo son 5 minutos.</p></div></div>
 <div id="toast"></div>
 <input type="file" id="file" accept="audio/*,video/*" hidden><input type="file" id="fmany" accept="audio/*,video/*,.zip,application/zip" multiple hidden>
 
 <script>
 'use strict';
+/* ===== Informe de error (.txt) automático ===== */
+const RPT=(()=>{
+  const VER='1.16',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
+  const fm=a=>{try{return typeof a==='string'?a:(a&&a.stack)?a.stack:JSON.stringify(a)}catch(e){return String(a)}};
+  ['log','info','warn','error','debug'].forEach(k=>{const o=console[k]&&console[k].bind(console);console[k]=function(){try{logs.push(new Date().toISOString().slice(11,23)+' ['+k+'] '+[].map.call(arguments,fm).join(' ').slice(0,600));if(logs.length>300)logs.shift()}catch(e){}if(o)o.apply(null,arguments)}});
+  const step=m=>{steps.push(((Date.now()-t0)/1000).toFixed(2)+'s  '+m);if(steps.length>200)steps.shift();st.stage=String(m)};
+  const J=o=>{try{return JSON.stringify(o)}catch(e){return String(o)}};
+  async function build(where,err,extra){
+    const n=navigator,L=[],mem=performance&&performance.memory;let coop='n/d',coep='n/d';
+    try{const c=new AbortController();setTimeout(()=>c.abort(),1500);const r=await fetch(location.href,{method:'HEAD',cache:'no-store',signal:c.signal});coop=r.headers.get('cross-origin-opener-policy')||'(sin cabecera)';coep=r.headers.get('cross-origin-embedder-policy')||'(sin cabecera)'}catch(e){}
+    let gpu='no';try{if(n.gpu){gpu='sí';const a=await Promise.race([n.gpu.requestAdapter(),new Promise(r=>setTimeout(()=>r(null),1000))]);gpu=a?'sí (adaptador disponible)':'sí (sin adaptador)'}}catch(e){gpu='sí (error al pedir adaptador)'}
+    L.push('INFORME DE ERROR · CrazyHead v'+VER,'Fecha: '+new Date().toISOString()+' (local '+new Date().toString()+')','Dónde ocurrió: '+where,'Etapa/progreso: '+st.stage,'Mensaje: '+(err&&err.message||String(err)),'');
+    L.push('--- Stack ---',String(err&&err.stack||'(sin stack)'),(extra&&extra.workerStack)?'Worker: '+extra.workerStack:'','');
+    L.push('--- Entorno ---','Navegador (UA): '+n.userAgent,'Plataforma: '+n.platform,'Núcleos: '+n.hardwareConcurrency,'RAM (GB aprox.): '+(n.deviceMemory||'n/d'),'Pantalla: '+screen.width+'x'+screen.height+' @'+(devicePixelRatio||1)+' · ventana '+innerWidth+'x'+innerHeight,
+      'URL/protocolo: '+location.href.split('#')[0].replace(/\?.*$/,'')+' ('+location.protocol+')','Contexto seguro: '+isSecureContext,'crossOriginIsolated: '+self.crossOriginIsolated+' · COOP: '+coop+' · COEP: '+coep,'WebGPU: '+gpu,
+      'Memoria JS: '+(mem?`usada ${(mem.usedJSHeapSize/1048576).toFixed(0)} MB · total ${(mem.totalJSHeapSize/1048576).toFixed(0)} MB · límite ${(mem.jsHeapSizeLimit/1048576).toFixed(0)} MB`:'n/d'),'Idioma: '+n.language,'');
+    let o='n/d';try{o=J(typeof st.opts==='function'?st.opts():st.opts)}catch(e){o='(error al leer opciones: '+e+')'}
+    L.push('--- Opciones elegidas ---',o,'','--- Archivo (solo nombre, tamaño y tipo; nunca el contenido) ---',st.file?J(st.file):'(ninguno)','','--- Resultado parcial ---',st.partial||'(ninguno)','','--- Cronología de pasos ---',...steps,'','--- Últimas líneas de consola ('+logs.length+') ---',...logs);
+    return L.join('\n');
+  }
+  async function download(where,err,extra,force){
+    const now=Date.now();if(!force&&(now-last<8000||cnt>=5))return;last=now;cnt++;
+    let txt;try{txt=await build(where,err,extra)}catch(e){txt='Informe incompleto: '+e+'\n'+String(err&&err.stack||err)}
+    const a=document.createElement('a'),nm='crazyhead-v'+VER+'-informe-'+new Date().toISOString().slice(0,19).replace(/[-:T]/g,'')+'.txt';
+    a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));a.download=nm;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+  }
+  let lastErr=null;
+  function fab(){try{let b=document.getElementById('rptfab');if(!b){b=document.createElement('button');b.id='rptfab';b.textContent='⚠ Descargar informe (.txt)';b.onclick=()=>download(lastErr?lastErr.where:'manual',lastErr?lastErr.err:'(sin error)',null,true);document.body.appendChild(b)}b.style.display='block'}catch(e){}}
+  function err(where,e,extra){console.error('['+where+']',e&&e.stack||e);lastErr={where,err:e};fab();return download(where,e,extra)}
+  window.addEventListener('error',e=>{if(!e.error&&!e.message)return;err('window.onerror '+(e.filename||'').split('/').pop()+':'+e.lineno+':'+e.colno,e.error||new Error(e.message))});
+  window.addEventListener('unhandledrejection',e=>err('unhandledrejection',e.reason instanceof Error?e.reason:new Error(String(e.reason))));
+  return{VER,step,err,download,st,get file(){return st.file},set file(v){st.file=v},set partial(v){st.partial=v},set opts(v){st.opts=v}};
+})();
 /*PURE-START*/
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -1113,7 +1164,7 @@ async function sendSampler(kind){
     let u=null;try{u=await BR.get('url:sampler')}catch(e){}
     toast('Enviado al sampler: '+items.length+(items.length===1?' sonido':' sonidos'));
     if(u)window.open(u,'_blank');else toast('Abre SampledHead para recogerlos (Más → Recoger de CrazyHead)',4000);
-  }catch(e){toast('No se pudo enviar al sampler')}
+  }catch(e){RPT.err('enviar al sampler',e);toast('No se pudo enviar al sampler')}
 }
 /* ---- Mixer (1.7.1) ---- */
 function buildMix(){
@@ -1166,126 +1217,267 @@ function mixMeters(){
   if(!playing&&MXL.some(v=>v>.002))needs=true;
 }
 /* ============ Grabar con el micrófono + editor básico ============ */
-const MR={data:null,orig:null,sr:44100,a:0,b:1,rec:false,chunks:[],stream:null,node:null,src:null,sink:null,lvl:0,t:0,drag:-1,play:null};
-function micOpen(){
-  $('#mic').classList.add('show');$('#mtgt').textContent=NM[S.sel];
-  $('#mbars').value=String(cur().loopBars);micSync();micDraw();
+const MR={chs:null,sr:44100,a:0,b:0,v0:0,v1:0,mode:'free',rec:false,armed:false,cl:[],cr:[],n:0,nch:1,pre:[],max:0,t0:null,stream:null,src:null,node:null,sink:null,gain:null,mon:null,lvl:0,pk:0,clip:0,play:null,ph:null,undo:[],pkb:null,devLabel:'',dev:''};
+const micDur=()=>MR.chs?MR.chs[0].length/MR.sr:0;
+async function micOpen(){
+  $('#mic').classList.add('show');$('#mtgt').textContent='';
+  micSync();micDraw();
+  if(!MR.stream)await micInput(MR.dev||(()=>{try{return localStorage.getItem('crazyhead.rcdev')||''}catch(e){return''}})());
 }
-function micClose(){if(MR.rec)micStop(true);micStopPlay();$('#mic').classList.remove('show')}
+function micClose(){if(MR.rec)micStop(true);micStopPlay();micInClose();$('#mic').classList.remove('show')}
+function micInClose(){
+  try{MR.src&&MR.src.disconnect();MR.gain&&MR.gain.disconnect();MR.node&&(MR.node.onaudioprocess=null,MR.node.disconnect());MR.sink&&MR.sink.disconnect();MR.mon&&MR.mon.disconnect()}catch(e){}
+  try{MR.stream&&MR.stream.getTracks().forEach(t=>t.stop())}catch(e){}
+  MR.stream=MR.src=MR.node=MR.sink=MR.gain=MR.mon=null;MR.lvl=0;
+}
+async function micDevices(){
+  try{
+    const dv=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput'),sel=$('#mdev');sel.innerHTML='';
+    dv.forEach((d,i)=>{const o=document.createElement('option');o.value=d.deviceId;o.textContent=d.label||('Entrada '+(i+1));sel.appendChild(o)});
+    const cur=MR.stream&&MR.stream.getAudioTracks()[0]&&MR.stream.getAudioTracks()[0].getSettings().deviceId;
+    if(cur&&[...sel.options].some(o=>o.value===cur))sel.value=cur;
+    MR.devLabel=sel.selectedOptions[0]?sel.selectedOptions[0].textContent:'';
+  }catch(e){console.error('enumerateDevices',e)}
+}
+async function micInput(devId){
+  await ensure();micInClose();
+  RPT.step('grabador: abrir entrada '+(devId||'predeterminada'));
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw Object.assign(new Error('getUserMedia no disponible (¿contexto no seguro? hace falta https o localhost)'),{name:'NotSupported'});
+    const au={echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}};if(devId)au.deviceId={exact:devId};
+    try{MR.stream=await navigator.mediaDevices.getUserMedia({audio:au})}
+    catch(e){if(devId&&(e.name==='OverconstrainedError'||e.name==='NotFoundError')){delete au.deviceId;MR.stream=await navigator.mediaDevices.getUserMedia({audio:au})}else throw e}
+    const tr0=MR.stream.getAudioTracks()[0],stt=tr0.getSettings();MR.dev=stt.deviceId||'';
+    try{localStorage.setItem('crazyhead.rcdev',MR.dev)}catch(e){}
+    MR.sr=ctx.sampleRate;
+    MR.src=ctx.createMediaStreamSource(MR.stream);MR.gain=ctx.createGain();MR.gain.gain.value=+$('#mgain').value/100;
+    MR.node=ctx.createScriptProcessor(4096,2,2);MR.node.onaudioprocess=micProc;
+    MR.sink=ctx.createGain();MR.sink.gain.value=0;MR.mon=ctx.createGain();MR.mon.gain.value=$('#mmon').classList.contains('on')?1:0;
+    MR.src.connect(MR.gain);MR.gain.connect(MR.node);MR.node.connect(MR.sink);MR.sink.connect(ctx.destination);MR.gain.connect(MR.mon);MR.mon.connect(ctx.destination);
+    if((stt.channelCount||1)===1&&!MR.chs)$('#mch').value='1';else if((stt.channelCount||1)>=2&&!MR.chs)$('#mch').value='2';
+    await micDevices();$('#mstat').textContent='';
+  }catch(e){
+    const m=e&&e.name==='NotAllowedError'?'Permiso de micrófono denegado: actívalo en los ajustes del navegador':e&&e.name==='NotFoundError'?'No se encontró ninguna entrada de audio':'No se pudo abrir la entrada: '+(e&&e.message||e);
+    $('#mstat').textContent=tr(m);toast(m,5000);RPT.err('grabador · abrir entrada',e);
+  }
+}
+function micProc(e){
+  const L=e.inputBuffer.getChannelData(0),R=e.inputBuffer.numberOfChannels>1?e.inputBuffer.getChannelData(1):L,n=L.length;
+  let pk=0;for(let i=0;i<n;i++){const a=Math.abs(L[i]),b=Math.abs(R[i]);if(a>pk)pk=a;if(b>pk)pk=b}
+  MR.lvl=Math.max(pk,MR.lvl*.9);MR.pk=Math.max(pk,MR.pk*.985);if(pk>=.99)MR.clip=90;
+  if(!MR.rec)return;
+  if(MR.t0!=null&&ctx.currentTime+n/ctx.sampleRate<MR.t0)return;
+  const mk=()=>MR.nch===2?[new Float32Array(L),new Float32Array(R)]:(()=>{const m=new Float32Array(n);for(let i=0;i<n;i++)m[i]=(L[i]+R[i])*.5;return[m]})();
+  if(MR.armed){
+    const c=mk();
+    if(pk>.03){MR.armed=false;MR.pre.push(c);for(const q of MR.pre){MR.cl.push(q[0]);if(MR.nch===2)MR.cr.push(q[1]);MR.n+=q[0].length}MR.pre=[];$('#mstat').textContent=tr('Grabando…')}
+    else{MR.pre.push(c);if(MR.pre.length>3)MR.pre.shift()}
+    return;
+  }
+  const c=mk();MR.cl.push(c[0]);if(MR.nch===2)MR.cr.push(c[1]);MR.n+=n;
+  if(MR.max&&MR.n>=MR.max&&!MR.stopping){MR.stopping=true;setTimeout(()=>{MR.stopping=false;if(MR.rec){toast('Máximo de grabación alcanzado');micStop(false)}},0)}
+}
 function micSync(){
-  const has=!!MR.data;
-  for(const id of['mplay','mtrim','mnorm','mfade','mrev','mundo','muse'])$('#'+id).disabled=!has||MR.rec;
+  const has=!!MR.chs;
+  for(const id of['mplay','mtrim','mnorm','mfin','mfout','mrev','mmono','mundo','msil','mwav','mzo','mzi','mzr','mza'])$('#'+id).disabled=!has||MR.rec;
+  $$('#mic [data-use]').forEach(b=>{b.disabled=!has||MR.rec;b.classList.toggle('on',+b.dataset.use===S.sel)});
   $('#mgo').textContent=MR.rec?'■ Parar':'⏺ Grabar';$('#mgo').classList.toggle('run',MR.rec);
-  $('#minfo').textContent=has?`${(MR.data.length/MR.sr).toFixed(2)} s`:'';
+  $('#mundo').disabled=!MR.undo.length||MR.rec;
+  const nb=$('#mna');if(nb){nb.disabled=nb.disabled||!has;$('#mnb').disabled=!has}
+  $('#minfo').textContent=has?`${micDur().toFixed(3)} s · ${MR.sr} Hz · ${MR.chs.length===2?'estéreo':'mono'} · selección ${(MR.b-MR.a).toFixed(3)} s`:'';
 }
 async function micStart(){
-  await ensure();
-  try{
-    MR.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-  }catch(e){toast('No se pudo acceder al micrófono');return}
-  micStopPlay();
-  const bars=+$('#mbars').value,bpm=S.bpm,beat=60/bpm,bl=bars*4*beat;
-  MR.sr=ctx.sampleRate;MR.chunks=[];MR.rec=true;
-  const now=ctx.currentTime;let tStart,tClick0=null;
-  const useMet=$('#mmet').classList.contains('on'),useCnt=$('#mcnt').classList.contains('on');
-  if(playing){/* sincroniza con el siguiente compás del secuenciador */
-    const sd=60/S.bpm/4,toBar=(16-(Sch.gs%16))%16;tStart=Sch.grid+toBar*sd;if(tStart<now+.15)tStart+=16*sd;
-    if(useMet)tClick0=tStart;
+  if(!MR.stream)await micInput(MR.dev);if(!MR.stream)return;
+  await ensure();micStopPlay();
+  const timed=MR.mode==='bars';MR.cl=[];MR.cr=[];MR.n=0;MR.pre=[];MR.nch=$('#mch').value==='2'?2:1;MR.t0=null;MR.armed=false;MR.max=0;MR.sr=ctx.sampleRate;
+  RPT.step('grabador: grabar modo '+MR.mode+' '+MR.nch+' canal(es)');
+  if(timed){
+    const bars=+$('#mbars').value,bpm=S.bpm,beat=60/bpm,bl=bars*4*beat,now=ctx.currentTime;let tStart,tClick0=null;
+    const useMet=$('#mmet').classList.contains('on'),useCnt=$('#mcnt').classList.contains('on');
+    if(playing){const sd=60/S.bpm/4,toBar=(16-(Sch.gs%16))%16;tStart=Sch.grid+toBar*sd;if(tStart<now+.15)tStart+=16*sd;if(useMet)tClick0=tStart}
+    else{tClick0=now+.12;tStart=tClick0+(useCnt?4*beat:0);if(!useMet&&!useCnt)tClick0=null}
+    MR.t0=tStart;const tEnd=tStart+bl;
+    if(tClick0!=null){const nC=Math.ceil((tEnd-tClick0)/beat);
+      for(let k=0;k<nC;k++){const t=tClick0+k*beat;if(t<tStart&&!useCnt)continue;if(t>=tEnd-1e-3)break;if(t>=tStart&&!useMet)continue;
+        const o=ctx.createOscillator(),g=ctx.createGain(),acc=((Math.round((t-tClick0)/beat))%4)===0;
+        o.frequency.value=acc?1500:1000;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.002);g.gain.exponentialRampToValueAtTime(.0001,t+.05);
+        o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+.06)}}
+    MR.auto=setTimeout(()=>{if(MR.rec)micStop(false)},Math.max(0,(tEnd-ctx.currentTime))*1000+260);
+    $('#mstat').textContent=tr(tStart>now+.2?'Esperando el compás…':'Grabando…');
   }else{
-    tClick0=now+.12;tStart=tClick0+(useCnt?4*beat:0);
-    if(!useMet&&!useCnt)tClick0=null;
+    MR.max=300*MR.sr;MR.armed=$('#mthr').classList.contains('on');$('#mstat').textContent=tr(MR.armed?'Esperando sonido…':'Grabando…');
   }
-  MR.t0=tStart;const tEnd=tStart+bl;
-  if(tClick0!=null){
-    const nClicks=Math.ceil((tEnd-tClick0)/beat);
-    for(let k=0;k<nClicks;k++){
-      const t=tClick0+k*beat;if(t<tStart&&!useCnt)continue;if(t>=tEnd-1e-3)break;
-      if(t>=tStart&&!useMet)continue;
-      const o=ctx.createOscillator(),g=ctx.createGain(),acc=((Math.round((t-tClick0)/beat))%4)===0;
-      o.frequency.value=acc?1500:1000;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.002);g.gain.exponentialRampToValueAtTime(.0001,t+.05);
-      o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+.06);
-    }
-  }
-  MR.src=ctx.createMediaStreamSource(MR.stream);
-  MR.node=ctx.createScriptProcessor(4096,1,1);
-  MR.node.onaudioprocess=e=>{
-    const x=e.inputBuffer.getChannelData(0);let pk=0;for(let i=0;i<x.length;i++){const v=Math.abs(x[i]);if(v>pk)pk=v}
-    MR.lvl=Math.max(pk,MR.lvl*.85);
-    if(ctx.currentTime+x.length/ctx.sampleRate>=MR.t0&&MR.rec)MR.chunks.push(new Float32Array(x));
-  };
-  MR.sink=ctx.createGain();MR.sink.gain.value=0;MR.src.connect(MR.node);MR.node.connect(MR.sink);MR.sink.connect(ctx.destination);
-  MR.auto=setTimeout(()=>{if(MR.rec)micStop(false)},Math.max(0,(tEnd-ctx.currentTime))*1000+260);
-  $('#mstat').textContent=(tStart>now+.2?'Esperando el compás…':'Grabando…');
-  micSync();
+  MR.rec=true;micSync();
 }
+function micCat(ar){let n=0;for(const c of ar)n+=c.length;const o=new Float32Array(n);let p=0;for(const c of ar){o.set(c,p);p+=c.length}return o}
 function micStop(abort){
-  clearTimeout(MR.auto);MR.rec=false;
-  try{MR.src.disconnect();MR.node.disconnect();MR.sink.disconnect()}catch(e){}
-  try{MR.stream.getTracks().forEach(t=>t.stop())}catch(e){}
-  $('#mstat').textContent='';
-  if(abort&&!MR.chunks.length){micSync();return}
-  let n=0;for(const c of MR.chunks)n+=c.length;
-  if(n<2048){toast('Grabación vacía');micSync();return}
-  const d=new Float32Array(n);let p=0;for(const c of MR.chunks){d.set(c,p);p+=c.length}
-  MR.chunks=[];
-  /* ajusta a la duración exacta de los compases pedidos si se ha pasado por poco */
-  const target=Math.round(+$('#mbars').value*4*60/S.bpm*MR.sr);
-  MR.data=d.length>target&&d.length<target+MR.sr*.6?d.slice(0,target):d;
-  MR.orig=MR.data;MR.a=0;MR.b=1;micSync();micDraw();
+  clearTimeout(MR.auto);const was=MR.rec;MR.rec=false;MR.armed=false;$('#mstat').textContent='';
+  if(!was){micSync();return}
+  if(abort&&!MR.n){micSync();return}
+  if(MR.n<256){toast('Grabación vacía');micSync();return}
+  let chs=[micCat(MR.cl)];if(MR.nch===2)chs.push(micCat(MR.cr));
+  MR.cl=[];MR.cr=[];MR.pre=[];
+  if(MR.mode==='bars'){const target=Math.round(+$('#mbars').value*4*60/S.bpm*MR.sr);if(chs[0].length>target&&chs[0].length<target+MR.sr*.6)chs=chs.map(c=>c.slice(0,target))}
+  MR.chs=chs;MR.undo=[];MR.a=0;MR.b=micDur();MR.v0=0;MR.v1=MR.b;micPeaks();micSync();micDraw();
+  RPT.step('grabador: grabación lista '+micDur().toFixed(2)+' s');
+}
+function micPeaks(){
+  const NB=600,pk=new Float32Array(NB),c=MR.chs,n=c[0].length,per=Math.max(1,Math.floor(n/NB));
+  for(let b=0;b<NB;b++){let m=0;const a=b*per,e=Math.min(n,a+per),st=Math.max(1,per>>6);for(let i=a;i<e;i+=st)for(const ch of c){const v=Math.abs(ch[i]);if(v>m)m=v}pk[b]=m}
+  MR.pkb=pk;
+}
+/* ---- editor de región ---- */
+const mSpan=()=>MR.v1-MR.v0;
+function mView(v0,v1){const D=micDur(),sp=clamp(v1-v0,Math.min(.02,D),D);v0=clamp(v0,0,D-sp);MR.v0=v0;MR.v1=v0+sp}
+function mZoom(f,cx){const sp=mSpan(),tc=cx==null?MR.v0+sp/2:cx,sp2=clamp(sp*f,Math.min(.02,micDur()),micDur()),k=(tc-MR.v0)/sp;mView(tc-k*sp2,tc-k*sp2+sp2)}
+function mShow(){const m=Math.max(.01,(MR.b-MR.a)*.12);mView(MR.a-m,MR.b+m)}
+function mZc(t){
+  if(!$('#mzc').classList.contains('on'))return t;
+  const x=MR.chs[0],sr=MR.sr,i0=Math.round(t*sr),R=Math.round(sr*.006);let best=i0,bd=1e9;
+  for(let i=Math.max(1,i0-R);i<Math.min(x.length-1,i0+R);i++){if((x[i-1]<=0&&x[i]>0)||(x[i-1]>=0&&x[i]<0)){const d=Math.abs(i-i0);if(d<bd){bd=d;best=i}}}
+  return best/sr;
 }
 function micDraw(){
-  const c=$('#mwf');if(!c)return;const w=c.clientWidth||300,h=110,dpr=window.devicePixelRatio||1;
-  if(c.width!==Math.round(w*dpr)){c.width=Math.round(w*dpr);c.height=h*dpr}
-  const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#120629';x.fillRect(0,0,w,h);
-  if(!MR.data){x.fillStyle='#8b78b8';x.font='13px system-ui';x.fillText(tr('Pulsa «Grabar»'),12,h/2);return}
-  const d=MR.data,n=d.length,step=Math.max(1,Math.floor(n/w));
-  x.fillStyle=COL[S.sel];
-  for(let px=0;px<w;px++){let mn=0,mx=0;const s0=Math.floor(px/w*n);for(let j=0;j<step;j++){const v=d[s0+j]||0;if(v<mn)mn=v;if(v>mx)mx=v}
-    x.fillRect(px,h/2+mn*h/2*.95,1,Math.max(1,(mx-mn)*h/2*.95))}
-  x.fillStyle='rgba(0,0,0,.55)';x.fillRect(0,0,MR.a*w,h);x.fillRect(MR.b*w,0,w-MR.b*w,h);
-  x.fillStyle='#fff';x.fillRect(MR.a*w-1,0,2,h);x.fillRect(MR.b*w-1,0,2,h);
+  const cv=$('#mwf'),ov=$('#mov');if(!cv||!$('#mic').classList.contains('show'))return;
+  const W=Math.max(100,cv.clientWidth),H=170,dpr=devicePixelRatio||1;
+  if(cv.width!==Math.round(W*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ov.width=Math.round(W*dpr);ov.height=Math.round(36*dpr)}
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+  const o=ov.getContext('2d');o.setTransform(dpr,0,0,dpr,0,0);o.clearRect(0,0,W,36);
+  if(!MR.chs){g.fillStyle='#8b78b8';g.font='13px system-ui';g.fillText(tr('Pulsa «Grabar» o abre un audio'),12,H/2);return}
+  const D=micDur(),sr=MR.sr,v0=MR.v0,v1=MR.v1||D,sp=v1-v0,X=t=>(t-v0)/sp*W,RH=16,cy=RH+(H-RH)/2,amp=(H-RH)/2*.95,col=COL[S.sel]||'#ffd028';
+  const xa=X(MR.a),xb=X(MR.b);
+  g.fillStyle='rgba(255,255,255,.10)';g.fillRect(Math.max(0,xa),RH,Math.min(W,xb)-Math.max(0,xa),H-RH);
+  const per=sp*sr/W,step=Math.max(1,Math.floor(per/48));g.fillStyle=col;
+  for(let px=0;px<W;px++){const i0=Math.max(0,Math.floor((v0+px/W*sp)*sr)),i1=Math.min(MR.chs[0].length,Math.max(i0+1,Math.floor((v0+(px+1)/W*sp)*sr)));let mn=0,mx=0;
+    for(const ch of MR.chs)for(let i=i0;i<i1;i+=step){const v=ch[i];if(v<mn)mn=v;if(v>mx)mx=v}
+    g.fillRect(px,cy-mx*amp,1,Math.max(1,(mx-mn)*amp))}
+  g.fillStyle='rgba(255,255,255,.18)';g.fillRect(0,cy,W,1);
+  g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,0,W,RH);g.font='10px sans-serif';g.textBaseline='middle';
+  const tk=stTicks(sp,W);for(let t=Math.ceil(v0/tk)*tk;t<=v1;t+=tk){const x=Math.round(X(t))+.5;g.fillStyle='rgba(255,255,255,.35)';g.fillRect(x,RH-5,1,5);g.fillStyle='#fff';g.fillText(tk<1?t.toFixed(tk<.1?2:1)+'s':stFmt(t).replace(/\.0$/,''),x+3,RH/2)}
+  g.fillStyle='#fff';g.fillRect(xa-1.5,0,3,H);g.fillRect(xb-1.5,0,3,H);
+  g.beginPath();g.moveTo(xa,RH);g.lineTo(xa+10,RH);g.lineTo(xa,RH+10);g.fill();g.beginPath();g.moveTo(xb,RH);g.lineTo(xb-10,RH);g.lineTo(xb,RH+10);g.fill();
+  if(MR.ph!=null){const x=X(MR.ph);g.fillStyle='#ff3d7a';g.fillRect(x-1,RH,2,H-RH)}
+  if(MR.pkb){const n=MR.pkb.length;o.fillStyle='#7f74a0';for(let i=0;i<n;i++){const h=Math.max(1,MR.pkb[i]*36*.9);o.fillRect(i/n*W,(36-h)/2,Math.max(1,W/n),h)}
+    o.fillStyle='rgba(255,255,255,.22)';o.fillRect(MR.a/D*W,0,Math.max(2,(MR.b-MR.a)/D*W),36);o.strokeStyle='#fff';o.lineWidth=2;o.strokeRect(v0/D*W+1,1,Math.max(4,sp/D*W)-2,34)}
+  const na=$('#mna'),nb=$('#mnb');if(na&&document.activeElement!==na)na.value=MR.a.toFixed(3);if(nb&&document.activeElement!==nb)nb.value=MR.b.toFixed(3);
+  $('#minfo').textContent=`${D.toFixed(3)} s · ${MR.sr} Hz · ${MR.chs.length===2?'estéreo':'mono'} · selección ${(MR.b-MR.a).toFixed(3)} s · vista ${sp.toFixed(2)} s`;
 }
-function micMeter(){
-  const l=$('#mlvl');if(l&&$('#mic').classList.contains('show')){l.style.width=Math.min(100,Math.sqrt(MR.lvl)*100)+'%';MR.lvl*=.9}
-  requestAnimationFrame(micMeter);
+function micBind(){
+  const cv=$('#mwf'),ov=$('#mov'),P=new Map();let drag=null,off=0,prev=null,pin=null,edge=null,lx=0;
+  const W=()=>cv.getBoundingClientRect().width,tAt=x=>MR.v0+clamp((x-cv.getBoundingClientRect().left)/W(),0,1)*mSpan();
+  const stopEdge=()=>{if(edge){clearInterval(edge);edge=null}};
+  const apply=t=>{const D=micDur();
+    if(drag==='n'){MR.a=clamp(Math.min(MR.o,t),0,D);MR.b=clamp(Math.max(MR.o,t),0,D)}
+    else if(drag==='a')MR.a=clamp(t,0,MR.b-.005);
+    else if(drag==='b')MR.b=clamp(t,MR.a+.005,D);
+    else if(drag==='m'){const l=MR.b-MR.a,a=clamp(t-off,0,D-l);MR.a=a;MR.b=a+l}};
+  const startEdge=()=>{if(edge)return;edge=setInterval(()=>{if(!drag||!MR.chs)return stopEdge();const r=cv.getBoundingClientRect(),z=28;let v=0;
+    if(lx<r.left+z)v=-(r.left+z-lx)/z;else if(lx>r.right-z)v=(lx-(r.right-z))/z;if(!v)return;
+    const d=v*mSpan()*.03,a=MR.v0;mView(MR.v0+d,MR.v1+d);if(MR.v0!==a){apply(tAt(lx));micDraw()}},30)};
+  cv.addEventListener('pointerdown',e=>{if(!MR.chs||MR.rec)return;e.preventDefault();cv.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX});
+    if(P.size===2){const[p,q]=[...P.values()];pin={d:Math.max(20,Math.abs(p.x-q.x)),sp:mSpan(),tc:tAt((p.x+q.x)/2)};if(drag==='n'&&prev){MR.a=prev[0];MR.b=prev[1]}drag=null;stopEdge();return}
+    const t=tAt(e.clientX),px=W()/mSpan(),ne=16/px;lx=e.clientX;prev=[MR.a,MR.b];
+    if(Math.abs(t-MR.a)<ne&&Math.abs(t-MR.a)<=Math.abs(t-MR.b))drag='a';else if(Math.abs(t-MR.b)<ne)drag='b';else if(t>MR.a&&t<MR.b){drag='m';off=t-MR.a}else{drag='n';MR.o=t;MR.a=MR.b=t}
+    startEdge();micDraw()});
+  cv.addEventListener('pointermove',e=>{if(!MR.chs||!P.has(e.pointerId))return;P.set(e.pointerId,{x:e.clientX});
+    if(P.size===2&&pin){const[p,q]=[...P.values()],d=Math.max(20,Math.abs(p.x-q.x)),mid=(p.x+q.x)/2,sp=clamp(pin.sp*pin.d/d,Math.min(.02,micDur()),micDur()),k=clamp((mid-cv.getBoundingClientRect().left)/W(),0,1);mView(pin.tc-k*sp,pin.tc-k*sp+sp);micDraw();return}
+    if(!drag)return;lx=e.clientX;apply(tAt(e.clientX));micDraw()});
+  const up=e=>{P.delete(e.pointerId);if(P.size<2)pin=null;
+    if(!P.size){if(drag==='n'&&MR.b-MR.a<.005&&prev){MR.a=prev[0];MR.b=prev[1]}
+      else if(drag==='a'||drag==='n'){MR.a=Math.min(mZc(MR.a),MR.b-.005)}
+      if(drag==='b'||drag==='n'){MR.b=Math.max(mZc(MR.b),MR.a+.005)}
+      drag=null;stopEdge();micSync()}
+    micDraw()};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  cv.addEventListener('wheel',e=>{if(!MR.chs)return;e.preventDefault();
+    if(e.shiftKey||Math.abs(e.deltaX)>Math.abs(e.deltaY)){const d=(e.deltaX||e.deltaY)/W()*mSpan();mView(MR.v0+d,MR.v1+d)}
+    else mZoom(Math.exp(clamp(e.deltaY,-120,120)*.0025),tAt(e.clientX));micDraw()},{passive:false});
+  let od=null;const ot=e=>clamp((e.clientX-ov.getBoundingClientRect().left)/ov.getBoundingClientRect().width,0,1)*micDur();
+  ov.addEventListener('pointerdown',e=>{if(!MR.chs)return;ov.setPointerCapture(e.pointerId);const t=ot(e);od=(t>=MR.v0&&t<=MR.v1)?t-MR.v0:mSpan()/2;mView(t-od,t-od+mSpan());micDraw()});
+  ov.addEventListener('pointermove',e=>{if(od==null||!MR.chs)return;const t=ot(e);mView(t-od,t-od+mSpan());micDraw()});
+  const ou=()=>{od=null};ov.addEventListener('pointerup',ou);ov.addEventListener('pointercancel',ou);
 }
-function micStopPlay(){try{MR.play&&MR.play.stop()}catch(e){}MR.play=null}
+function micStopPlay(){try{MR.play&&MR.play.stop()}catch(e){}MR.play=null;MR.ph=null}
 function micPlay(){
-  if(!MR.data)return;ensure();micStopPlay();
-  const n=MR.data.length,a=Math.floor(MR.a*n),b=Math.max(a+64,Math.floor(MR.b*n)),buf=ctx.createBuffer(1,b-a,MR.sr);
-  buf.getChannelData(0).set(MR.data.subarray(a,b));
-  const s=ctx.createBufferSource();s.buffer=buf;s.connect(ctx.destination);s.start();MR.play=s;
+  if(!MR.chs)return;if(MR.play){micStopPlay();$('#mplay').textContent='▶ Oír selección';micDraw();return}
+  ensure();const sr=MR.sr,a=Math.floor(MR.a*sr),b=Math.max(a+64,Math.floor(MR.b*sr)),n=b-a,buf=ctx.createBuffer(MR.chs.length,n,sr);
+  MR.chs.forEach((c,i)=>buf.getChannelData(i).set(c.subarray(a,b)));
+  const s=ctx.createBufferSource();s.buffer=buf;s.loop=$('#mloop').classList.contains('on');s.connect(ctx.destination);
+  s.onended=()=>{if(MR.play===s){MR.play=null;MR.ph=null;$('#mplay').textContent='▶ Oír selección';micDraw()}};
+  s.start();MR.play=s;MR.pt0=ctx.currentTime;MR.pa=MR.a;MR.pd=n/sr;$('#mplay').textContent='■ Parar';
 }
+function micPush(){MR.undo.push({chs:MR.chs,a:MR.a,b:MR.b});if(MR.undo.length>12)MR.undo.shift()}
 function micEdit(k){
-  if(!MR.data)return;const n=MR.data.length;
-  if(k==='trim'){const a=Math.floor(MR.a*n),b=Math.max(a+64,Math.floor(MR.b*n));MR.data=MR.data.slice(a,b);MR.a=0;MR.b=1}
-  else if(k==='norm'){let pk=0;for(let i=0;i<n;i++)pk=Math.max(pk,Math.abs(MR.data[i]));if(pk>0){const g=.95/pk,o=new Float32Array(n);for(let i=0;i<n;i++)o[i]=MR.data[i]*g;MR.data=o}}
-  else if(k==='fade'){const o=MR.data.slice(),f=Math.min(Math.round(MR.sr*.008),n>>1);for(let i=0;i<f;i++){const g=i/f;o[i]*=g;o[n-1-i]*=g}MR.data=o}
-  else if(k==='rev'){MR.data=MR.data.slice().reverse()}
-  else if(k==='undo'){MR.data=MR.orig;MR.a=0;MR.b=1}
+  if(!MR.chs||MR.rec)return;const sr=MR.sr,n=MR.chs[0].length,a=Math.floor(MR.a*sr),b=Math.max(a+1,Math.min(n,Math.floor(MR.b*sr)));
+  try{
+    if(k==='undo'){const u=MR.undo.pop();if(u){MR.chs=u.chs;MR.a=u.a;MR.b=u.b;mView(0,micDur());micPeaks()}}
+    else if(k==='sil'){
+      let pk=0;for(const c of MR.chs)for(let i=0;i<n;i++)pk=Math.max(pk,Math.abs(c[i]));const th=Math.max(pk*.02,.002),m=Math.round(sr*.004);
+      let f=-1,l=-1;for(let i=0;i<n&&f<0;i++)for(const c of MR.chs)if(Math.abs(c[i])>th){f=i;break}
+      for(let i=n-1;i>=0&&l<0;i--)for(const c of MR.chs)if(Math.abs(c[i])>th){l=i;break}
+      if(f<0){toast('Todo es silencio');return}
+      MR.a=mZc(Math.max(0,f-m)/sr);MR.b=Math.min(micDur(),Math.max(mZc((l+m)/sr),MR.a+.005));mShow();
+    }else{
+      micPush();
+      if(k==='trim'){MR.chs=MR.chs.map(c=>c.slice(a,b));MR.a=0;MR.b=micDur();mView(0,micDur())}
+      else if(k==='norm'){let pk=0;for(const c of MR.chs)for(let i=0;i<n;i++)pk=Math.max(pk,Math.abs(c[i]));if(pk>0){const g=.891/pk;MR.chs=MR.chs.map(c=>{const o=new Float32Array(n);for(let i=0;i<n;i++)o[i]=c[i]*g;return o})}}
+      else if(k==='fin'||k==='fout'){const f=Math.max(2,Math.min(Math.round(sr*clamp(+$('#mfms').value||10,1,2000)/1000),b-a));
+        MR.chs=MR.chs.map(c=>{const o=c.slice();if(k==='fin')for(let i=0;i<f;i++)o[a+i]*=i/f;else for(let i=0;i<f;i++)o[b-1-i]*=i/f;return o})}
+      else if(k==='rev'){MR.chs=MR.chs.map(c=>{const o=c.slice(),r=c.slice(a,b).reverse();o.set(r,a);return o})}
+      else if(k==='mono'){if(MR.chs.length<2){MR.undo.pop();return}const o=new Float32Array(n);for(let i=0;i<n;i++)o[i]=(MR.chs[0][i]+MR.chs[1][i])*.5;MR.chs=[o]}
+      micPeaks();
+    }
+  }catch(e){RPT.err('grabador · editar '+k,e);toast('No se pudo aplicar')}
   micSync();micDraw();
 }
-async function micUse(){
-  if(!MR.data)return;
-  const d=S.sel,n=MR.data.length,bars=+$('#mbars').value;
-  const buf=ctx.createBuffer(1,n,MR.sr);buf.getChannelData(0).set(MR.data);
-  const name='Grabación '+stamp().slice(4);
-  const wav=wavEncode([MR.data],MR.sr);await idbPut('a'+d,{name,data:wav.buffer.slice(0)});
-  setBuffer(d,buf,name,'file',{bars});
-  micClose();toast('Cargado: '+name);
+async function micLoadFile(f){
+  try{
+    RPT.file={nombre:f.name,bytes:f.size,tipo:f.type};RPT.step('grabador: abrir audio');
+    await ensure();const buf=await ctx.decodeAudioData((await f.arrayBuffer()).slice(0));
+    micStopPlay();MR.sr=buf.sampleRate;MR.chs=[];for(let c=0;c<Math.min(2,buf.numberOfChannels);c++)MR.chs.push(new Float32Array(buf.getChannelData(c)));
+    MR.undo=[];MR.a=0;MR.b=micDur();MR.v0=0;MR.v1=MR.b;micPeaks();micSync();micDraw();toast('Abierto: '+f.name);
+  }catch(e){RPT.err('grabador · abrir audio',e);toast('No se pudo leer el audio')}
+}
+async function micUse(d){
+  if(!MR.chs)return;
+  try{
+    const sr=MR.sr,a=Math.floor(MR.a*sr),b=Math.max(a+64,Math.min(MR.chs[0].length,Math.floor(MR.b*sr)));
+    if(AUD[d]&&!confirm(tr('Ese loop ya tiene audio. ¿Sustituirlo?')))return;
+    const chs=MR.chs.map(c=>c.slice(a,b)),buf=ctx.createBuffer(chs.length,chs[0].length,sr);chs.forEach((c,i)=>buf.getChannelData(i).set(c));
+    const name='Grabación '+stamp().slice(4),wav=wavEncode(chs,sr);
+    await idbPut('a'+d,{name,data:wav.buffer.slice(0)});
+    setBuffer(d,buf,name,'file',MR.mode==='bars'?{bars:+$('#mbars').value}:undefined);
+    S.sel=d;micClose();setView('loops');syncUI();toast('Cargado en '+NM[d]+': '+name);RPT.step('grabador: enviado a '+NM[d]);
+  }catch(e){RPT.err('grabador · cargar en loop',e);toast('No se pudo cargar')}
+}
+function micMeter(){
+  if($('#mic').classList.contains('show')){
+    const l=$('#mlvl');if(l){const db=20*Math.log10(Math.max(1e-5,MR.lvl));l.style.width=clamp((db+60)/60,0,1)*100+'%';MR.lvl*=.9}
+    const pkdb=20*Math.log10(Math.max(1e-5,MR.pk)),t=$('#mdb');if(t){t.textContent=MR.stream?`pico ${pkdb>-99?pkdb.toFixed(1):'−∞'} dBFS`+(MR.clip>0?'  ⚠ SATURA':''):tr('Entrada apagada');t.style.color=MR.clip>0?'#ff3d7a':''}
+    if(MR.clip>0)MR.clip--;
+    if(MR.rec){$('#mtime').textContent=(MR.n/MR.sr).toFixed(1)+' s'}else if($('#mtime').textContent)$('#mtime').textContent='';
+    if(MR.play){let t=ctx.currentTime-MR.pt0;if(MR.play.loop&&MR.pd)t%=MR.pd;MR.ph=MR.pa+t;micDraw()}
+  }
+  requestAnimationFrame(micMeter);
 }
 function initMic(){
   $('#bmic').onclick=micOpen;$('#mclose').onclick=micClose;
   $('#mic').addEventListener('click',e=>{if(e.target.id==='mic')micClose()});
   $('#mgo').onclick=()=>MR.rec?micStop(false):micStart();
-  $('#mmet').onclick=e=>e.currentTarget.classList.toggle('on');$('#mcnt').onclick=e=>e.currentTarget.classList.toggle('on');
-  $('#mplay').onclick=micPlay;$('#mtrim').onclick=()=>micEdit('trim');$('#mnorm').onclick=()=>micEdit('norm');$('#mfade').onclick=()=>micEdit('fade');$('#mrev').onclick=()=>micEdit('rev');$('#mundo').onclick=()=>micEdit('undo');
-  $('#muse').onclick=micUse;
-  const c=$('#mwf'),fx=e=>{const r=c.getBoundingClientRect();return clamp((e.clientX-r.left)/r.width,0,1)};
-  c.addEventListener('pointerdown',e=>{if(!MR.data)return;const x=fx(e);MR.drag=Math.abs(x-MR.a)<Math.abs(x-MR.b)?0:1;c.setPointerCapture(e.pointerId);mvH(e)});
-  const mvH=e=>{if(MR.drag<0)return;const x=fx(e);if(MR.drag===0)MR.a=Math.min(x,MR.b-.01);else MR.b=Math.max(x,MR.a+.01);micDraw()};
-  c.addEventListener('pointermove',mvH);const up=()=>MR.drag=-1;c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
-  requestAnimationFrame(micMeter);
+  for(const id of['mmet','mcnt','mmon','mthr','mloop','mzc'])$('#'+id).onclick=e=>{e.currentTarget.classList.toggle('on');if(id==='mmon'&&MR.mon)MR.mon.gain.value=e.currentTarget.classList.contains('on')?1:0};
+  $('#mgain').oninput=e=>{$('#mgl').textContent=e.target.value+'%';if(MR.gain)MR.gain.gain.value=e.target.value/100};
+  $('#mmode').querySelectorAll('button').forEach(b=>b.onclick=()=>{MR.mode=b.dataset.v;$('#mmode').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));$('#mfree').style.display=MR.mode==='free'?'':'none';$('#mbarsw').style.display=MR.mode==='bars'?'':'none'});
+  $('#mdev').onchange=e=>micInput(e.target.value);$('#mref').onclick=()=>micInput($('#mdev').value);
+  $('#mplay').onclick=micPlay;$('#mtrim').onclick=()=>micEdit('trim');$('#mnorm').onclick=()=>micEdit('norm');$('#mfin').onclick=()=>micEdit('fin');$('#mfout').onclick=()=>micEdit('fout');
+  $('#mrev').onclick=()=>micEdit('rev');$('#mmono').onclick=()=>micEdit('mono');$('#mundo').onclick=()=>micEdit('undo');$('#msil').onclick=()=>micEdit('sil');
+  $('#mzi').onclick=()=>{mZoom(.5);micDraw()};$('#mzo').onclick=()=>{mZoom(2);micDraw()};$('#mzr').onclick=()=>{mShow();micDraw()};$('#mza').onclick=()=>{mView(0,micDur());micDraw()};
+  const num=()=>{if(!MR.chs)return;const D=micDur();let a=parseFloat($('#mna').value),b=parseFloat($('#mnb').value);if(!(a>=0))a=MR.a;if(!(b>0))b=MR.b;a=clamp(a,0,D-.005);b=clamp(b,a+.005,D);MR.a=a;MR.b=b;micSync();micDraw()};
+  $('#mna').onchange=num;$('#mnb').onchange=num;
+  $$('#mic [data-use]').forEach(b=>b.onclick=()=>micUse(+b.dataset.use));
+  $('#mwav').onclick=()=>{if(!MR.chs)return;const sr=MR.sr,a=Math.floor(MR.a*sr),b=Math.max(a+64,Math.floor(MR.b*sr));download(new Blob([wavEncode(MR.chs.map(c=>c.slice(a,b)),sr)],{type:'audio/wav'}),'grabacion_'+stamp()+'.wav')};
+  const fi=document.createElement('input');fi.type='file';fi.accept='audio/*,video/*';fi.hidden=true;document.body.appendChild(fi);fi.onchange=()=>{if(fi.files[0])micLoadFile(fi.files[0]);fi.value=''};$('#mopen').onclick=()=>fi.click();
+  const sh=$('#mic');['dragover','dragenter'].forEach(n=>sh.addEventListener('dragover',e=>e.preventDefault()));
+  micBind();requestAnimationFrame(micMeter);
 }
 
 /* ---- modo ORDEN: sin azar, los cortes uno tras otro al ritmo del secuenciador ---- */
@@ -1482,7 +1674,7 @@ async function stModUI(){
   el.textContent=have?LL('Modelo: listo ✓','Model: ready ✓'):LL('Modelo: no descargado (se descargará al separar)','Model: not downloaded (downloads when separating)');
 }
 async function stLoad(f){
-  try{
+  try{RPT.file={nombre:f.name,bytes:f.size,tipo:f.type};
     stMsg(LL('Leyendo…','Reading…'));
     const ab=await f.arrayBuffer(),buf=await ctx.decodeAudioData(ab.slice(0));
     stStop();ST.buf=buf;ST.name=f.name.replace(/\.[^.]+$/,'');
@@ -1494,7 +1686,7 @@ async function stLoad(f){
     stMsg('');stDraw();
   }catch(e){stMsg(LL('No se pudo leer el audio','Could not read the audio'))}
 }
-function stMsg(t){const m=$('#stmsg');if(m)m.textContent=t}
+function stMsg(t){const m=$('#stmsg');if(m)m.textContent=t;if(t)RPT.step('stems: '+t)}
 const stSpan=()=>ST.v1-ST.v0;
 function stView(v0,v1){const D=ST.buf.duration;let sp=clamp(v1-v0,Math.min(.2,D),D);v0=clamp(v0,0,D-sp);ST.v0=v0;ST.v1=v0+sp}
 function stShow(){if(!ST.buf)return;const m=Math.max(.5,(ST.b-ST.a)*.12);stView(ST.a-m,ST.b+m)}
@@ -1618,7 +1810,7 @@ async function stOpen(mb){
   const steps=ST.low?['disabled','basic']:['all','disabled'],errs=[];
   for(let i=0;i<steps.length;i++){
     stMsg(LL('Iniciando el modelo… (intento '+(i+1)+')','Starting the model… (try '+(i+1)+')'));stProg(.4);await new Promise(r=>setTimeout(r,30));
-    try{return await stWorker(mb,steps[i])}catch(e){errs.push(String(e&&e.message||e).slice(0,90));if(ST.cancel)throw new Error('cancel')}}
+    try{return await stWorker(mb,steps[i])}catch(e){console.error('stems worker intento '+(i+1)+' ('+steps[i]+')',e&&e.stack||e);errs.push(String(e&&e.message||e).slice(0,90));if(ST.cancel)throw new Error('cancel')}}
   stMsg(LL('Iniciando el modelo… (último intento)','Starting the model… (last try)'));await new Promise(r=>setTimeout(r,30));
   try{return await stMain(mb)}catch(e){errs.push(String(e&&e.message||e).slice(0,90));throw new Error(errs.join(' | '))}
 }
@@ -1657,7 +1849,7 @@ async function stRun(){
   }catch(e){
     const m=String(e&&e.message||e);
     if(m==='cancel'){stMsg(LL('Cancelado','Cancelled'))}
-    else{stMsg(LL('Error al ','Error while ')+phase+': '+m.slice(0,300))}
+    else{RPT.err('stems · '+phase,e,{});stMsg(LL('Error al ','Error while ')+phase+': '+m.slice(0,300))}
   }finally{ST.busy=false;ST.cancel=false;$('#stgo').disabled=false;$('#stcancel').style.display='none';stProg(0)}
 }
 
@@ -1671,14 +1863,14 @@ function setBuffer(d,buf,name,srcTag,opts){
   setTimeout(()=>{try{if(AUD[d]&&AUD[d].buf===buf&&eng)eng.getR(d)}catch(e){}},600);
 }
 async function loadFile(d,file){
-  try{
+  try{RPT.file={nombre:file.name,bytes:file.size,tipo:file.type};RPT.step('cargar archivo en '+NM[d]);
     toast('Cargando…');
     const ab=await file.arrayBuffer();
     const buf=await ctx.decodeAudioData(ab.slice(0));
     await idbPut('a'+d,{name:file.name,data:ab});
     setBuffer(d,buf,file.name,'file');
     toast('Cargado: '+file.name);
-  }catch(e){toast('No se pudo leer el audio')}
+  }catch(e){RPT.err('cargar audio',e);toast('No se pudo leer el audio')}
 }
 function demoBuffer(kind){const m=makeDemo(kind,ctx.sampleRate),b=ctx.createBuffer(1,m.data.length,ctx.sampleRate);b.getChannelData(0).set(m.data);return{buf:b,m}}
 function useDemo(d,kind){
@@ -2048,7 +2240,7 @@ async function exportWav(stems){
     else{const files=[];for(let d=0;d<4;d++)if(AUD[d]){files.push({name:`loop_${NM[d]}.wav`,data:bufToWav(await renderMix(bars,d))})}
       download(zipStore(files),`crazyhead_stems_${stamp()}.zip`)}
     toast('Listo');
-  }catch(e){toast('Error al renderizar')}
+  }catch(e){RPT.err('renderizar',e);toast('Error al renderizar')}
 }
 function exportMidi(){
   if(!AUD.some(a=>a)){toast('No hay loops cargados');return}
@@ -2239,7 +2431,7 @@ async function exportMove(){
     const all=[...files,{name:'Song.abl',data:enc.encode(mvJson(set,0,''))},{name:'BundleInfo.json',data:enc.encode(JSON.stringify({originalSampleUris:uris},null,2))}];
     download(zipStore(all),name+'.ablbundle');
     toast('Exportado: '+name+'.ablbundle'+(dropped?` (${dropped} golpes sin celda)`:''),5000);
-  }catch(e){console.error(e);toast('No se pudo exportar a Move')}
+  }catch(e){RPT.err('exportar Move',e);toast('No se pudo exportar a Move')}
 }
 async function exportDaw(kind){
   if(!AUD.some(a=>a)){toast('No hay loops cargados');return}
@@ -2300,7 +2492,7 @@ async function exportDaw(kind){
     files.unshift({name:'LEEME.txt',data:enc.encode(`CrazyHead → Ableton Live (proyecto con Simpler)\n\nDescomprime TODO el zip y abre «${name}.als» (dentro de «${proj}»). Mantén «Samples/Imported» junto al .als.\nCada loop es una pista MIDI con un Simpler en modo Slice: el loop entero con tus marcas de corte (hasta 64); el corte 1 suena con C1 (nota 36), el 2 con C#1…\nCada pista lleva un clip en la vista de sesión (escena 1) con la secuencia, y el tempo del proyecto (${bpm0} BPM). Puedes mover las marcas de corte dentro del Simpler.\nControles del Simpler: Afinar/Fino del loop van en Transpose/Detune; el tono por golpe del azar va como automatización de Transpose dentro del clip (escalones); si el loop tiene filtro activo, tipo/frecuencia/resonancia van en el filtro del Simpler. Pan y volumen del loop van en el mixer de la pista. Puedes grabar o editar cualquiera de ellos en Live.\nLímite: Simpler no invierte por golpe${lost?` (${lost} golpes invertidos suenan normales)`:''}. Para la inversión usa la opción «proyecto (.als)» con Drum Rack.\n\n${info.join('\n')}\n`)});
     download(new Blob([zipStore(files)],{type:'application/zip'}),`${name.replace(/ +/g,'_')}_ableton_simpler.zip`);
     toast('Listo');return;
-   }catch(e){console.error(e);toast('No se pudo crear el .als: '+(e&&e.message||e),9000);return}
+   }catch(e){RPT.err('exportar .als',e);toast('No se pudo crear el .als: '+(e&&e.message||e),9000);return}
   }
   if(kind==='als'){
    try{
@@ -2328,7 +2520,7 @@ async function exportDaw(kind){
     files.unshift({name:'LEEME.txt',data:enc.encode(`CrazyHead → Ableton Live (proyecto .als)\n\nDescomprime TODO el zip y abre «${name}.als» (dentro de «${proj}»). Mantén «Samples/Imported» junto al .als.\nCada loop es una pista MIDI con un Drum Rack: el corte 1 en C1 (nota 36), el 2 en C#1… Tras los cortes van las celdas extra (invertidos y tonos distintos) con su afinación. Se aplican el volumen, el panorama y el mute del loop.\nEl clip de cada loop está en la vista de sesión (escena 1; púlsalo para lanzarlo), con la duración del loop y el tempo del proyecto: ${bpm0} BPM.\nGenerado a partir de un proyecto de Live 12.4.6: en versiones antiguas de Live puede no abrir; en ese caso usa la opción «Drum Rack (.adg + MIDI)».\n\n${info.join('\n')}\n`)});
     download(new Blob([zipStore(files)],{type:'application/zip'}),`${name.replace(/ +/g,'_')}_ableton_proyecto.zip`);
     toast('Listo');return;
-   }catch(e){console.error(e);toast('No se pudo crear el .als: '+(e&&e.message||e)+' · prueba «Drum Rack (.adg + MIDI)»',9000);return}
+   }catch(e){RPT.err('exportar .als (Simpler)',e);toast('No se pudo crear el .als: '+(e&&e.message||e)+' · prueba «Drum Rack (.adg + MIDI)»',9000);return}
   }
   /* Ableton: un Drum Rack (.adg) por loop + sus WAV + la secuencia .mid */
   const racks=[];
@@ -2408,7 +2600,7 @@ ${info.join('\n')}
 ${dropped?`\nOJO: ${dropped} variantes no caben (máx. 160 pads) y se omiten en el MIDI.\n`:''}`)});
     download(new Blob([zipStore(files)],{type:'application/zip'}),`${name.replace(/ +/g,'_')}_SP404MK2.zip`);
     toast(LL(`SP-404 MK2: ${used} muestras + MIDI`,`SP-404 MK2: ${used} samples + MIDI`)+(dropped?` · ${dropped} omitidas`:''));
-  }catch(e){console.error('SPERR',e&&e.stack);toast(LL('Error en la exportación: ','Export error: ')+String(e&&e.message||e).slice(0,120))}
+  }catch(e){RPT.err('exportar SP-404',e);toast(LL('Error en la exportación: ','Export error: ')+String(e&&e.message||e).slice(0,120))}
 }
 function sliceMono(buf,a,b,rev){
   const sr=buf.sampleRate,i0=Math.floor(a*sr),i1=Math.max(i0+16,Math.min(buf.length,Math.floor(b*sr))),n=i1-i0,chs=[];
@@ -2551,7 +2743,7 @@ const AUDX=/\.(wav|mp3|m4a|aac|ogg|oga|opus|flac|aif|aiff|mp4|mov|webm)$/i;
 async function importMany(files){
   let list=[];
   for(const f of files){
-    if(/\.zip$/i.test(f.name)){try{list.push(...await unzipAll(f))}catch(e){toast('Zip no válido')}}
+    if(/\.zip$/i.test(f.name)){try{list.push(...await unzipAll(f))}catch(e){RPT.err('abrir zip',e);toast('Zip no válido')}}
     else list.push(f);
   }
   list=list.filter(f=>AUDX.test(f.name)||/^(audio|video)\//.test(f.type));
@@ -2629,7 +2821,7 @@ function initProj(){
   $('#pexp').onclick=async()=>{const name=nm.value.trim()||localStorage.getItem('crazyhead.pname')||'proyecto';download(packProject(await snapProject(name)),pfile(name)+'.crazyhead');toast('Archivo exportado')};
   $('#pimp').onclick=()=>{$('#pfile').value='';$('#pfile').click()};
   $('#pfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;
-    try{const p=await unpackProject(f);if(confirm(tr('Se sustituirá el proyecto actual. ¿Continuar?')))applyProject(p)}catch(err){toast('Archivo no válido')}};
+    try{const p=await unpackProject(f);if(confirm(tr('Se sustituirá el proyecto actual. ¿Continuar?')))applyProject(p)}catch(err){RPT.err('abrir proyecto',err);toast('Archivo no válido')}};
 }
 
 
@@ -2672,7 +2864,7 @@ async function brCheck(){
     await BR.del('toCrazyHead');
     S.sel=0;save();syncUI();
     toast('Recibido de SampledHead: '+n+(n===1?' loop':' loops'));
-  }catch(e){toast('No se pudo leer el audio de SampledHead')}
+  }catch(e){RPT.err('audio de SampledHead',e);toast('No se pudo leer el audio de SampledHead')}
   brBusy=false;
 }
 function initBridge(){
@@ -2703,7 +2895,7 @@ const EN={
 'Ableton: un proyecto .als con 4 pistas (Drum Rack con los cortes + la secuencia), un proyecto con Simpler (el loop entero con tus marcas y un clip por pista), o un Drum Rack .adg por loop con su .mid. Koala: un proyecto .koala con los 4 loops en los bancos A–D y sus 4 secuencias. El WAV incluye los efectos y las mutaciones de cada vuelta. El MIDI lleva un canal por loop; la nota 36 (C1) es el corte 1, 37 el corte 2, etc.':'Ableton: one .als project with 4 tracks (Drum Rack with the cuts + the sequence), a Simpler project (the whole loop with your marks and one clip per track), or one .adg Drum Rack per loop with its .mid. Koala: one .koala project with the 4 loops in banks A–D and their 4 sequences. The WAV includes the effects and the mutations of each pass. The MIDI has one channel per loop; note 36 (C1) is cut 1, 37 is cut 2, etc.',
 'Proyecto':'Project','Borrar todo':'Delete all','Idioma / Language':'Language / Idioma','📖 Guía':'📖 Guide',
 '@Reproducir / parar':'@Play / stop','@BPM menos':'@BPM down','@BPM más':'@BPM up','@Regenerar todos (los no bloqueados)':'@Regenerate all (unlocked)','@Regenerar todo':'@Regenerate all','@Ajustes y exportar':'@Settings and export','@Bloquear':'@Lock',
-'Sin loops':'No loops','📌 Golpes fijos':'📌 Fixed hits','Elige un corte y toca los tiempos donde debe sonar siempre; el resto sigue siendo aleatorio.':'Pick a cut and tap the steps where it must always play; the rest stays random.','Quitar fijos':'Clear fixed','Roland SP-404 MK2 · muestras + MIDI (.zip)':'Roland SP-404 MK2 · samples + MIDI (.zip)','Nombre del proyecto SP-404 MK2':'SP-404 MK2 project name','Máx.':'Max','Arrastra un archivo aquí o usa Cargar. Elige una región (máx. 60 s): arrastra sobre la onda, mueve la región o sus bordes. Rueda o pellizco = zoom, Mayús + rueda o el mapa de abajo = desplazar.':'Drop a file here or use Load. Pick a region (max 60 s): drag on the waveform, move the region or its edges. Wheel or pinch = zoom, Shift + wheel or the map below = scroll.','Ver región':'Zoom to region','Ver todo':'Show all','Inicio':'Start','Fin':'End','Nuevo proyecto: se vaciarán los loops, las secuencias y el audio. ¿Continuar?':'New project: loops, sequences and audio will be cleared. Continue?','¿Guardar antes una copia del proyecto actual? (queda en Proyectos y se descarga como .crazyhead)':'Save a copy of the current project first? (kept in Projects and downloaded as .crazyhead)','No se pudo guardar la copia. ¿Continuar igualmente?':'Could not save the copy. Continue anyway?','🆕 Nuevo proyecto':'🆕 New project','Sostener: cada golpe suena hasta que empieza el siguiente':'Sustain: each hit rings until the next one starts','Ableton Live · Drum Rack (.adg + MIDI)':'Ableton Live · Drum Rack (.adg + MIDI)','Ableton Live · proyecto (.als)':'Ableton Live · project (.als)','Ableton Live · proyecto con Simpler (.als)':'Ableton Live · Simpler project (.als)','Nombre del proyecto de Ableton':'Ableton project name','compases':'bars','cortes':'cuts','Koala · proyecto con secuencias':'Koala · project with sequences','Nombre del proyecto Koala':'Koala project name','Nombre del kit de Ableton':'Ableton kit name','SampledHead ha enviado audio a CrazyHead':'SampledHead has sent audio to CrazyHead','Se cargará en A–D y sustituye los loops actuales. ¿Continuar?':'It will load into A–D and replace the current loops. Continue?','Importar':'Import','📥 Varios archivos o ZIP → A–D':'📥 Several files or ZIP → A–D','Por ejemplo las pistas del Looper o del generador de SampledHead (ZIP o WAV sueltos): se reparten en A, B, C y D por orden de nombre.':'For example the Looper or generator tracks from SampledHead (ZIP or loose WAVs): they are spread over A, B, C and D in name order.','📁 Proyectos':'📁 Projects','Proyectos':'Projects','Guardar':'Save','Guardados':'Saved','Archivo':'File','Exportar archivo':'Export file','Importar archivo':'Import file','Cargar':'Load','Exportar':'Export','Borrar':'Delete',
+'Sin loops':'No loops','Grabar muestra':'Record sample','Entrada':'Input','Canales':'Channels','Mono':'Mono','Estéreo':'Stereo','Ganancia':'Gain','🎧 Monitor':'🎧 Monitor','Modo':'Mode','Libre':'Free','Por compases':'By bars','Esperar sonido':'Wait for sound','📂 Abrir audio':'📂 Open audio','Cruce por cero':'Zero crossing','▶ Oír selección':'▶ Play selection','Bucle':'Loop','Quitar silencios':'Trim silence','✂ Recortar':'✂ Trim','Normalizar':'Normalize','Fundido':'Fade','Entrada':'Input','Salida':'Output','Invertir':'Reverse','A mono':'To mono','↶ Deshacer':'↶ Undo','Pasar al secuenciador':'Send to sequencer','Cargar en':'Load into','💾 Guardar WAV':'💾 Save WAV','Ver selección':'Zoom selection','Descargar informe (.txt)':'Download report (.txt)','Pulsa «Grabar» o abre un audio':'Press “Record” or open an audio file','Ese loop ya tiene audio. ¿Sustituirlo?':'That loop already has audio. Replace it?','Entrada apagada':'Input off','📌 Golpes fijos':'📌 Fixed hits','Elige un corte y toca los tiempos donde debe sonar siempre; el resto sigue siendo aleatorio.':'Pick a cut and tap the steps where it must always play; the rest stays random.','Quitar fijos':'Clear fixed','Roland SP-404 MK2 · muestras + MIDI (.zip)':'Roland SP-404 MK2 · samples + MIDI (.zip)','Nombre del proyecto SP-404 MK2':'SP-404 MK2 project name','Máx.':'Max','Arrastra un archivo aquí o usa Cargar. Elige una región (máx. 60 s): arrastra sobre la onda, mueve la región o sus bordes. Rueda o pellizco = zoom, Mayús + rueda o el mapa de abajo = desplazar.':'Drop a file here or use Load. Pick a region (max 60 s): drag on the waveform, move the region or its edges. Wheel or pinch = zoom, Shift + wheel or the map below = scroll.','Ver región':'Zoom to region','Ver todo':'Show all','Inicio':'Start','Fin':'End','Nuevo proyecto: se vaciarán los loops, las secuencias y el audio. ¿Continuar?':'New project: loops, sequences and audio will be cleared. Continue?','¿Guardar antes una copia del proyecto actual? (queda en Proyectos y se descarga como .crazyhead)':'Save a copy of the current project first? (kept in Projects and downloaded as .crazyhead)','No se pudo guardar la copia. ¿Continuar igualmente?':'Could not save the copy. Continue anyway?','🆕 Nuevo proyecto':'🆕 New project','Sostener: cada golpe suena hasta que empieza el siguiente':'Sustain: each hit rings until the next one starts','Ableton Live · Drum Rack (.adg + MIDI)':'Ableton Live · Drum Rack (.adg + MIDI)','Ableton Live · proyecto (.als)':'Ableton Live · project (.als)','Ableton Live · proyecto con Simpler (.als)':'Ableton Live · Simpler project (.als)','Nombre del proyecto de Ableton':'Ableton project name','compases':'bars','cortes':'cuts','Koala · proyecto con secuencias':'Koala · project with sequences','Nombre del proyecto Koala':'Koala project name','Nombre del kit de Ableton':'Ableton kit name','SampledHead ha enviado audio a CrazyHead':'SampledHead has sent audio to CrazyHead','Se cargará en A–D y sustituye los loops actuales. ¿Continuar?':'It will load into A–D and replace the current loops. Continue?','Importar':'Import','📥 Varios archivos o ZIP → A–D':'📥 Several files or ZIP → A–D','Por ejemplo las pistas del Looper o del generador de SampledHead (ZIP o WAV sueltos): se reparten en A, B, C y D por orden de nombre.':'For example the Looper or generator tracks from SampledHead (ZIP or loose WAVs): they are spread over A, B, C and D in name order.','📁 Proyectos':'📁 Projects','Proyectos':'Projects','Guardar':'Save','Guardados':'Saved','Archivo':'File','Exportar archivo':'Export file','Importar archivo':'Import file','Cargar':'Load','Exportar':'Export','Borrar':'Delete',
 'Todo se guarda solo en este dispositivo; aquí puedes guardar versiones con nombre.':'Everything is saved automatically on this device; here you can save named versions.','Sin proyectos guardados':'No saved projects',
 'El archivo .crazyhead lleva ajustes, secuencias y audio. Sirve de copia de seguridad o para pasarlo a otro dispositivo.':'The .crazyhead file holds settings, sequences and audio. Use it as a backup or to move to another device.','@Nombre del proyecto':'@Project name'
 };
@@ -2812,7 +3004,7 @@ function initTop(){
     else if(e.key==='r'||e.key==='R'){regen(S.sel,true);syncUI()}
   });
   document.addEventListener('dragover',e=>e.preventDefault());
-  document.addEventListener('drop',e=>{e.preventDefault();const fl=[...e.dataTransfer.files];if(view==='st'){const f=fl.find(x=>AUDX.test(x.name)||/^(audio|video)\//.test(x.type));if(f)stLoad(f);else toast(LL('Suelta un archivo de audio','Drop an audio file'));return}if(fl.length>1||(fl[0]&&/\.zip$/i.test(fl[0].name)))importMany(fl);else if(fl[0])loadFile(S.sel,fl[0])});
+  document.addEventListener('drop',e=>{e.preventDefault();const fl=[...e.dataTransfer.files];if($('#mic').classList.contains('show')){const f=fl.find(x=>AUDX.test(x.name)||/^(audio|video)\//.test(x.type));if(f)micLoadFile(f);return}if(view==='st'){const f=fl.find(x=>AUDX.test(x.name)||/^(audio|video)\//.test(x.type));if(f)stLoad(f);else toast(LL('Suelta un archivo de audio','Drop an audio file'));return}if(fl.length>1||(fl[0]&&/\.zip$/i.test(fl[0].name)))importMany(fl);else if(fl[0])loadFile(S.sel,fl[0])});
 }
 async function restore(){
   for(let d=0;d<4;d++){
@@ -2831,6 +3023,8 @@ async function restore(){
   ctx.onstatechange=()=>{if(playing&&ctx.state!=='running'&&!document.hidden)ctx.resume().catch(()=>{})};
   await restore();
   eng=new Engine(ctx,S,AUD,false);
+  $('#appfoot').textContent='CrazyHead v'+RPT.VER+' · By SampledHead';$('#rptbtn').onclick=()=>RPT.download('manual (botón del menú)','(informe pedido por el usuario)',null,true);
+  RPT.opts=()=>({bpm:S.bpm,lang:S.lang,vista:view,loopSel:S.sel,maxCortes:S.maxCuts,loops:AUD.map(a=>a?{nombre:a.name,seg:+a.buf.duration.toFixed(2),canales:a.buf.numberOfChannels,sr:a.buf.sampleRate}:null),stems:{region:[ST.a,ST.b],compases:$('#stbars')&&$('#stbars').value,pocaMemoria:ST.low},grabador:{modo:MR.mode,sr:MR.sr,canales:MR.chs?MR.chs.length:0,dispositivo:MR.devLabel||'',ganancia:$('#mgain')&&$('#mgain').value}});
   buildOv();buildScn();initOvDrag();initCopy();buildDeck();buildStems();initRO();initTone();initMic();buildMenuKnobs();initKnobs();buildFx();initTop();$('#rec').onclick=recToggle;initProj();initMany();initBridge();initLang();$('#vMix').onclick=()=>setView('mix');$('#vSt').onclick=()=>setView('st');buildMix();$('#vLoops').onclick=()=>setView('loops');$('#vFx').onclick=()=>setView('fx');syncUI();fitWf();fitPat();fitGr();
   requestAnimationFrame(frame);H.last=hsnap();syncScn();
   {const sp=document.getElementById('splash');if(sp){const go=()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),600)};sp.onclick=go;setTimeout(go,Math.max(0,1700-performance.now()))}}
