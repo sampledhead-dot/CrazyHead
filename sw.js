@@ -1,4 +1,4 @@
-const V='crazyhead-v1.19';
+const V='crazyhead-v1.20';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable.png','./sh-core.js'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('crazyhead-v')&&x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
