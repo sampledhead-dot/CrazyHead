@@ -200,7 +200,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <div class="row"><button id="pexp">Exportar archivo</button><button id="pimp">Importar archivo</button></div>
   <div class="small">El archivo .crazyhead lleva ajustes, secuencias y audio. Sirve de copia de seguridad o para pasarlo a otro dispositivo.</div>
   <input type="file" id="pfile" accept=".crazyhead,application/octet-stream" hidden></div></div>
-<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.17 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
+<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.19 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
 <div class="sheet" id="cpsheet"><div class="box"><h3>Loops</h3><p class="small" style="font-size:15px;font-weight:700" id="cptxt"></p>
   <div class="row"><button id="cpcopy">Copiar</button><button id="cpswap">Intercambiar</button><button id="cpno">Cancelar</button></div>
   <p class="small">Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.</p></div></div>
@@ -233,7 +233,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 'use strict';
 /* ===== Informe de error (.txt) automático ===== */
 const RPT=(()=>{
-  const VER='1.18',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
+  const VER='1.19',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
   const fm=a=>{try{return typeof a==='string'?a:(a&&a.stack)?a.stack:JSON.stringify(a)}catch(e){return String(a)}};
   ['log','info','warn','error','debug'].forEach(k=>{const o=console[k]&&console[k].bind(console);console[k]=function(){try{logs.push(new Date().toISOString().slice(11,23)+' ['+k+'] '+[].map.call(arguments,fm).join(' ').slice(0,600));if(logs.length>300)logs.shift()}catch(e){}if(o)o.apply(null,arguments)}});
   const step=m=>{steps.push(((Date.now()-t0)/1000).toFixed(2)+'s  '+m);if(steps.length>200)steps.shift();st.stage=String(m)};
@@ -1677,7 +1677,7 @@ function buildStems(){
 }
 async function stModUI(){
   const el=$('#stmod');if(!el)return;let have=!!ST.model;
-  if(!have){try{have=!!(await (await caches.open(ST_CACHE)).match(ST_URL))}catch(e){}}
+  if(!have){try{have=(window.SH&&SH.isDesktop)?await SH.models.has(ST_URL):!!(await (await caches.open(ST_CACHE)).match(ST_URL))}catch(e){}}
   el.textContent=have?LL('Modelo: listo ✓','Model: ready ✓'):LL('Modelo: no descargado (se descargará al separar)','Model: not downloaded (downloads when separating)');
 }
 async function stLoad(f){
@@ -1781,6 +1781,7 @@ function stOrt(){
 }
 async function stModel(){
   if(ST.model)return ST.model;
+  if(window.SH&&SH.isDesktop){ST.model=await SH.models.get(ST_URL,{size:136e6,onProgress:f=>{stProg(f*.4);stMsg(LL('Descargando modelo… ','Downloading model… ')+Math.round(f*100)+'%')}});return ST.model}   // 1.19: carpeta compartida Documentos/SampledHead/Modelos
   let cache=null;try{cache=await caches.open(ST_CACHE);const r=await cache.match(ST_URL);if(r){ST.model=await r.arrayBuffer();return ST.model}}catch(e){}
   const r=await fetch(ST_URL);if(!r.ok)throw new Error('HTTP '+r.status);
   const tot=+r.headers.get('content-length')||136e6,rd=r.body.getReader(),parts=[];let got=0;
@@ -3044,6 +3045,17 @@ async function restore(){
   requestAnimationFrame(frame);H.last=hsnap();syncScn();
   {const sp=document.getElementById('splash');if(sp){const go=()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),600)};sp.onclick=go;setTimeout(go,Math.max(0,1700-performance.now()))}}
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+<script src="sh-core.js"></script>
+<script>/* 1.19: conexión con todas las apps (sh-core): «⇄ Apps», bandeja compartida y carpeta Documentos/SampledHead en Windows/Mac */
+(function(){
+  if(!window.SH)return;
+  SH.ui.dock({me:'crazyhead',pos:'left',bottom:64,kinds:['loop'],sendHint:'Manda los loops A–D a otra app',
+    provide:async()=>{const out=AUD.map((a,i)=>a&&a.buf?{name:String(a.name||('Loop '+'ABCD'[i])).replace(/\.[^.]+$/,''),kind:'loop',audio:a.buf,bpm:S.bpm}:null).filter(Boolean);return out.length?out:null},
+    accept:async list=>{const its=list.filter(x=>x.wav).slice(0,4);if(!its.length)return false;
+      await BR.set('toCrazyHead',{ts:Date.now(),items:its.map(x=>({name:x.name,wav:x.wav,sr:x.sr,secs:x.secs,bpm:x.bpm||null}))});
+      await brCheck();return true}});
 })();
 </script>
 </body>
