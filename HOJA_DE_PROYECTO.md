@@ -13,12 +13,28 @@ App web de Sampled Head (secuenciador/groovebox) en un solo `index.html`, con `s
 - Entrega numerada en zip (`crazyhead-vX.zip` con carpeta `crazyhead-vX`), versión standalone de un solo archivo, informe de error `.txt` y esta hoja.
 - **Zona segura:** nada interactivo en la franja de la hora, la batería o la cámara: la cabecera usa `env(safe-area-inset-top)`.
 
+## GlitchHead (1.21)
+Pestaña **Glitch**: el motor y el panel de GlitchHead (Shred · Haze · Split; repo `GlitchHead`) van copiados dentro de
+`index.html` entre `<!--GH:BEGIN-->` y `<!--GH:END-->` con `node ../GlitchHead/tools/embed.js index.html` (no editar ahí).
+El código propio de la pestaña está en el bloque `/* 1.21: pestaña GlitchHead */` al final.
+- **En vivo** (`GHX.t`): Apagado, Máster (entre `eng.out` y el compresor) o un loop A–D (entre su `vol` y `eng.out`).
+  Un solo AudioWorklet. Ajustes en `localStorage['crazyhead.gh']` (no van en los proyectos ni en las escenas).
+- **Exportar**: `renderMix` está envuelta: con GlitchHead en el máster procesa la mezcla ya renderizada (va después del
+  compresor, en vivo va antes); en un loop renderiza ese loop solo, lo procesa y lo suma al resto.
+- **Procesar un loop**: procesa el audio de un loop (offline, en Worker) y lo carga en otro o en el mismo, manteniendo los
+  cortes si se marca; «Deshacer» recupera lo que había (o vacía la ranura si estaba vacía). ⬇ WAV del loop procesado.
+
 ## Historial
+- **1.21** (20-11-2026): pestaña **Glitch** con GlitchHead 1.0.0 (en vivo en máster o en un loop, procesar un loop y
+  cargarlo en otro, incluido en WAV mezcla/por loop y ⏺ REC). Pestañas más compactas en móvil.
 - **1.20** (19-11-2026): golpes fijos con **probabilidad** (100/75/50/25 %, estable por paso hasta regenerar: `D.pinProb`) y **por compás** (chips «Todos / 1…n»: `D.pinBars`, máscara de bits como el sidechain). `pinCell` decide; al cambiarlos se reaplican las columnas fijadas (`pinApply`). Recibe del sampler 1.68 los cortes del Chop al «Enviar pad a CrazyHead» (campo `cuts`, ya soportado).
 - **1.19** (19-11-2026): conexión con todas las apps de Sampled Head (sh-core): botón «⇄ Apps» con «Recibido» y «Enviar a…»; en Windows/Mac usa la carpeta Documentos/SampledHead. Lo recibido entra en los loops A–D. En escritorio el modelo de stems va a la carpeta compartida. El sw ya no borra cachés de otras apps.
 - **v1.18** (19-11-2026) — zona segura: la cabecera (y, donde las hay, las ventanas a pantalla completa y la barra inferior) deja libre la franja de la hora, la batería y la cámara del móvil con `env(safe-area-inset-*)`. Comprobado en Chrome simulando un móvil con 48 px arriba y 24 px abajo: ningún botón tapado. En ordenador no cambia nada.
 
 ## Límites conocidos
+- GlitchHead (1.21): probado en Chrome headless (en vivo, procesar, deshacer, render con y sin GlitchHead); no oído en un
+  móvil real. Sus ajustes no se guardan en los proyectos `.crazyhead`. En el máster, el WAV exportado aplica GlitchHead
+  después del compresor (en vivo va antes): puede sonar algo distinto con niveles altos.
 - Golpes fijos por probabilidad/compás (1.20): probada la lógica en Chrome headless; no oído en un móvil real.
 - Esta hoja se creó en la v1.18; el historial anterior no está documentado aquí.
 - Zona segura comprobada en un móvil simulado (Chrome); no en un móvil real.

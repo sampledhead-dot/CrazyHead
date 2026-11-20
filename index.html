@@ -62,7 +62,7 @@ canvas{display:block;touch-action:none}
 .help{font-size:12px;color:var(--mu);line-height:1.5}
 .help b{color:var(--tx)}
 .views{display:flex;gap:6px;margin:6px 0 8px}
-.views button{flex:1;font-weight:700}
+.views button{flex:1;font-weight:700}@media(max-width:480px){.views{gap:4px}.views button{padding-left:3px;padding-right:3px;font-size:13px}.views #rec{flex:0 0 60px!important}}
 .views button.on{background:var(--c);border-color:var(--c);color:#111}
 .seg{display:flex;gap:4px;margin:6px 0}
 .seg button{flex:1;padding:6px 2px;font-weight:700;border-color:var(--k);color:var(--k)}
@@ -149,10 +149,11 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 <div class="wrap">
   <div id="ov"></div>
   <div id="scn" class="scn"></div>
-  <div class="views"><button id="vLoops" class="on">Loops</button><button id="vFx">FX pads</button><button id="vMix">Mixer</button><button id="vSt">Stems</button><button id="rec" style="flex:0 0 78px" aria-label="Grabar la salida" title="Grabar la salida">⏺ REC</button></div>
+  <div class="views"><button id="vLoops" class="on">Loops</button><button id="vFx">FX pads</button><button id="vMix">Mixer</button><button id="vSt">Stems</button><button id="vGh" title="GlitchHead: Shred · Haze · Split">Glitch</button><button id="rec" style="flex:0 0 78px" aria-label="Grabar la salida" title="Grabar la salida">⏺ REC</button></div>
   <div id="fxview" style="display:none"></div>
   <div id="mixview" style="display:none"></div>
   <div id="stview" style="display:none"></div>
+  <div id="ghview" style="display:none"></div>
   <div id="deck"></div>
 </div>
 <div id="appfoot"></div>
@@ -200,7 +201,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <div class="row"><button id="pexp">Exportar archivo</button><button id="pimp">Importar archivo</button></div>
   <div class="small">El archivo .crazyhead lleva ajustes, secuencias y audio. Sirve de copia de seguridad o para pasarlo a otro dispositivo.</div>
   <input type="file" id="pfile" accept=".crazyhead,application/octet-stream" hidden></div></div>
-<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.20 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
+<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.21 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
 <div class="sheet" id="cpsheet"><div class="box"><h3>Loops</h3><p class="small" style="font-size:15px;font-weight:700" id="cptxt"></p>
   <div class="row"><button id="cpcopy">Copiar</button><button id="cpswap">Intercambiar</button><button id="cpno">Cancelar</button></div>
   <p class="small">Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.</p></div></div>
@@ -233,7 +234,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 'use strict';
 /* ===== Informe de error (.txt) automático ===== */
 const RPT=(()=>{
-  const VER='1.20',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
+  const VER='1.21',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
   const fm=a=>{try{return typeof a==='string'?a:(a&&a.stack)?a.stack:JSON.stringify(a)}catch(e){return String(a)}};
   ['log','info','warn','error','debug'].forEach(k=>{const o=console[k]&&console[k].bind(console);console[k]=function(){try{logs.push(new Date().toISOString().slice(11,23)+' ['+k+'] '+[].map.call(arguments,fm).join(' ').slice(0,600));if(logs.length>300)logs.shift()}catch(e){}if(o)o.apply(null,arguments)}});
   const step=m=>{steps.push(((Date.now()-t0)/1000).toFixed(2)+'s  '+m);if(steps.length>200)steps.shift();st.stage=String(m)};
@@ -2702,7 +2703,7 @@ function fxViewSync(){
   $$('.pad').forEach(el=>{const k=el.dataset.p;el.classList.toggle('hold',!!padHold[k]);$('.hd',el).classList.toggle('on',!!padHold[k])});
 }
 function setView(v){
-  view=v;$('#deck').style.display=v==='loops'?'':'none';$('#fxview').style.display=v==='fx'?'':'none';$('#mixview').style.display=v==='mix'?'':'none';$('#stview').style.display=v==='st'?'':'none';$('#vSt').classList.toggle('on',v==='st');
+  view=v;$('#deck').style.display=v==='loops'?'':'none';$('#fxview').style.display=v==='fx'?'':'none';$('#mixview').style.display=v==='mix'?'':'none';$('#stview').style.display=v==='st'?'':'none';$('#vSt').classList.toggle('on',v==='st');$('#ghview').style.display=v==='gh'?'':'none';$('#vGh').classList.toggle('on',v==='gh');if(v==='gh'&&typeof ghBuild==='function')ghBuild();
   $('#vLoops').classList.toggle('on',v==='loops');$('#vFx').classList.toggle('on',v==='fx');$('#vMix').classList.toggle('on',v==='mix');
   if(v==='mix'){mixSync();needs=true}
   if(v==='st')stDraw();
@@ -2977,6 +2978,7 @@ const GUIDE={es:`
 <details><summary>Modo Orden (sin azar)</summary><div class="g">El botón <b>123</b> de cada loop (en su fila, junto a M y S) detiene el azar solo en ese loop: toca sus cortes <b>uno tras otro</b> (1, 2, 3…) a un golpe por paso, al tempo del secuenciador, y vuelve a empezar al terminar los cortes. Respeta los cortes activados (chips), la rejilla (1/4, 1/8, 1/16) y la longitud. Mientras está activo en un loop no actúan en él Regenerar, Dado, Mutación ni los efectos aleatorios. Al desactivarlo vuelve tu patrón anterior (si recargaste la página, se regenera con la misma semilla).</div></details>
 <details><summary>Sostener (∞)</summary><div class="g">El botón <b>∞</b> de cada loop (junto a 123) hace que cada golpe <b>suene hasta que empieza el siguiente</b> en vez de durar solo lo que dura su corte, aunque falten uno, dos o tres compases (si solo hay un golpe, suena hasta que el loop vuelve a empezar o se acaba el audio). Sirve para notas largas, pads y bajos. Con ratchets los golpes repetidos siguen siendo cortos. También afecta a la exportación (WAV, MIDI, Ableton, Move, Koala): las notas duran hasta el siguiente golpe.</div></details>
 <details><summary>Rendimiento y cortes de audio</summary><div class="g">Si con muchos efectos el audio se corta: usa el <b>Modo estable</b> (⋮ → Rendimiento, activo por defecto; más búfer, unos ms más de latencia), apaga efectos que no uses (el reverb y el compresor solo consumen cuando están activos), baja el número de loops con reverb largo y cierra otras pestañas/apps. Con el dibujo pesado la app reduce sola los fotogramas.</div></details>
+<details><summary>GlitchHead (Shred · Haze · Split)</summary><div class="g">Pestaña <b>Glitch</b>: tres efectos en cadena, los mismos del plugin GlitchHead. <b>SHRED</b> corta el audio en cada cruce por cero y reordena los trozos al azar; <b>HAZE</b> crea texturas con memoria (halos, drones); <b>SPLIT</b> separa lo que pasa del umbral y lo que queda debajo. <b>En vivo</b>: elige Máster o un loop A–D y suena mientras tocas (también en WAV mezcla y ⏺ REC). <b>Procesar un loop</b>: aplica los ajustes al audio de un loop y lo carga en otro (o en el mismo); <b>Deshacer</b> recupera el anterior. Pasa el dedo por un mando para ver qué hace.</div></details>
 <details><summary>Atajos y límites</summary><div class="g">Ordenador: Espacio = play/stop · 1–4 = elegir loop · R = regenerar. Todo se guarda en el dispositivo. Funciona sin conexión una vez cargada.</div></details>`,
 en:`
 <details open><summary>What is CrazyHead</summary><div class="g">Load up to <b>4 loops</b> (A–D); the app <b>chops them at the hits</b> and generates an <b>independent random sequence</b> for each. Everything plays at the same BPM, but each loop has its own length, groove and effects.</div></details>
@@ -2999,6 +3001,7 @@ en:`
 <details><summary>Order mode (no randomness)</summary><div class="g">The <b>123</b> button on each loop’s row (next to M and S) stops the randomness for that loop only: it plays its cuts <b>one after another</b> (1, 2, 3…), one hit per step, at the sequencer tempo, and starts over when the cuts run out. It respects the enabled cuts (chips), the grid (1/4, 1/8, 1/16) and the length. While active on a loop, Regenerate, Dice, Mutation and random effects do nothing for it. Turning it off brings your previous pattern back (if you reloaded the page, it is regenerated from the same seed).</div></details>
 <details><summary>Sustain (∞)</summary><div class="g">The <b>∞</b> button on each loop (next to 123) makes every hit <b>ring until the next hit starts</b> instead of lasting only as long as its cut, even if it is one, two or three bars away (with a single hit it rings until the loop restarts or the audio ends). Useful for long notes, pads and basses. Ratchet repeats stay short. It also affects exports (WAV, MIDI, Ableton, Move, Koala): notes last until the next hit.</div></details>
 <details><summary>Performance and audio dropouts</summary><div class="g">If audio crackles with many effects: use <b>Stable mode</b> (⋮ → Performance, on by default; bigger buffer, a few ms more latency), switch off effects you do not use (reverb and compressor only cost CPU while active), use fewer loops with long reverb and close other tabs/apps. With heavy drawing the app lowers its frame rate by itself.</div></details>
+<details><summary>GlitchHead (Shred · Haze · Split)</summary><div class="g"><b>Glitch</b> tab: three effects in a chain, the same as the GlitchHead plugin. <b>SHRED</b> cuts the audio at every zero crossing and reorders the pieces at random; <b>HAZE</b> builds textures from memory (halos, drones); <b>SPLIT</b> splits what goes over the threshold from what stays below. <b>Live</b>: pick Master or a loop A–D and it plays while you jam (also in WAV mix and ⏺ REC). <b>Process a loop</b>: applies the settings to a loop’s audio and loads it into another (or the same) slot; <b>Undo</b> restores the previous one. Touch a knob to see what it does.</div></details>
 <details><summary>Shortcuts and limits</summary><div class="g">Computer: Space = play/stop · 1–4 = pick loop · R = regenerate. Everything is saved on your device. Works offline once loaded.</div></details>`};
 
 /* ============ ARRANQUE ============ */
@@ -3068,5 +3071,990 @@ async function restore(){
       await brCheck();return true}});
 })();
 </script>
+<script>/* 1.21: pestaña GlitchHead (Shred · Haze · Split) — mismo motor que el plugin y la app GlitchHead */
+const GHX={t:'off',p:null,node:null,ui:null,at:null,bak:[null,null,null,null],busy:false};
+try{const j=JSON.parse(localStorage.getItem('crazyhead.gh')||'null');if(j){GHX.t=j.t==null?'off':j.t;GHX.p=j.p||null}}catch(e){}
+function ghSave(){try{localStorage.setItem('crazyhead.gh',JSON.stringify({t:GHX.t,p:GHX.ui?GHX.ui.params:GHX.p}))}catch(e){}}
+function ghParams(){return GHX.ui?GHX.ui.params:Object.assign(GlitchHeadDSP.defaults(),GHX.p||{})}
+// dónde se inserta en vivo: 'off', 'm' (máster) o 0..3 (loop)
+function ghUnroute(){
+  if(!GHX.node||GHX.at==null||!eng)return;
+  try{GHX.node.disconnect()}catch(e){}
+  if(GHX.at==='m'){try{eng.out.disconnect(GHX.node)}catch(e){}eng.out.connect(eng.comp)}
+  else{const n=eng.dk[GHX.at];try{n.vol.disconnect(GHX.node)}catch(e){}n.vol.connect(eng.out)}
+  GHX.at=null;
+}
+async function ghRoute(){
+  if(!eng||!ctx)return;
+  ghUnroute();
+  if(GHX.t==='off'){ghStatus();return}
+  try{
+    if(!GHX.node){GHX.node=await GlitchHeadUI.createNode(ctx,l=>{if(GHX.ui)GHX.ui.leds(l)});GHX.node.setParams(ghParams())}
+    if(GHX.t==='m'){eng.out.disconnect(eng.comp);eng.out.connect(GHX.node);GHX.node.connect(eng.comp)}
+    else{const n=eng.dk[GHX.t];n.vol.disconnect(eng.out);n.vol.connect(GHX.node);GHX.node.connect(eng.out)}
+    GHX.at=GHX.t;RPT.step('GlitchHead en '+(GHX.t==='m'?'máster':NM[GHX.t]));
+  }catch(e){RPT.err('GlitchHead: insertar',e);GHX.t='off';toast(LL('GlitchHead no puede sonar en vivo en este navegador','GlitchHead cannot run live in this browser'))}
+  ghStatus();
+}
+function ghStatus(){
+  const el=document.getElementById('ghst');if(!el)return;
+  document.querySelectorAll('#ghwhere button').forEach(b=>b.classList.toggle('on',String(GHX.t)===b.dataset.t));
+  el.textContent=GHX.t==='off'?LL('Apagado: no actúa en vivo. Puedes procesar un loop abajo.','Off: not acting live. You can process a loop below.')
+    :LL('Suena en vivo en ','Playing live on ')+(GHX.t==='m'?LL('el máster','the master'):LL('el loop ','loop ')+NM[GHX.t])+LL('. «WAV mezcla», «por loop» y ⏺ REC lo incluyen.','. «WAV mix», «per loop» and ⏺ REC include it.');
+}
+function ghBuild(){
+  if(GHX.ui||!window.GlitchHeadUI)return;
+  const v=document.getElementById('ghview');
+  v.innerHTML=`<div class="stc">
+   <div class="small" style="font-weight:700">${LL('GlitchHead en vivo','GlitchHead live')}</div>
+   <div class="row" id="ghwhere"><button data-t="off">${LL('Apagado','Off')}</button><button data-t="m">${LL('Máster','Master')}</button><button data-t="0">A</button><button data-t="1">B</button><button data-t="2">C</button><button data-t="3">D</button></div>
+   <div class="small" id="ghst"></div>
+   <div class="small" style="font-weight:700;margin-top:8px">${LL('Procesar un loop (sin tiempo real)','Process a loop (offline)')}</div>
+   <div class="row"><span class="small">${LL('De','From')}</span><select id="ghsrc"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+    <span class="small">${LL('a','to')}</span><select id="ghdst"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+    <label class="small"><input type="checkbox" id="ghkeep" checked> ${LL('mantener cortes','keep cuts')}</label>
+    <button id="ghgo" class="go">⚡ ${LL('Procesar y cargar','Process and load')}</button><button id="ghundo">↶ ${LL('Deshacer','Undo')}</button><button id="ghwav">⬇ WAV</button></div>
+   <div class="small" id="ghmsg">${LL('Procesa el audio del loop con los ajustes de abajo (mismo resultado cada vez) y lo carga en el destino. El original se puede recuperar con Deshacer.','Processes the loop audio with the settings below (same result every time) and loads it into the target. Undo brings the original back.')}</div>
+  </div><div id="ghpanel" style="margin-top:8px;--gh-flow:var(--c,#f3efe9)"></div>`;
+  GHX.ui=GlitchHeadUI.mount(document.getElementById('ghpanel'),{onChange(p){if(GHX.node)GHX.node.setParams(p);ghSave()}});
+  if(GHX.p)GHX.ui.set(Object.assign(GlitchHeadDSP.defaults(),GHX.p));
+  document.querySelectorAll('#ghwhere button').forEach(b=>b.onclick=async()=>{await ensure();GHX.t=b.dataset.t==='off'||b.dataset.t==='m'?b.dataset.t:+b.dataset.t;ghSave();ghRoute()});
+  document.getElementById('ghsrc').value=document.getElementById('ghdst').value=String(S.sel||0);
+  document.getElementById('ghgo').onclick=ghProcess;
+  document.getElementById('ghundo').onclick=()=>{const d=+document.getElementById('ghdst').value,b=GHX.bak[d];if(!b){toast(LL('Nada que deshacer en '+NM[d],'Nothing to undo on '+NM[d]));return}
+    GHX.bak[d]=null;if(b.empty){const D=S.decks[d];AUD[d]=null;D.markers=[];D.pool=[];D.pat=[];D.src='';try{idbDel('a'+d)}catch(e){}wfDirty=true;save();syncUI();dirty()}else{setBuffer(d,b.buf,b.name,b.src,{bars:b.bars,keep:true});S.decks[d].markers=b.cuts;regen(d,true);syncUI()}toast(LL('Recuperado ','Restored ')+NM[d])};
+  document.getElementById('ghwav').onclick=async()=>{const s=+document.getElementById('ghsrc').value;if(!AUD[s]){toast(LL('El loop '+NM[s]+' está vacío','Loop '+NM[s]+' is empty'));return}
+    try{const out=await ghRender(AUD[s].buf);download(new Blob([wavEncode(out.ch,out.sr)],{type:'audio/wav'}),`crazyhead_${NM[s]}_glitchhead_${stamp()}.wav`)}catch(e){RPT.err('GlitchHead: WAV',e)}};
+  ghStatus();
+}
+async function ghRender(buf,tail){
+  const ch=[buf.getChannelData(0),buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0)];
+  const out=await GlitchHeadUI.renderOffline(ch,buf.sampleRate,ghParams(),tail||0);
+  let pk=0;for(const c of out)for(let i=0;i<c.length;i++){const a=Math.abs(c[i]);if(a>pk)pk=a}
+  if(pk>.98){const g=.98/pk;for(const c of out)for(let i=0;i<c.length;i++)c[i]*=g}
+  return{ch:out,sr:buf.sampleRate};
+}
+async function ghProcess(){
+  if(GHX.busy)return;
+  const s=+document.getElementById('ghsrc').value,d=+document.getElementById('ghdst').value,keep=document.getElementById('ghkeep').checked;
+  if(!AUD[s]){toast(LL('El loop '+NM[s]+' está vacío','Loop '+NM[s]+' is empty'));return}
+  GHX.busy=true;const msg=document.getElementById('ghmsg');msg.textContent=LL('Procesando…','Processing…');
+  try{
+    RPT.st.stage='GlitchHead procesar '+NM[s]+'→'+NM[d];
+    const src=AUD[s],D0=S.decks[s],out=await ghRender(src.buf);
+    const nb=ctx.createBuffer(2,out.ch[0].length,out.sr);nb.copyToChannel(out.ch[0],0);nb.copyToChannel(out.ch[1],1);
+    GHX.bak[d]=AUD[d]?null:{empty:true};if(AUD[d])GHX.bak[d]={buf:AUD[d].buf,name:AUD[d].name,src:S.decks[d].src,bars:S.decks[d].loopBars,cuts:JSON.parse(JSON.stringify(S.decks[d].markers||[]))};
+    const cuts=keep?JSON.parse(JSON.stringify(D0.markers||[])):null,bars=D0.loopBars;
+    setBuffer(d,nb,'GlitchHead · '+src.name+' · '+(GHX.ui?GHX.ui.presetName:''),'glitchhead',{bars,keep:!!cuts});
+    if(cuts){S.decks[d].markers=cuts;regen(d,true);syncUI()}
+    msg.textContent=LL('Hecho: ','Done: ')+NM[s]+' → '+NM[d]+(GHX.bak[d]?LL(' (Deshacer recupera el anterior)',' (Undo restores the previous one)'):'');
+    RPT.step('GlitchHead procesado '+NM[s]+'→'+NM[d]);
+  }catch(e){RPT.err('GlitchHead: procesar loop',e);msg.textContent=LL('Error al procesar','Processing error')}
+  GHX.busy=false;
+}
+// Exportar: la mezcla y los loops incluyen GlitchHead si está insertado en vivo
+const ghRenderMix0=renderMix;
+async function ghRenderExcept(bars,ex){
+  const S2=cloneS();for(const D of S2.decks)D.cyc=0;S2.decks.forEach((D,i)=>{if(i===ex){D.mute=true;D.solo=false}});if(S2.decks.every((D,i)=>i===ex||!D.solo))S2.decks.forEach(D=>D.solo=false);
+  const sd=60/S2.bpm/4,steps=bars*16,sr=44100,total=steps*sd+3;
+  const oc=new OfflineAudioContext(2,Math.ceil(total*sr),sr),e=new Engine(oc,S2,AUD,true);
+  for(let gs=0;gs<steps;gs++)stepAll(e,S2,AUD,gs,gs*sd,sd,null);
+  return await oc.startRendering();
+}
+function ghToBuf(o){const b=new AudioBuffer({numberOfChannels:2,length:o.ch[0].length,sampleRate:o.sr});b.copyToChannel(o.ch[0],0);b.copyToChannel(o.ch[1],1);return b}
+renderMix=async function(bars,solo){
+  const t=GHX.t;
+  if(t==='off'||!window.GlitchHeadUI)return ghRenderMix0(bars,solo);
+  if(t==='m')return ghToBuf(await ghRender(await ghRenderMix0(bars,solo)));
+  if(solo>=0&&solo!==t)return ghRenderMix0(bars,solo);
+  const fx=ghToBuf(await ghRender(await ghRenderMix0(bars,t)));
+  if(solo===t)return fx;
+  const rest=await ghRenderExcept(bars,t),n=Math.min(fx.length,rest.length);
+  for(let c=0;c<2;c++){const a=rest.getChannelData(c),b=fx.getChannelData(c);for(let i=0;i<n;i++)a[i]+=b[i]}
+  return rest;
+};
+document.getElementById('vGh').onclick=()=>setView('gh');
+// insertar en vivo en cuanto exista el motor de audio
+(function wait(){if(eng&&ctx){if(GHX.t!=='off')ghRoute();return}setTimeout(wait,400)})();
+</script>
+<!--GH:BEGIN motor y panel de GlitchHead 1.0.0 (copiados con GlitchHead/tools/embed.js: no editar aquí)-->
+<script>/* GlitchHead — motor DSP de referencia (JavaScript). By Sampled Head.
+ * Tres motores en cadena (orden configurable):
+ *   SHRED  · trocea la entrada en wavesets (de cruce por cero a cruce por cero), los agrupa en «colecciones»
+ *            y las reproduce con probabilidades (desorden, repetición, ausencia, sueño fuente/proceso).
+ *   HAZE   · memoria corta que mezcla pasado y presente y la lee con granos: halos, sostenidos, drones.
+ *   SPLIT  · puerta partida: lo que supera el umbral (ARRIBA, filtro tipo low-pass gate) y lo que queda
+ *            debajo (ABAJO, inverso) se procesan por separado.
+ * El mismo diseño está en vst/Source/dsp/GlitchDSP.h (C++). PARIDAD: cualquier cambio de sonido en los dos.
+ * Todo el azar sale de Rng (xorshift32) con semillas fijas: mismo resultado en JS y C++.
+ * Funciona en navegador (global GlitchHeadDSP), AudioWorklet y Node (module.exports).
+ */
+(function (g, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api; else g.GlitchHeadDSP = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function factory() {
+'use strict';
+
+// ---------------------------------------------------------------- parámetros
+// [id, nombre, min, max, defecto, tipo, descripción]  tipo: f (continuo), i (entero), b (interruptor), c:<opciones>
+const PARAMS = [
+  ['inputDb', 'Input', -24, 24, 0, 'f', 'Ganancia de entrada antes de los tres motores.'],
+  ['mix', 'Mix', 0, 1, 1, 'f', 'Mezcla global entre la señal original y la procesada.'],
+  ['outputDb', 'Output', -24, 24, 0, 'f', 'Volumen de salida.'],
+  ['order', 'Orden', 0, 5, 0, 'c:Shred>Haze>Split|Shred>Split>Haze|Haze>Shred>Split|Haze>Split>Shred|Split>Shred>Haze|Split>Haze>Shred', 'Orden de los tres motores en la cadena.'],
+  // SHRED
+  ['sOn', 'Shred On', 0, 1, 1, 'b', 'Enciende o apaga SHRED.'],
+  ['sFloor', 'Floor', 0, 3, 1, 'c:0 ms|25 ms|50 ms|100 ms', 'Duración mínima de cada colección (0, 25, 50 o 100 ms).'],
+  ['sLength', 'Length', 1, 64, 8, 'i', 'Cuántos wavesets (de cruce por cero a cruce por cero) forman una colección.'],
+  ['sStuck', 'Stuck', 0, 1, 0, 'f', 'Probabilidad de no grabar colecciones nuevas: el pasado se queda pegado.'],
+  ['sEnv', 'Envelope', 0, 1, 0, 'b', 'Ventana suave en cada colección: transiciones más redondas.'],
+  ['sDisorder', 'Disorder', 0, 1, 0.2, 'f', 'Probabilidad de saltar a colecciones anteriores (orden no lineal).'],
+  ['sRate', 'Rate', -24, 24, 0, 'f', 'Velocidad de reproducción de las colecciones, en semitonos.'],
+  ['sAbsence', 'Absence', -1, 1, 0, 'f', 'Izquierda: volumen aleatorio por colección. Derecha: silencios aleatorios.'],
+  ['sRepeat', 'Repeat', 0, 1, 0.2, 'f', 'Probabilidad de repetir la misma colección.'],
+  ['sFreeze', 'Freeze', 0, 1, 0, 'b', 'Repite la colección actual sin fin (Repeat al 100 %).'],
+  ['sDream', 'Dream', 0, 1, 1, 'f', 'En cada colección, probabilidad de oír el proceso en vez de la fuente.'],
+  ['sSync', 'Sync', 0, 1, 0, 'b', 'Dream decide igual en los dos canales (mono).'],
+  ['sLean', 'Lean', -1, 1, 0, 'f', 'Reparte Dream entre izquierda y derecha.'],
+  ['sSmoo', 'Smoo', 0, 1, 0.2, 'f', 'Suaviza el paso entre fuente y proceso (de corte seco a fundido).'],
+  ['sMonitor', 'Monitor', 0, 1, 0.5, 'f', 'Balance de salida entre la fuente y el proceso.'],
+  ['sSustain', 'Sustain', 0, 1, 0, 'b', 'Sigue sonando aunque deje de entrar audio.'],
+  // HAZE
+  ['hOn', 'Haze On', 0, 1, 0, 'b', 'Enciende o apaga HAZE.'],
+  ['hRaw', 'Raw', 0, 1, 0, 'b', 'Apagado suaviza los ataques de la entrada; encendido, sonido más afilado.'],
+  ['hMemory', 'Memory', 0, 1, 0.5, 'f', 'Cuánto del pasado se conserva al grabar encima: persistencia de los recuerdos.'],
+  ['hFreeze', 'Freeze', 0, 1, 0, 'b', 'Congela la memoria: textura sostenida infinita.'],
+  ['hSize', 'Size', 20, 2000, 300, 'f', 'Longitud de la memoria: densidad de la textura.'],
+  ['hRate', 'Rate', -24, 24, 0, 'f', 'Velocidad de las cabezas de lectura, en semitonos.'],
+  ['hLo', 'Lo', -12, 12, 0, 'f', 'Recorta o realza los graves de la textura.'],
+  ['hHi', 'Hi', -12, 12, 0, 'f', 'Recorta o realza los agudos de la textura.'],
+  ['hTemp', 'Temperature', 0, 1, 0.2, 'f', 'Distorsión; en la mitad alta añade modulación de amplitud con ruido.'],
+  ['hWidth', 'Mid/Side', 0, 2, 1, 'f', 'Anchura estéreo de la textura (Mid/Side).'],
+  ['hWet', 'Wet', 0, 1, 0.5, 'f', 'Volumen de la textura.'],
+  ['hDry', 'Dry', 0, 1, 1, 'f', 'Volumen de la señal que entra en HAZE.'],
+  // SPLIT
+  ['xOn', 'Split On', 0, 1, 0, 'b', 'Enciende o apaga SPLIT.'],
+  ['xMode', 'Mode', 0, 2, 0, 'c:Direct|Crossed|Summed', 'Direct: cada canal se controla a sí mismo. Crossed: al contrario. Summed: los dos juntos.'],
+  ['xVerge', 'Verge', -60, 0, -30, 'f', 'Umbral: lo que lo supera va ARRIBA y genera la envolvente.'],
+  ['xBoost', 'Boost', 0, 24, 0, 'f', 'Sube la entrada del detector.'],
+  ['xSmooth', 'Smooth', 1, 200, 20, 'f', 'Suaviza la envolvente.'],
+  ['xRetain', 'Retain', 0, 1, 0, 'f', 'Alarga la caída de la envolvente con ráfagas aleatorias.'],
+  ['xDriveA', 'Drive Above', 0, 1, 0.2, 'f', 'Distorsión de ARRIBA.'],
+  ['xCutA', 'Cut Above', 0, 1, 0, 'f', 'Quita graves de ARRIBA.'],
+  ['xVolA', 'Vol Above', 0, 1, 0.7, 'f', 'Volumen de ARRIBA.'],
+  ['xSide', 'Sidechain', 0, 1, 0, 'f', 'La envolvente de ARRIBA agacha más a ABAJO (ducking).'],
+  ['xDrift', 'Drift', 0, 1, 0.2, 'f', 'Retardo corto aleatorio en ABAJO: afinación inestable.'],
+  ['xMelt', 'Melt', 0, 1, 0.3, 'f', 'Difumina ABAJO.'],
+  ['xDriveB', 'Drive Below', 0, 1, 0.2, 'f', 'Distorsión de ABAJO.'],
+  ['xCutB', 'Cut Below', 0, 1, 0, 'f', 'Quita agudos de ABAJO.'],
+  ['xVolB', 'Vol Below', 0, 1, 0.5, 'f', 'Volumen de ABAJO.'],
+];
+const ORDERS = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+const FLOOR_MS = [0, 25, 50, 100];
+
+function defaults() { const p = {}; for (const d of PARAMS) p[d[0]] = d[4]; return p; }
+
+// Presets de fábrica (solo los valores distintos del defecto). Se copian a vst/Source/Presets.h con tests/gen_cpp.js
+const PRESETS = [
+  { name: 'Default', cat: 'General', v: {} },
+  // SHRED
+  { name: 'Rasguño leve', cat: 'Shred', v: { sLength: 12, sDisorder: 0.08, sRepeat: 0.1, sDream: 0.6, sSmoo: 0.5 } },
+  { name: 'Tartamudo', cat: 'Shred', v: { sLength: 24, sFloor: 3, sRepeat: 0.7, sDisorder: 0.1 } },
+  { name: 'Cinta rota', cat: 'Shred', v: { sLength: 16, sFloor: 2, sStuck: 0.4, sDisorder: 0.5, sAbsence: 0.35, sRate: -2 } },
+  { name: 'Fuzz de wavesets', cat: 'Shred', v: { sLength: 1, sFloor: 0, sAbsence: 0.55, sRepeat: 0.3, sDisorder: 0 } },
+  { name: 'Sueño estéreo', cat: 'Shred', v: { sLength: 20, sDream: 0.5, sLean: 0.3, sSmoo: 0.8, sEnv: 1, sDisorder: 0.3 } },
+  { name: 'Octava fantasma', cat: 'Shred', v: { sLength: 6, sRate: 12, sEnv: 1, sRepeat: 0.5, sMonitor: 0.45 } },
+  { name: 'Congelado', cat: 'Shred', v: { sLength: 32, sFloor: 3, sFreeze: 1, sEnv: 1, sSustain: 1 } },
+  // HAZE
+  { name: 'Halo', cat: 'Haze', v: { sOn: 0, hOn: 1, hMemory: 0.55, hSize: 450, hWet: 0.45, hHi: 3, hTemp: 0.1 } },
+  { name: 'Dron infinito', cat: 'Haze', v: { sOn: 0, hOn: 1, hMemory: 0.92, hSize: 1600, hWet: 0.7, hDry: 0.6, hLo: 2, hHi: -4 } },
+  { name: 'Metal que grita', cat: 'Haze', v: { sOn: 0, hOn: 1, hRaw: 1, hMemory: 0.6, hSize: 60, hRate: 7, hTemp: 0.8, hWet: 0.6, hHi: 4 } },
+  { name: 'Viento helado', cat: 'Haze', v: { sOn: 0, hOn: 1, hMemory: 0.8, hSize: 900, hRate: 12, hLo: -10, hHi: 6, hWidth: 1.8, hWet: 0.5 } },
+  { name: 'Plomo fundido', cat: 'Haze', v: { sOn: 0, hOn: 1, hMemory: 0.7, hSize: 250, hRate: -12, hTemp: 0.65, hLo: 6, hHi: -6, hWet: 0.6 } },
+  // SPLIT
+  { name: 'Puerta oscura', cat: 'Split', v: { sOn: 0, xOn: 1, xVerge: -24, xDriveA: 0.5, xVolA: 0.7, xVolB: 0 } },
+  { name: 'Caídas', cat: 'Split', v: { sOn: 0, xOn: 1, xVerge: -20, xRetain: 0.7, xSmooth: 8, xVolA: 0.8, xVolB: 0.2 } },
+  { name: 'Textura temblorosa', cat: 'Split', v: { sOn: 0, xOn: 1, xVerge: -18, xVolA: 0.3, xVolB: 0.8, xDrift: 0.7, xMelt: 0.6, xSide: 0.3 } },
+  { name: 'Monstruo cruzado', cat: 'Split', v: { sOn: 0, xOn: 1, xMode: 1, xVerge: -26, xBoost: 6, xDriveA: 0.8, xDriveB: 0.6, xVolA: 0.6, xVolB: 0.5 } },
+  // Combinaciones
+  { name: 'Bestia', cat: 'Combo', v: { sLength: 4, sAbsence: 0.3, sRepeat: 0.4, xOn: 1, xVerge: -22, xDriveA: 0.7, xVolB: 0.3, order: 0 } },
+  { name: 'Desintegrar loop', cat: 'Combo', v: { sLength: 16, sFloor: 2, sStuck: 0.3, sDisorder: 0.45, hOn: 1, hMemory: 0.6, hSize: 700, hWet: 0.35 } },
+  { name: 'Sombra granular', cat: 'Combo', v: { sLength: 10, sDream: 0.7, sEnv: 1, hOn: 1, hMemory: 0.75, hSize: 1200, hWet: 0.4, xOn: 1, xVerge: -30, xVolA: 0.6, xVolB: 0.4, xMelt: 0.5, order: 2 } },
+];
+
+// ---------------------------------------------------------------- utilidades
+const TAU = 2 * Math.PI;
+const dbToGain = d => Math.pow(10, d / 20);
+const clamp = (x, a, b) => x < a ? a : (x > b ? b : x);
+const BUF_BITS = 18, BUF_N = 1 << BUF_BITS, BUF_MASK = BUF_N - 1;
+
+class Rng {               // xorshift32 → [0,1)
+  constructor(seed) { this.s = (seed >>> 0) || 1; }
+  next() { let s = this.s; s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; this.s = s; return s / 4294967296; }
+}
+
+// Biquad RBJ (forma directa I, doble precisión)
+class Biquad {
+  constructor() { this.b0 = 1; this.b1 = 0; this.b2 = 0; this.a1 = 0; this.a2 = 0; this.x1 = 0; this.x2 = 0; this.y1 = 0; this.y2 = 0; }
+  shelf(sr, f, db, high) {
+    const A = Math.pow(10, db / 40), w = TAU * f / sr, cs = Math.cos(w), sn = Math.sin(w);
+    const al = sn / 2 * Math.SQRT2, sA = 2 * Math.sqrt(A) * al;
+    let b0, b1, b2, a0, a1, a2;
+    if (!high) {
+      b0 = A * ((A + 1) - (A - 1) * cs + sA); b1 = 2 * A * ((A - 1) - (A + 1) * cs); b2 = A * ((A + 1) - (A - 1) * cs - sA);
+      a0 = (A + 1) + (A - 1) * cs + sA; a1 = -2 * ((A - 1) + (A + 1) * cs); a2 = (A + 1) + (A - 1) * cs - sA;
+    } else {
+      b0 = A * ((A + 1) + (A - 1) * cs + sA); b1 = -2 * A * ((A - 1) + (A + 1) * cs); b2 = A * ((A + 1) + (A - 1) * cs - sA);
+      a0 = (A + 1) - (A - 1) * cs + sA; a1 = 2 * ((A - 1) - (A + 1) * cs); a2 = (A + 1) - (A - 1) * cs - sA;
+    }
+    this.b0 = b0 / a0; this.b1 = b1 / a0; this.b2 = b2 / a0; this.a1 = a1 / a0; this.a2 = a2 / a0;
+  }
+  run(x) {
+    const y = this.b0 * x + this.b1 * this.x1 + this.b2 * this.x2 - this.a1 * this.y1 - this.a2 * this.y2;
+    this.x2 = this.x1; this.x1 = x; this.y2 = this.y1; this.y1 = y; return y;
+  }
+}
+
+// SVF TPT (Zavalishin): lp / hp
+class Svf {
+  constructor() { this.g = 0; this.k = Math.SQRT2; this.a1 = 0; this.a2 = 0; this.a3 = 0; this.ic1 = 0; this.ic2 = 0; this.lp = 0; this.hp = 0; }
+  set(sr, f, q) {
+    f = clamp(f, 10, sr * 0.45); this.g = Math.tan(Math.PI * f / sr); this.k = 1 / q;
+    this.a1 = 1 / (1 + this.g * (this.g + this.k)); this.a2 = this.g * this.a1; this.a3 = this.g * this.a2;
+  }
+  run(v0) {
+    const v3 = v0 - this.ic2, v1 = this.a1 * this.ic1 + this.a2 * v3, v2 = this.ic2 + this.a2 * this.ic1 + this.a3 * v3;
+    this.ic1 = 2 * v1 - this.ic1; this.ic2 = 2 * v2 - this.ic2;
+    this.lp = v2; this.hp = v0 - this.k * v1 - v2; return v2;
+  }
+}
+
+// ---------------------------------------------------------------- SHRED (un canal)
+const HIST = 32;
+class ShredChannel {
+  constructor(seed) {
+    this.buf = new Float32Array(BUF_N); this.rng = new Rng(seed);
+    this.hs = new Float64Array(HIST); this.hl = new Float64Array(HIST); this.reset();
+  }
+  reset() {
+    this.buf.fill(0); this.w = 0; this.prev = 0; this.quiet = 0; this.colStart = 0; this.ws = 0;
+    this.hHead = 0; this.hCount = 0; this.env = 0;
+    this.playing = false; this.cs = 0; this.cl = 0; this.pos = 0; this.g = 1; this.hasCur = false;
+    this.dream = 1; this.gate = 1; this.newCol = false;
+  }
+  push(start, len) { this.hs[this.hHead] = start; this.hl[this.hHead] = len; this.hHead = (this.hHead + 1) % HIST; if (this.hCount < HIST) this.hCount++; }
+  valid(k) { return this.w - this.hs[k] < BUF_N - 4; }
+  // escribe una muestra de entrada y cierra colecciones
+  record(x, P, sr) {
+    this.buf[this.w & BUF_MASK] = x;
+    const ax = Math.abs(x); this.env = ax > this.env ? ax : this.env * P.envDecay;
+    const silent = this.env < 0.001;
+    this.quiet = silent ? this.quiet + 1 : 0;
+    // sin Sustain, tras 0,2 s de silencio se olvida la memoria y el proceso se calla (salvo Freeze)
+    if (!P.sustain && !P.freeze && this.quiet === P.forgetN) { this.hCount = 0; this.hasCur = false; }
+    const hold = P.sustain && silent;                     // Sustain: sin entrada, no se graba nada nuevo
+    if (hold) { this.colStart = this.w + 1; this.ws = 0; }
+    else {
+      const cross = this.prev < 0 && x >= 0;
+      const len = this.w - this.colStart;
+      if (cross) this.ws++;
+      if ((cross && this.ws >= P.length && len >= P.floorN) || len >= P.maxN) {
+        if (len > 0) {
+          if (this.rng.next() >= P.stuck) this.push(this.colStart, len);
+        }
+        this.colStart = this.w; this.ws = 0;
+      }
+    }
+    this.prev = x; this.w++;
+  }
+  pick(P) {
+    let same = false;
+    if (this.hasCur) {
+      if (P.freeze) same = true;
+      else if (this.rng.next() < P.repeat) same = true;
+    }
+    if (!same) {
+      if (this.hCount === 0) { this.hasCur = false; return false; }
+      let k = (this.hHead - 1 + HIST) % HIST;               // la más reciente
+      if (this.rng.next() < P.disorder) {
+        const j = Math.floor(this.rng.next() * this.hCount);
+        const kk = (this.hHead - 1 - j + 2 * HIST) % HIST;
+        if (this.valid(kk)) k = kk;
+      }
+      this.cs = this.hs[k]; this.cl = this.hl[k]; this.hasCur = true;
+    }
+    // Absence: izquierda = volumen aleatorio, derecha = silencio aleatorio
+    const a = P.absence;
+    if (a < 0) this.g = 1 + a * this.rng.next();
+    else if (a > 0) this.g = this.rng.next() < a ? 0 : 1;
+    else this.g = 1;
+    this.pos = 0; this.playing = true; this.newCol = true;
+    return true;
+  }
+  play(P) {
+    if (!this.playing && !this.pick(P)) return 0;
+    if (this.pos >= this.cl && !this.pick(P)) return 0;
+    const p = this.pos, i = Math.floor(p), fr = p - i;
+    const a = this.buf[(this.cs + i) & BUF_MASK], b = this.buf[(this.cs + i + 1) & BUF_MASK];
+    let y = (a + (b - a) * fr) * this.g;
+    if (P.envOn) { const s = Math.sin(Math.PI * p / this.cl); y *= s * s; }
+    this.pos += P.rate;
+    if (this.pos >= this.cl) this.playing = false;
+    return y;
+  }
+}
+
+class Shred {
+  constructor(sr) { this.sr = sr; this.ch = [new ShredChannel(0x1234567), new ShredChannel(0x89ABCDE)]; this.drng = new Rng(0x5EED5); this.P = {}; }
+  reset() { for (const c of this.ch) c.reset(); this.drng = new Rng(0x5EED5); }
+  set(p) {
+    const sr = this.sr, P = this.P;
+    P.length = Math.round(p.sLength); P.floorN = Math.round(FLOOR_MS[clamp(Math.round(p.sFloor), 0, 3)] * 0.001 * sr);
+    P.maxN = Math.round(sr * 0.75); P.stuck = p.sStuck; P.envOn = p.sEnv >= 0.5; P.disorder = p.sDisorder;
+    P.rate = Math.pow(2, p.sRate / 12); P.absence = p.sAbsence; P.repeat = p.sRepeat; P.freeze = p.sFreeze >= 0.5;
+    P.sustain = p.sSustain >= 0.5; P.forgetN = Math.round(0.2 * sr); P.envDecay = Math.exp(-1 / (0.05 * sr));
+    P.dream = p.sDream; P.sync = p.sSync >= 0.5; P.lean = p.sLean;
+    P.smooK = p.sSmoo <= 0 ? 1 : 1 - Math.exp(-1 / (p.sSmoo * 0.06 * sr));
+    P.srcLvl = Math.min(1, 2 * (1 - p.sMonitor)); P.prcLvl = Math.min(1, 2 * p.sMonitor);
+  }
+  run(L, R, n) {
+    const P = this.P, c0 = this.ch[0], c1 = this.ch[1];
+    const pL = P.dream * Math.min(1, 1 - P.lean), pR = P.dream * Math.min(1, 1 + P.lean);
+    for (let i = 0; i < n; i++) {
+      const xl = L[i], xr = R[i];
+      c0.record(xl, P, this.sr); c1.record(xr, P, this.sr);
+      c0.newCol = false; c1.newCol = false;
+      const yl = c0.play(P), yr = c1.play(P);
+      // Dream: en cada colección nueva se sortea si suena el proceso o la fuente
+      if (c0.newCol) c0.dream = this.drng.next() < pL ? 1 : 0;
+      if (P.sync) { if (c0.newCol) c1.dream = c0.dream; }
+      else if (c1.newCol) c1.dream = this.drng.next() < pR ? 1 : 0;
+      c0.gate += (c0.dream - c0.gate) * P.smooK; c1.gate += (c1.dream - c1.gate) * P.smooK;
+      L[i] = xl * P.srcLvl * (1 - c0.gate) + yl * P.prcLvl * c0.gate;
+      R[i] = xr * P.srcLvl * (1 - c1.gate) + yr * P.prcLvl * c1.gate;
+    }
+  }
+  leds() { return [this.ch[0].gate, this.ch[1].gate]; }
+}
+
+// ---------------------------------------------------------------- HAZE (un canal)
+const GRAINS = 4;
+class HazeChannel {
+  constructor(seed) { this.buf = new Float32Array(BUF_N); this.rng = new Rng(seed); this.lo = new Biquad(); this.hi = new Biquad(); this.reset(); }
+  reset() {
+    this.buf.fill(0); this.wp = 0; this.ef = 0; this.es = 0; this.nz = 0;
+    this.gs = new Float64Array(GRAINS); this.gp = new Float64Array(GRAINS); this.gl = 0;
+    this.lo.x1 = this.lo.x2 = this.lo.y1 = this.lo.y2 = 0; this.hi.x1 = this.hi.x2 = this.hi.y1 = this.hi.y2 = 0;
+    this.started = false;
+  }
+  run(x, P) {
+    // Raw apagado: se suavizan los transitorios de la entrada (seguidor de envolvente)
+    if (!P.raw) {
+      const a = Math.abs(x);
+      this.ef += (a - this.ef) * (a > this.ef ? P.kf1 : P.kf2);
+      this.es += (a - this.es) * P.ks;
+      x *= this.ef > 1e-9 ? Math.min(1, this.es / this.ef) : 1;
+    }
+    const S = P.S;
+    if (this.wp >= S) this.wp = 0;
+    if (!P.freeze) this.buf[this.wp] = this.buf[this.wp] * P.mem + x * (1 - P.mem);
+    this.wp++;
+    // granos con ventana de Hann, 4 voces escalonadas
+    const gl = P.gl;
+    if (!this.started) { for (let v = 0; v < GRAINS; v++) { this.gs[v] = this.rng.next() * S; this.gp[v] = gl * v / GRAINS; } this.started = true; }
+    let y = 0;
+    for (let v = 0; v < GRAINS; v++) {
+      if (this.gp[v] >= gl) { this.gp[v] -= gl; this.gs[v] = this.rng.next() * S; }
+      const ph = this.gp[v];
+      let r = this.gs[v] + ph * P.rate; r -= Math.floor(r / S) * S;
+      const i = Math.floor(r), fr = r - i, i2 = i + 1 >= S ? 0 : i + 1;
+      const s = this.buf[i] + (this.buf[i2] - this.buf[i]) * fr;
+      const w = Math.sin(Math.PI * ph / gl);
+      y += s * w * w;
+      this.gp[v] = ph + 1;
+    }
+    y *= 0.5;
+    // Temperature: saturación y, en la mitad alta, modulación de amplitud con ruido
+    if (P.temp > 0) {
+      const d = 1 + 6 * P.temp;
+      y = Math.tanh(y * d) / (1 + 1.5 * P.temp);
+      if (P.temp > 0.5) {
+        this.nz += ((this.rng.next() * 2 - 1) - this.nz) * P.kn;
+        const k = (P.temp - 0.5) * 1.8;
+        y *= 1 - k * (0.5 + 0.5 * clamp(this.nz * 4, -1, 1));
+      }
+    }
+    return this.hi.run(this.lo.run(y));
+  }
+}
+
+class Haze {
+  constructor(sr) { this.sr = sr; this.ch = [new HazeChannel(0x2468ACE), new HazeChannel(0x13579BD)]; this.P = {}; this.eq = null; }
+  reset() { for (const c of this.ch) c.reset(); }
+  set(p) {
+    const sr = this.sr, P = this.P;
+    P.raw = p.hRaw >= 0.5; P.mem = p.hFreeze >= 0.5 ? 1 : p.hMemory; P.freeze = p.hFreeze >= 0.5;
+    P.S = clamp(Math.round(p.hSize * 0.001 * sr), 64, BUF_N - 1);
+    P.gl = clamp(Math.round(P.S * 0.5), Math.round(0.01 * sr), Math.round(0.25 * sr));
+    P.rate = Math.pow(2, p.hRate / 12); P.temp = p.hTemp;
+    P.kf1 = 1 - Math.exp(-1 / (0.0005 * sr)); P.kf2 = 1 - Math.exp(-1 / (0.03 * sr)); P.ks = 1 - Math.exp(-1 / (0.025 * sr));
+    P.kn = 1 - Math.exp(-TAU * 40 / sr);
+    P.width = p.hWidth; P.wet = p.hWet; P.dry = p.hDry;
+    const eq = p.hLo + '|' + p.hHi;
+    if (eq !== this.eq) { this.eq = eq; for (const c of this.ch) { c.lo.shelf(sr, 250, p.hLo, false); c.hi.shelf(sr, 3500, p.hHi, true); } }
+  }
+  run(L, R, n) {
+    const P = this.P, c0 = this.ch[0], c1 = this.ch[1];
+    for (let i = 0; i < n; i++) {
+      let l = c0.run(L[i], P), r = c1.run(R[i], P);
+      const m = 0.5 * (l + r), s = 0.5 * (l - r) * P.width;
+      l = m + s; r = m - s;
+      L[i] = L[i] * P.dry + l * P.wet; R[i] = R[i] * P.dry + r * P.wet;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- SPLIT
+const AP_MS = [3.2, 2.4, 8.6, 6.3];
+class SplitChannel {
+  constructor(seed, sr) {
+    this.rng = new Rng(seed); this.sr = sr;
+    this.lpg = new Svf(); this.cutA = new Svf(); this.cutB = new Svf();
+    this.dl = new Float32Array(4096); this.apN = AP_MS.map(ms => Math.round(ms * 0.001 * sr));
+    this.ap = this.apN.map(n => new Float32Array(n)); this.reset();
+  }
+  reset() {
+    this.pk = 0; this.es = 0; this.g = 0; this.burst = 0; this.act = 0;
+    for (const f of [this.lpg, this.cutA, this.cutB]) { f.ic1 = 0; f.ic2 = 0; }
+    this.dl.fill(0); this.dw = 0; this.lfo = 0; this.lfoT = 0; this.lfoC = 0;
+    for (const a of this.ap) a.fill(0); this.apI = [0, 0, 0, 0];
+  }
+  detect(x, P) {   // envolvente sobre el umbral (0..1) con Retain
+    const a = Math.abs(x) * P.boost;
+    this.pk = a > this.pk ? a : this.pk * P.pkRel;
+    this.es += (this.pk - this.es) * P.ks;
+    const db = 20 * Math.log10(this.es + 1e-12);
+    let g = clamp((db - P.verge) / 24, 0, 1);
+    if (g > 0.05) this.act = P.actN;
+    else if (this.act > 0) this.act--;
+    if (P.retain > 0 && this.act > 0 && this.rng.next() < P.burstP) this.burst = Math.max(this.burst, this.rng.next() * P.retain);
+    this.burst *= P.burstDecay;
+    this.g = g > this.burst ? g : this.burst;
+  }
+  above(x, g, P, upd) {
+    if (upd) this.lpg.set(this.sr, 60 * Math.pow(2, g * 8.3), 0.8);
+    let y = this.lpg.run(x) * Math.min(1, g * 4);
+    if (P.driveA > 0) { const k = 1 + 15 * P.driveA; y = Math.tanh(y * k) / (1 + 2 * P.driveA); }
+    if (P.cutA > 0) { this.cutA.run(y); y = this.cutA.hp; }
+    return y * P.volA;
+  }
+  below(x, g, gs, P, upd) {
+    let y = x * (1 - Math.min(1, g * (1 + 15 * P.side)));
+    // Drift: retardo corto aleatorio (inestabilidad de afinación)
+    this.dl[this.dw & 4095] = y;
+    if (P.drift > 0) {
+      if (--this.lfoC <= 0) { this.lfoC = P.lfoN; this.lfoT = this.rng.next(); }
+      this.lfo += (this.lfoT - this.lfo) * P.lfoK;
+      const d = P.drift * (P.d0 + P.d1 * this.lfo);
+      const r = this.dw - d, i = Math.floor(r), fr = r - i;
+      const a = this.dl[i & 4095], b = this.dl[(i + 1) & 4095];
+      y = a + (b - a) * fr;
+    }
+    this.dw++;
+    // Melt: difusión con 4 pasatodos
+    if (P.melt > 0) {
+      let z = y;
+      for (let k = 0; k < 4; k++) {
+        const buf = this.ap[k], j = this.apI[k], v = buf[j];
+        const u = z + 0.7 * v; buf[j] = u; z = v - 0.7 * u;
+        this.apI[k] = j + 1 >= this.apN[k] ? 0 : j + 1;
+      }
+      y = y * (1 - P.melt) + z * P.melt;
+    }
+    if (P.driveB > 0) { const k = 1 + 15 * P.driveB; y = Math.tanh(y * k) / (1 + 2 * P.driveB); }
+    if (P.cutB > 0) y = this.cutB.run(y);
+    return y * P.volB;
+  }
+}
+
+class Split {
+  constructor(sr) { this.sr = sr; this.ch = [new SplitChannel(0x3C6EF37, sr), new SplitChannel(0x0BB67AE, sr)]; this.P = {}; this.cnt = 0; }
+  reset() { for (const c of this.ch) c.reset(); this.cnt = 0; }
+  set(p) {
+    const sr = this.sr, P = this.P;
+    P.mode = Math.round(p.xMode); P.verge = p.xVerge; P.boost = dbToGain(p.xBoost);
+    P.pkRel = Math.exp(-1 / (0.05 * sr)); P.ks = 1 - Math.exp(-1 / (p.xSmooth * 0.001 * sr));
+    P.retain = p.xRetain; P.actN = Math.round(sr * 1.0); P.burstP = 20 / sr * (0.3 + p.xRetain);
+    P.burstDecay = Math.exp(-1 / (0.06 * sr));
+    P.driveA = p.xDriveA; P.cutA = p.xCutA; P.volA = p.xVolA; P.side = p.xSide;
+    P.drift = p.xDrift; P.melt = p.xMelt; P.driveB = p.xDriveB; P.cutB = p.xCutB; P.volB = p.xVolB;
+    P.lfoN = Math.round(0.08 * sr); P.lfoK = 1 - Math.exp(-1 / (0.04 * sr)); P.d0 = 0.003 * sr; P.d1 = 0.010 * sr;
+    const fa = 20 * Math.pow(150, p.xCutA), fb = 20000 * Math.pow(0.015, p.xCutB);
+    for (const c of this.ch) { c.cutA.set(sr, fa, 0.707); c.cutB.set(sr, fb, 0.707); }
+  }
+  run(L, R, n) {
+    const P = this.P, c0 = this.ch[0], c1 = this.ch[1];
+    for (let i = 0; i < n; i++) {
+      const xl = L[i], xr = R[i];
+      c0.detect(xl, P); c1.detect(xr, P);
+      let gl = c0.g, gr = c1.g;
+      if (P.mode === 1) { const t = gl; gl = gr; gr = t; }
+      else if (P.mode === 2) { gl = gr = 0.5 * (gl + gr); }
+      const upd = (this.cnt++ & 31) === 0;
+      L[i] = c0.above(xl, gl, P, upd) + c0.below(xl, gl, 0, P, upd);
+      R[i] = c1.above(xr, gr, P, upd) + c1.below(xr, gr, 0, P, upd);
+    }
+  }
+  leds() { return [this.ch[0].g, this.ch[1].g]; }
+}
+
+// ---------------------------------------------------------------- cadena completa
+class Engine {
+  constructor(sr) {
+    this.sr = sr; this.shred = new Shred(sr); this.haze = new Haze(sr); this.split = new Split(sr);
+    this.p = defaults(); this.dirty = true;
+    this.gIn = 1; this.gOut = 1; this.gMix = 1; this.kSm = 1 - Math.exp(-1 / (0.02 * sr));
+    this.dL = new Float32Array(0); this.dR = new Float32Array(0); this.first = true;
+  }
+  setParams(obj) { for (const k in obj) if (k in this.p) { const v = +obj[k]; if (isFinite(v)) this.p[k] = v; } this.dirty = true; }
+  setParam(k, v) { if (k in this.p && isFinite(+v)) { this.p[k] = +v; this.dirty = true; } }
+  reset() { this.shred.reset(); this.haze.reset(); this.split.reset(); this.first = true; }
+  // procesa n muestras en sitio (L, R: Float32Array o Float64Array)
+  process(L, R, n) {
+    const p = this.p;
+    if (this.dirty) { this.shred.set(p); this.haze.set(p); this.split.set(p); this.dirty = false; }
+    if (this.dL.length < n) { this.dL = new Float32Array(n); this.dR = new Float32Array(n); }
+    const tIn = dbToGain(p.inputDb), tOut = dbToGain(p.outputDb), tMix = p.mix, k = this.kSm;
+    if (this.first) { this.gIn = tIn; this.gOut = tOut; this.gMix = tMix; this.first = false; }
+    let gi = this.gIn;
+    for (let i = 0; i < n; i++) { gi += (tIn - gi) * k; L[i] *= gi; R[i] *= gi; this.dL[i] = L[i]; this.dR[i] = R[i]; }
+    this.gIn = gi;
+    const ord = ORDERS[clamp(Math.round(p.order), 0, 5)];
+    for (let j = 0; j < 3; j++) {
+      const m = ord[j];
+      if (m === 0 && p.sOn >= 0.5) this.shred.run(L, R, n);
+      else if (m === 1 && p.hOn >= 0.5) this.haze.run(L, R, n);
+      else if (m === 2 && p.xOn >= 0.5) this.split.run(L, R, n);
+    }
+    let gm = this.gMix, go = this.gOut;
+    for (let i = 0; i < n; i++) {
+      gm += (tMix - gm) * k; go += (tOut - go) * k;
+      let l = (this.dL[i] * (1 - gm) + L[i] * gm) * go, r = (this.dR[i] * (1 - gm) + R[i] * gm) * go;
+      if (!(l === l) || !(r === r)) { l = 0; r = 0; }   // NaN → 0
+      L[i] = l; R[i] = r;
+    }
+    this.gMix = gm; this.gOut = go;
+  }
+  leds() {   // actividad para la interfaz: [shredL, shredR, splitL, splitR]
+    const a = this.p.sOn >= 0.5 ? this.shred.leds() : [0, 0], b = this.p.xOn >= 0.5 ? this.split.leds() : [0, 0];
+    return [a[0], a[1], b[0], b[1]];
+  }
+}
+
+// procesado offline de un archivo completo (para las apps web)
+function processBuffers(chans, sr, params, opts) {
+  opts = opts || {};
+  const n = chans[0].length, L = new Float32Array(chans[0]), R = new Float32Array(chans[1] || chans[0]);
+  const e = new Engine(sr); e.setParams(params || {});
+  const B = 512;
+  const tail = Math.round((opts.tail || 0) * sr);
+  const N = n + tail, oL = new Float32Array(N), oR = new Float32Array(N);
+  oL.set(L); oR.set(R);
+  for (let o = 0; o < N; o += B) {
+    const m = Math.min(B, N - o);
+    e.process(oL.subarray(o, o + m), oR.subarray(o, o + m), m);
+  }
+  return [oL, oR];
+}
+
+// código del AudioWorkletProcessor (se registra con registerWorklet() o como texto con workletSource())
+function installProcessor(scope) {
+  scope.registerProcessor('glitchhead', class extends scope.AudioWorkletProcessor {
+    constructor() {
+      super(); this.e = new Engine(scope.sampleRate); this.on = true; this.t = 0;
+      this.port.onmessage = ev => {
+        const d = ev.data || {};
+        if (d.params) this.e.setParams(d.params);
+        if (d.reset) this.e.reset();
+        if ('bypass' in d) this.on = !d.bypass;
+      };
+    }
+    process(ins, outs) {
+      const i = ins[0], o = outs[0]; if (!o || !o[0]) return true;
+      const n = o[0].length, L = o[0], R = o[1] || o[0];
+      if (i && i[0]) { L.set(i[0]); if (o[1]) R.set(i[1] || i[0]); } else { L.fill(0); if (o[1]) R.fill(0); }
+      if (this.on) this.e.process(L, o[1] ? R : new Float32Array(L), n);
+      if ((this.t += n) >= 2048) { this.t = 0; this.port.postMessage({ leds: this.e.leds() }); }
+      return true;
+    }
+  });
+}
+
+const api = { VERSION: '1.0.0', PARAMS, PRESETS, ORDERS, FLOOR_MS, defaults, Engine, Rng, processBuffers, installProcessor };
+// texto autocontenido para crear el módulo del worklet desde un Blob (apps de un solo archivo)
+api.engineSource = function () { return 'var __GH = (' + factory.toString() + ')();\n'; };
+api.workletSource = function () { return api.engineSource() + '__GH.installProcessor(globalThis);\n'; };
+return api;
+});
+</script>
+<script>/* GlitchHead — panel de mandos web (común a la app GlitchHead, la pestaña de CrazyHead y la de SampledHead App).
+ * Necesita GlitchHeadDSP (dsp/glitchhead.js) cargado antes.
+ *
+ *   const ui = GlitchHeadUI.mount(contenedor, { onChange(params, id) {}, storageKey })
+ *   ui.params            parámetros actuales (objeto plano con los ids de PARAMS)
+ *   ui.set(obj)          aplica valores (sin llamar a onChange)
+ *   ui.leds([sL,sR,xL,xR])   pilotos de actividad (0..1)
+ *   ui.presetName        nombre del preset elegido
+ *
+ * Presets de usuario en localStorage «glitchhead.userPresets» (compartidos por las apps del mismo dominio).
+ */
+(function (G) {
+'use strict';
+const D = G.GlitchHeadDSP;
+const DEF = {}; const BYID = {};
+for (const p of D.PARAMS) { DEF[p[0]] = p[4]; BYID[p[0]] = { id: p[0], name: p[1], min: p[2], max: p[3], def: p[4], type: p[5], desc: p[6] }; }
+const LOGP = { hSize: 1, xSmooth: 1 };
+const ORDERS = D.ORDERS, MODS = ['SHRED', 'HAZE', 'SPLIT'];
+
+const CSS = `
+.ghui{--plate:#f3efe9;--plate2:#e8e2d9;--line:#d6cec2;--ink:#111;--ink2:#2b2622;--muted:#6f675e;--or:#d9600b;--orl:#ef7a22;--ord:#a94a07;
+  --shred:#d9600b;--haze:#3f7f8c;--split:#8c3f6e;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--heavy:"Arial Black","Helvetica Neue",Impact,system-ui,sans-serif;
+  color:var(--ink);font:14px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.ghui *{box-sizing:border-box}
+.ghui .gh-top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:var(--plate);border-radius:8px;padding:12px;box-shadow:0 5px 0 rgba(0,0,0,.35);margin-bottom:10px}
+.ghui .gh-pre{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1;min-width:250px}
+.ghui select{background:var(--ink);color:var(--orl);border:0;border-radius:6px;padding:9px;font:inherit;font-family:var(--mono);font-weight:700;min-width:170px;flex:1}
+.ghui .gh-b{background:var(--ink);color:var(--plate);border:0;border-radius:6px;padding:6px 10px;min-height:34px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.ghui .gh-b.on{background:var(--or);color:var(--ink)}
+.ghui .gh-b:disabled{opacity:.35;cursor:default}
+.ghui .gh-flow{font-family:var(--mono);font-size:12px;opacity:.75;margin:4px 2px 8px;color:var(--gh-flow,#f3efe9)}
+.ghui .gh-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.ghui .gh-mod{background:var(--plate);border-radius:8px;padding:12px 10px 14px;position:relative;box-shadow:0 2px 0 var(--line) inset,0 5px 0 rgba(0,0,0,.35)}
+.ghui .gh-mod::after{content:"";position:absolute;bottom:8px;left:8px;width:6px;height:6px;border-radius:50%;background:var(--ord);opacity:.7}
+.ghui .gh-h{display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:3px solid var(--c);margin-bottom:8px}
+.ghui .gh-nm{background:var(--ink);color:var(--plate);font-family:var(--heavy);font-size:14px;letter-spacing:.06em;padding:3px 9px 4px;border-radius:3px;transform:rotate(-1.5deg);box-shadow:inset 0 -4px 0 var(--c)}
+.ghui .gh-sub{font-size:11px;font-style:italic;color:var(--muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ghui .gh-led{width:11px;height:11px;border-radius:50%;background:#ff4a2a;border:2px solid var(--ink);opacity:.2;flex:none}
+.ghui .gh-mv{background:var(--plate2);border:2px solid var(--ink);border-radius:4px;width:24px;height:22px;font-weight:900;font-size:11px;cursor:pointer;padding:0}
+.ghui .gh-mv:disabled{opacity:.3;cursor:default}
+.ghui .gh-sw{width:44px;height:24px;border-radius:999px;background:var(--plate2);border:2px solid var(--ink);position:relative;cursor:pointer;flex:none;padding:0}
+.ghui .gh-sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--ink);transition:.12s}
+.ghui .gh-sw.on{background:var(--c,var(--or))}
+.ghui .gh-sw.on::after{left:22px}
+.ghui .gh-mod.off .gh-body{opacity:.38}
+.ghui .gh-sec{font-size:10px;font-weight:900;letter-spacing:.12em;color:var(--muted);display:flex;align-items:center;gap:8px;margin:6px 2px 2px}
+.ghui .gh-sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.ghui .gh-row{display:flex;flex-wrap:wrap;justify-content:space-around;gap:2px}
+.ghui .gh-pads{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:2px 0 4px}
+.ghui .gh-pad{background:var(--plate);border:2px solid var(--c);color:var(--ink);padding:5px 10px;border-radius:5px;font:inherit;font-size:12px;font-weight:900;cursor:pointer;min-width:52px}
+.ghui .gh-pad.on{background:var(--c);color:var(--plate)}
+.ghui .gh-k{display:flex;flex-direction:column;align-items:center;width:62px;user-select:none;-webkit-user-select:none}
+.ghui .gh-k svg{width:50px;height:50px;touch-action:none;cursor:ns-resize}
+.ghui .gh-k .l{font-size:9.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.ghui .gh-k .v{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap}
+.ghui .gh-t{display:flex;flex-direction:column;align-items:center;gap:3px;width:70px;font-size:9.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.ghui .gh-info{position:sticky;bottom:58px;background:var(--ink);color:var(--orl);border-radius:6px;padding:7px 10px;font-size:13px;margin-top:10px;min-height:34px;z-index:2}
+.ghui .gh-glob{display:flex;gap:2px}
+.ghui .gh-glob .gh-k .l{color:inherit}
+@media (max-width:520px){.ghui .gh-k{width:58px}.ghui .gh-k svg{width:46px;height:46px}.ghui .gh-grid{grid-template-columns:1fr}}
+`;
+
+function fmt(id, v) {
+  const d = BYID[id];
+  if (d.type === 'i') return String(Math.round(v));
+  if (d.type.startsWith('c:')) return d.type.slice(2).split('|')[Math.round(v)] || '';
+  if (id === 'hSize' || id === 'xSmooth') return v >= 1000 ? (v / 1000).toFixed(2) + ' s' : Math.round(v) + ' ms';
+  if (/Db$/.test(id) || id === 'hLo' || id === 'hHi' || id === 'xVerge' || id === 'xBoost') return (v > 0.04 ? '+' : '') + v.toFixed(1) + ' dB';
+  if (id === 'sRate' || id === 'hRate') return (v > 0.04 ? '+' : '') + v.toFixed(1) + ' st';
+  if (id === 'sAbsence' || id === 'sLean') return (v > 0.004 ? '+' : '') + Math.round(v * 100) + ' %';
+  return Math.round(v * 100) + ' %';
+}
+function toN(id, v) { const d = BYID[id]; if (LOGP[id]) return Math.log(v / d.min) / Math.log(d.max / d.min); return (v - d.min) / (d.max - d.min); }
+function fromN(id, t) {
+  const d = BYID[id]; t = Math.min(1, Math.max(0, t));
+  let v = LOGP[id] ? d.min * Math.pow(d.max / d.min, t) : d.min + t * (d.max - d.min);
+  if (d.type === 'i') v = Math.round(v); else if (id === 'sRate' || id === 'hRate') v = Math.round(v * 10) / 10; else v = Math.round(v * 1000) / 1000;
+  return v;
+}
+function arc(t0, t1) {
+  const r = 24, cx = 32, cy = 32, A = t => (-135 + 270 * t) * Math.PI / 180;
+  const a0 = A(Math.min(t0, t1)), a1 = A(Math.max(t0, t1));
+  const x0 = cx + r * Math.sin(a0), y0 = cy - r * Math.cos(a0), x1 = cx + r * Math.sin(a1), y1 = cy - r * Math.cos(a1);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${(a1 - a0) > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+}
+
+function mount(root, opts) {
+  opts = opts || {};
+  if (!document.getElementById('ghui-css')) { const st = document.createElement('style'); st.id = 'ghui-css'; st.textContent = CSS; document.head.appendChild(st); }
+  const KEY = 'glitchhead.userPresets', LOCK = 'glitchhead.lock';
+  const P = Object.assign({}, DEF);
+  const ui = { params: P, presetName: 'Default' };
+  const knobs = {}, sws = {}, pads = {};
+  let lock = false; try { lock = localStorage.getItem(LOCK) === '1'; } catch (e) {}
+
+  root.classList.add('ghui');
+  root.innerHTML = `
+  <div class="gh-top">
+    <div class="gh-pre">
+      <select class="gh-sel" aria-label="Preset"></select>
+      <button class="gh-b" data-a="prev" title="Preset anterior">◀</button><button class="gh-b" data-a="next" title="Preset siguiente">▶</button>
+      <button class="gh-b" data-a="save" title="Guardar como preset de usuario">💾</button><button class="gh-b" data-a="del" title="Borrar preset de usuario">🗑</button>
+      <button class="gh-b" data-a="lock" title="Candado: al cambiar de preset se conservan Input, Mix y Output">🔒</button>
+      <button class="gh-b" data-a="rand" title="Ajustes al azar (sin tocar Input, Mix ni Output)">🎲</button>
+      <button class="gh-b" data-a="exp" title="Exportar presets de usuario (.json)">Exportar</button>
+      <label class="gh-b" title="Importar presets (.json)">Importar<input type="file" accept=".json,application/json" hidden></label>
+    </div>
+    <div class="gh-glob"></div>
+  </div>
+  <div class="gh-flow"></div>
+  <div class="gh-grid"></div>
+  <div class="gh-info">Pasa el dedo o el ratón por un mando para ver qué hace. Doble toque = valor por defecto.</div>`;
+  const $ = s => root.querySelector(s);
+  const sel = $('.gh-sel'), grid = $('.gh-grid'), info = $('.gh-info'), flow = $('.gh-flow');
+
+  function showInfo(id) {
+    if (id === 'lock') { info.textContent = 'Candado: al cambiar de preset se conservan Input, Mix y Output.'; return; }
+    const d = BYID[id]; if (d) info.textContent = d.name + ': ' + d.desc;
+  }
+  function emit(id) { if (opts.onChange) opts.onChange(Object.assign({}, P), id); }
+  function setP(id, v, silent) {
+    if (!(id in P)) return; P[id] = v;
+    if (knobs[id]) knobs[id].upd(); if (sws[id]) sws[id].upd(); if (pads[id]) pads[id].upd();
+    if (id === 'order' || /On$/.test(id)) layout();
+    if (id === 'sFreeze' && knobs.sRepeat) knobs.sRepeat.el.style.opacity = v >= 0.5 ? .4 : 1;
+    if (!silent) emit(id);
+  }
+
+  function knob(id, label, parent, light) {
+    const d = BYID[id], bip = d.min < 0 && d.max > 0;
+    const el = document.createElement('div'); el.className = 'gh-k';
+    el.innerHTML = `<svg viewBox="0 0 64 64" role="slider" tabindex="0" aria-label="${d.name}">
+      <path d="${arc(0, 1)}" stroke="${light ? '#3d3631' : '#d6cec2'}" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path class="a" stroke="${light ? '#f3efe9' : '#111'}" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <circle cx="32" cy="33.5" r="16" fill="#a94a07"/><circle cx="32" cy="32" r="16" fill="#d9600b"/>
+      <circle cx="32" cy="32" r="10" fill="none" stroke="#ef7a22" stroke-width="1.4"/>
+      <line class="p" x1="32" y1="31" x2="32" y2="19" stroke="#f3efe9" stroke-width="3.2" stroke-linecap="round"/></svg>
+      <div class="l">${label}</div><div class="v"></div>`;
+    parent.appendChild(el);
+    const svg = el.querySelector('svg'), a = el.querySelector('.a'), p = el.querySelector('.p'), val = el.querySelector('.v');
+    const k = { el, upd() { const t = Math.min(1, Math.max(0, toN(id, P[id]))), f = bip ? 0.5 : 0; a.setAttribute('d', Math.abs(t - f) > 0.004 ? arc(f, t) : ''); p.setAttribute('transform', `rotate(${-135 + 270 * t} 32 32)`); val.textContent = fmt(id, P[id]); svg.setAttribute('aria-valuetext', fmt(id, P[id])); } };
+    let y0 = 0, t0 = 0, drag = false, lastTap = 0;
+    svg.addEventListener('pointerdown', e => {
+      showInfo(id);
+      const now = Date.now(); if (now - lastTap < 320) { setP(id, d.def); lastTap = 0; return; } lastTap = now;
+      drag = true; y0 = e.clientY; t0 = toN(id, P[id]); try { svg.setPointerCapture(e.pointerId); } catch (er) {} e.preventDefault();
+    });
+    svg.addEventListener('pointermove', e => { if (!drag) return; const s = e.shiftKey ? 0.0015 : 0.006; const v = fromN(id, t0 + (y0 - e.clientY) * s); if (v !== P[id]) setP(id, v); });
+    svg.addEventListener('pointerup', () => { drag = false; }); svg.addEventListener('pointercancel', () => { drag = false; });
+    svg.addEventListener('wheel', e => { e.preventDefault(); setP(id, fromN(id, toN(id, P[id]) - Math.sign(e.deltaY) * (d.type === 'i' ? 1 / (d.max - d.min) : 0.02))); }, { passive: false });
+    svg.addEventListener('keydown', e => { const s = (e.key === 'ArrowUp' || e.key === 'ArrowRight') ? 1 : (e.key === 'ArrowDown' || e.key === 'ArrowLeft') ? -1 : 0; if (s) { e.preventDefault(); setP(id, fromN(id, toN(id, P[id]) + s * (d.type === 'i' ? 1 / (d.max - d.min) : 0.02))); } });
+    el.addEventListener('pointerenter', () => showInfo(id));
+    knobs[id] = k; k.upd(); return k;
+  }
+  function toggle(id, label, parent, color) {
+    const el = document.createElement('div'); el.className = 'gh-t';
+    el.innerHTML = `<button class="gh-sw" style="--c:${color}" aria-label="${BYID[id].name}"></button><span>${label}</span>`;
+    parent.appendChild(el);
+    const b = el.querySelector('button');
+    b.onclick = () => { showInfo(id); setP(id, P[id] >= 0.5 ? 0 : 1); };
+    el.addEventListener('pointerenter', () => showInfo(id));
+    const s = { el, upd() { b.classList.toggle('on', P[id] >= 0.5); b.setAttribute('aria-pressed', P[id] >= 0.5); } };
+    sws[id] = s; s.upd(); return s;
+  }
+  function padRow(id, labels, parent) {
+    const row = document.createElement('div'); row.className = 'gh-pads'; parent.appendChild(row);
+    const bs = labels.map((t, i) => { const b = document.createElement('button'); b.className = 'gh-pad'; b.textContent = t; b.onclick = () => { showInfo(id); setP(id, i); }; b.addEventListener('pointerenter', () => showInfo(id)); row.appendChild(b); return b; });
+    pads[id] = { upd() { bs.forEach((b, i) => b.classList.toggle('on', Math.round(P[id]) === i)); } }; pads[id].upd();
+  }
+  function sec(parent, t) { const s = document.createElement('div'); s.className = 'gh-sec'; s.textContent = t; parent.appendChild(s); }
+  function row(parent) { const r = document.createElement('div'); r.className = 'gh-row'; parent.appendChild(r); return r; }
+
+  // globales
+  const gl = $('.gh-glob');
+  knob('inputDb', 'Input', gl); knob('mix', 'Mix', gl); knob('outputDb', 'Output', gl);
+
+  // módulos
+  const color = ['var(--shred)', 'var(--haze)', 'var(--split)'];
+  const onIds = ['sOn', 'hOn', 'xOn'], subs = ['trocea en wavesets', 'memoria y granos', 'puerta partida'];
+  const mods = [0, 1, 2].map(m => {
+    const el = document.createElement('div'); el.className = 'gh-mod'; el.style.setProperty('--c', color[m]);
+    el.innerHTML = `<div class="gh-h"><span class="gh-nm">${MODS[m]}</span><span class="gh-sub">${subs[m]}</span>
+      ${m !== 1 ? '<span class="gh-led"></span><span class="gh-led"></span>' : ''}
+      <button class="gh-mv" data-d="-1" title="Mover a la izquierda">◀</button><button class="gh-mv" data-d="1" title="Mover a la derecha">▶</button>
+      <button class="gh-sw" style="--c:${color[m]}" aria-label="${MODS[m]} on"></button></div><div class="gh-body"></div>`;
+    const sw = el.querySelector('.gh-h .gh-sw');
+    sw.onclick = () => { showInfo(onIds[m]); setP(onIds[m], P[onIds[m]] >= 0.5 ? 0 : 1); };
+    sws[onIds[m]] = { upd() { sw.classList.toggle('on', P[onIds[m]] >= 0.5); el.classList.toggle('off', P[onIds[m]] < 0.5); } };
+    el.querySelectorAll('.gh-mv').forEach(b => { b.onclick = () => { showInfo('order'); move(m, +b.dataset.d); }; });
+    return { el, body: el.querySelector('.gh-body'), leds: el.querySelectorAll('.gh-led'), mv: el.querySelectorAll('.gh-mv') };
+  });
+  { // SHRED
+    const b = mods[0].body;
+    sec(b, 'FLOOR'); padRow('sFloor', ['0', '25', '50', '100 ms'], b);
+    const r1 = row(b); ['sLength:Length', 'sStuck:Stuck', 'sDisorder:Disorder', 'sRepeat:Repeat', 'sRate:Rate'].forEach(s => { const [i, l] = s.split(':'); knob(i, l, r1); });
+    const r2 = row(b); ['sAbsence:Absence', 'sDream:Dream', 'sLean:Lean', 'sSmoo:Smoo', 'sMonitor:Monitor'].forEach(s => { const [i, l] = s.split(':'); knob(i, l, r2); });
+    sec(b, 'MODO'); const r3 = row(b); ['sEnv:Envelope', 'sFreeze:Freeze', 'sSync:Sync', 'sSustain:Sustain'].forEach(s => { const [i, l] = s.split(':'); toggle(i, l, r3, 'var(--shred)'); });
+  }
+  { // HAZE
+    const b = mods[1].body;
+    const r0 = row(b); toggle('hRaw', 'Raw', r0, 'var(--haze)'); toggle('hFreeze', 'Freeze', r0, 'var(--haze)');
+    const r1 = row(b); ['hMemory:Memory', 'hSize:Size', 'hRate:Rate', 'hTemp:Temp', 'hWidth:Mid/Side'].forEach(s => { const [i, l] = s.split(':'); knob(i, l, r1); });
+    sec(b, 'EQ Y MEZCLA'); const r2 = row(b); ['hLo:Lo', 'hHi:Hi', 'hWet:Wet', 'hDry:Dry'].forEach(s => { const [i, l] = s.split(':'); knob(i, l, r2); });
+  }
+  { // SPLIT
+    const b = mods[2].body;
+    sec(b, 'MODE'); padRow('xMode', ['Direct', 'Crossed', 'Summed'], b);
+    const r1 = row(b); ['xVerge:Verge', 'xBoost:Boost', 'xSmooth:Smooth', 'xRetain:Retain', 'xSide:Sidechain'].forEach(s => { const [i, l] = s.split(':'); knob(i, l, r1); });
+    sec(b, 'ARRIBA'); const r2 = row(b); ['xDriveA:Drive', 'xCutA:Cut', 'xVolA:Vol'].forEach(s => { const [i, l] = s.split(':'); knob(i, l, r2); });
+    sec(b, 'ABAJO'); const r3 = row(b); ['xDrift:Drift', 'xMelt:Melt', 'xDriveB:Drive', 'xCutB:Cut', 'xVolB:Vol'].forEach(s => { const [i, l] = s.split(':'); knob(i, l, r3); });
+  }
+  Object.values(sws).forEach(s => s.upd());
+
+  function layout() {
+    const o = ORDERS[Math.max(0, Math.min(5, Math.round(P.order)))];
+    o.forEach((m, slot) => { grid.appendChild(mods[m].el); mods[m].mv[0].disabled = slot === 0; mods[m].mv[1].disabled = slot === 2; });
+    flow.textContent = 'Input › ' + o.map(m => MODS[m] + (P[onIds[m]] >= 0.5 ? '' : ' (off)')).join(' › ') + ' › Mix › Output';
+    Object.values(sws).forEach(s => s.upd());
+  }
+  function move(m, dir) {
+    const o = ORDERS[Math.round(P.order)].slice(), pos = o.indexOf(m), np = pos + dir;
+    if (np < 0 || np > 2) return; [o[pos], o[np]] = [o[np], o[pos]];
+    const idx = ORDERS.findIndex(x => x[0] === o[0] && x[1] === o[1] && x[2] === o[2]); setP('order', idx);
+  }
+  layout();
+
+  // presets
+  function userPresets() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
+  function saveUser(obj) { try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) {} }
+  function fill(selVal) {
+    sel.innerHTML = ''; let cat = '', og = null;
+    D.PRESETS.forEach((p, i) => { if (p.cat !== cat) { cat = p.cat; og = document.createElement('optgroup'); og.label = 'Fábrica · ' + cat; sel.appendChild(og); } const o = document.createElement('option'); o.value = 'f:' + i; o.textContent = p.name; og.appendChild(o); });
+    const u = userPresets(), names = Object.keys(u).sort();
+    if (names.length) { og = document.createElement('optgroup'); og.label = 'Usuario'; sel.appendChild(og); names.forEach(n => { const o = document.createElement('option'); o.value = 'u:' + n; o.textContent = n; og.appendChild(o); }); }
+    if (selVal) sel.value = selVal;
+  }
+  function apply(vals, name) {
+    const keep = lock ? { inputDb: P.inputDb, mix: P.mix, outputDb: P.outputDb } : {};
+    Object.assign(P, DEF, vals || {}, keep);
+    Object.values(knobs).forEach(k => k.upd()); Object.values(pads).forEach(k => k.upd());
+    if (knobs.sRepeat) knobs.sRepeat.el.style.opacity = P.sFreeze >= 0.5 ? .4 : 1;
+    layout(); ui.presetName = name || 'Default'; emit('preset');
+  }
+  function choose(v) {
+    if (v.startsWith('f:')) { const p = D.PRESETS[+v.slice(2)]; apply(p.v, p.name); }
+    else { const n = v.slice(2), u = userPresets()[n]; if (u) apply(u, n); }
+  }
+  sel.onchange = () => choose(sel.value);
+  fill('f:0');
+  const btn = a => root.querySelector(`[data-a="${a}"]`);
+  btn('prev').onclick = () => { sel.selectedIndex = (sel.selectedIndex - 1 + sel.options.length) % sel.options.length; choose(sel.value); };
+  btn('next').onclick = () => { sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length; choose(sel.value); };
+  btn('save').onclick = () => {
+    let n = prompt('Nombre del preset:', ui.presetName === 'Default' ? '' : ui.presetName); if (!n) return; n = n.trim(); if (!n || n === 'Default') return;
+    const u = userPresets(); if (u[n] && !confirm('Ya existe «' + n + '». ¿Sobrescribir?')) return;
+    const vals = {}; for (const k in P) if (P[k] !== DEF[k]) vals[k] = P[k];
+    u[n] = vals; saveUser(u); ui.presetName = n; fill('u:' + n);
+  };
+  btn('del').onclick = () => {
+    if (!sel.value.startsWith('u:')) { info.textContent = 'Solo se pueden borrar los presets de usuario.'; return; }
+    const n = sel.value.slice(2); if (!confirm('¿Borrar el preset «' + n + '»?')) return;
+    const u = userPresets(); delete u[n]; saveUser(u); fill('f:0'); choose('f:0');
+  };
+  const lb = btn('lock'); lb.classList.toggle('on', lock);
+  lb.onclick = () => { lock = !lock; lb.classList.toggle('on', lock); try { localStorage.setItem(LOCK, lock ? '1' : '0'); } catch (e) {} showInfo('lock'); };
+  lb.addEventListener('pointerenter', () => showInfo('lock'));
+  btn('rand').onclick = () => {
+    const r = Math.random;
+    for (const d of D.PARAMS) {
+      const id = d[0]; if (/^(inputDb|mix|outputDb|order|sOn|hOn|xOn)$/.test(id)) continue;
+      if (d[5] === 'b') P[id] = r() < 0.25 ? 1 : 0; else P[id] = fromN(id, r());
+    }
+    P.sFreeze = 0; P.hFreeze = r() < 0.15 ? 1 : 0; P.sMonitor = 0.4 + r() * 0.3; P.xVolA = 0.4 + r() * 0.5; P.xVolB = 0.2 + r() * 0.6; P.hWet = 0.3 + r() * 0.5;
+    Object.values(knobs).forEach(k => k.upd()); Object.values(pads).forEach(k => k.upd()); layout(); ui.presetName = 'Azar'; emit('rand');
+    info.textContent = 'Ajustes al azar en los motores encendidos. Guarda con 💾 si te gusta.';
+  };
+  btn('exp').onclick = () => {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'GlitchHead', presets: userPresets() }, null, 1)], { type: 'application/json' }));
+    a.download = 'glitchhead-presets.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  };
+  root.querySelector('.gh-pre input[type=file]').onchange = async e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    try { const j = JSON.parse(await f.text()); const u = userPresets(); Object.assign(u, j.presets || j); saveUser(u); fill(sel.value); info.textContent = 'Presets importados.'; }
+    catch (er) { info.textContent = 'No se pudo leer el archivo de presets.'; }
+  };
+
+  ui.set = obj => { Object.assign(P, obj); Object.values(knobs).forEach(k => k.upd()); Object.values(pads).forEach(k => k.upd()); layout(); };
+  ui.leds = v => {
+    if (!v) return;
+    mods[0].leds.forEach((l, i) => { l.style.opacity = (0.2 + 0.8 * Math.min(1, v[i] || 0)).toFixed(2); });
+    mods[2].leds.forEach((l, i) => { l.style.opacity = (0.2 + 0.8 * Math.min(1, v[2 + i] || 0)).toFixed(2); });
+  };
+  ui.showInfo = t => { info.textContent = t; };
+  return ui;
+}
+
+// Carga un módulo de AudioWorklet desde texto: blob: y, si falla (file:// en Chrome), data:
+async function addModule(ctx, code) {
+  try { await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([code], { type: 'application/javascript' }))); }
+  catch (e) {
+    const b64 = btoa(unescape(encodeURIComponent(code)));
+    await ctx.audioWorklet.addModule('data:application/javascript;base64,' + b64);
+  }
+}
+
+// Conecta un nodo de tiempo real (AudioWorklet). Devuelve el nodo; los LED llegan por onLeds.
+async function createNode(ctx, onLeds) {
+  if (!ctx.audioWorklet) throw new Error('Este navegador no tiene AudioWorklet (hace falta para el efecto en tiempo real).');
+  if (!ctx.__ghReady) ctx.__ghReady = addModule(ctx, D.workletSource());
+  await ctx.__ghReady;
+  const node = new AudioWorkletNode(ctx, 'glitchhead', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2], channelCount: 2, channelCountMode: 'explicit', channelInterpretation: 'speakers' });
+  node.port.onmessage = e => { if (e.data && e.data.leds && onLeds) onLeds(e.data.leds); };
+  node.setParams = p => node.port.postMessage({ params: p });
+  node.resetEngine = () => node.port.postMessage({ reset: true });
+  node.setBypass = b => node.port.postMessage({ bypass: !!b });
+  return node;
+}
+
+// Procesado offline en un Worker (no bloquea la interfaz). chans: [Float32Array L, R]
+function renderOffline(chans, sr, params, tailSec, onProgress) {
+  const L0 = new Float32Array(chans[0]), R0 = new Float32Array(chans[1] || chans[0]);
+  const local = () => D.processBuffers([L0, R0], sr, params, { tail: tailSec || 0 });   // sin Worker: hilo principal
+  return new Promise((resolve, reject) => {
+    let w, done = false;
+    const fallback = why => { if (done) return; done = true; try { if (w) w.terminate(); } catch (e) {} console.warn('GlitchHead: procesado sin Worker (' + why + ')'); try { resolve(local()); } catch (er) { reject(er); } };
+    try { w = new Worker(URL.createObjectURL(new Blob([D.engineSource() + '(' + workerMain.toString() + ')(__GH);'], { type: 'application/javascript' }))); }
+    catch (e) { fallback(e.message); return; }
+    w.onmessage = e => {
+      const d = e.data;
+      if (d.progress != null) { if (onProgress) onProgress(d.progress); return; }
+      done = true; w.terminate();
+      if (d.error) { const er = new Error(d.error); er.stack = d.stack; reject(er); } else resolve([d.L, d.R]);
+    };
+    w.onerror = e => fallback('Worker: ' + (e.message || 'no se pudo crear'));
+    const L = new Float32Array(L0), R = new Float32Array(R0);
+    w.postMessage({ L, R, sr, params, tail: tailSec || 0 }, [L.buffer, R.buffer]);
+  });
+}
+function workerMain(api) {
+  self.onmessage = e => {
+    const { L, R, sr, params, tail } = e.data;
+    try {
+      const n = L.length, T = Math.round(tail * sr), N = n + T;
+      const oL = new Float32Array(N), oR = new Float32Array(N); oL.set(L); oR.set(R);
+      const eng = new api.Engine(sr); eng.setParams(params);
+      const B = 4096;
+      for (let o = 0; o < N; o += B) {
+        const m = Math.min(B, N - o); eng.process(oL.subarray(o, o + m), oR.subarray(o, o + m), m);
+        if ((o / B) % 32 === 0) self.postMessage({ progress: o / N });
+      }
+      self.postMessage({ L: oL, R: oR }, [oL.buffer, oR.buffer]);
+    } catch (er) { self.postMessage({ error: String(er && er.message || er), stack: er && er.stack }); }
+  };
+}
+
+G.GlitchHeadUI = { mount, createNode, renderOffline, addModule, fmt, PARAM_INFO: BYID };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+</script>
+<!--GH:END-->
 </body>
 </html>
