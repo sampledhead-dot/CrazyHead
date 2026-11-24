@@ -161,7 +161,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 <div class="sheet" id="sheet"><div class="box">
   <button class="x" id="sclose">✕</button>
   <h3>Mezcla y exportar</h3>
-  <div class="kg k3">${''}<!--KG--></div>
+  <div class="kg k3" id="mixkg">${''}<!--KG--></div>
   <div class="sub">Exportar</div>
   <div class="row"><span class="small">Compases a renderizar</span>
     <select id="exbars"><option>1</option><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div>
@@ -201,7 +201,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <div class="row"><button id="pexp">Exportar archivo</button><button id="pimp">Importar archivo</button></div>
   <div class="small">El archivo .crazyhead lleva ajustes, secuencias y audio. Sirve de copia de seguridad o para pasarlo a otro dispositivo.</div>
   <input type="file" id="pfile" accept=".crazyhead,application/octet-stream" hidden></div></div>
-<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.23 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
+<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.24 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
 <div class="sheet" id="cpsheet"><div class="box"><h3>Loops</h3><p class="small" style="font-size:15px;font-weight:700" id="cptxt"></p>
   <div class="row"><button id="cpcopy">Copiar</button><button id="cpswap">Intercambiar</button><button id="cpno">Cancelar</button></div>
   <p class="small">Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.</p></div></div>
@@ -238,7 +238,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 'use strict';
 /* ===== Informe de error (.txt) automático ===== */
 const RPT=(()=>{
-  const VER='1.23',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
+  const VER='1.24',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
   const fm=a=>{try{return typeof a==='string'?a:(a&&a.stack)?a.stack:JSON.stringify(a)}catch(e){return String(a)}};
   ['log','info','warn','error','debug'].forEach(k=>{const o=console[k]&&console[k].bind(console);console[k]=function(){try{logs.push(new Date().toISOString().slice(11,23)+' ['+k+'] '+[].map.call(arguments,fm).join(' ').slice(0,600));if(logs.length>300)logs.shift()}catch(e){}if(o)o.apply(null,arguments)}});
   const step=m=>{steps.push(((Date.now()-t0)/1000).toFixed(2)+'s  '+m);if(steps.length>200)steps.shift();st.stage=String(m)};
@@ -2061,7 +2061,7 @@ function initKnobs(){
 }
 
 function buildMenuKnobs(){
-  const g=document.querySelector('#sheet .kg');
+  const g=document.querySelector('#mixkg');   // 1.24: puede estar dentro del menú común
   g.innerHTML=knob('Master','master',0,100,1,1)+knob('Swing','swing',50,75,1,1)+'';
 }
 function buildOv(){
@@ -4117,5 +4117,36 @@ G.GlitchHeadUI = { mount, createNode, renderOffline, addModule, fmt, PARAM_INFO:
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 </script>
 <!--GH:END-->
+<script>
+/* 1.24: menú común «☰ Menú» de todas las apps (sh-core 1.5.0). El antiguo «⋮» (Mezcla y exportar) pasa a ser el menú
+   común, con las mismas secciones y en el mismo orden que en las demás apps; «⇄ Apps» va dentro (Otras apps). */
+(function(){
+  if(!window.SH||!SH.ui||!SH.ui.menu)return;
+  const T=(es,en)=>()=>S.lang==='en'?en:es,q=s=>document.querySelector(s);
+  SH.ui.menu({
+    me:'crazyhead',version:()=>RPT.VER,button:'#menu',lang:()=>S.lang==='en'?'en':'es',
+    proyecto:[
+      {icon:'📁',click:'#bproj',pri:true,label:T('Mis proyectos (guardar y abrir)','My projects (save and open)')},
+      {icon:'🆕',click:'#newproj',label:T('Nuevo proyecto','New project')}
+    ],
+    importar:[{icon:'📥',click:'#bmany'}],
+    exportar:[
+      {title:T('Audio y MIDI','Audio and MIDI')},
+      {node:q('#exbars')&&q('#exbars').closest('.row')},
+      {icon:'🔊',click:'#exwav'},{icon:'🗂',click:'#exstem'},{icon:'🎼',click:'#exmid'},
+      {title:T('Máquinas y programas','Devices and software')},
+      {icon:'🎛',click:'#exsp'},{icon:'🎛',click:'#exmove'},{icon:'🎹',click:'#exabl'},{icon:'🎹',click:'#exsim'},{icon:'🎹',click:'#exadg'},{icon:'🐨',click:'#exkoa'}
+    ],
+    apps:{extra:[{title:'SampledHead App'},{icon:'➜',click:'#tosh1'},{icon:'➜',click:'#tosh2'}]},
+    ajustes:[
+      {title:T('Mezcla','Mix')},{node:'#mixkg'},
+      {title:T('Idioma','Language')},{node:'#sheet .langs'},
+      {title:T('Rendimiento','Performance')},{icon:'⚡',click:'#latb'}
+    ],
+    guide:()=>q('#bguide').click(),
+    report:()=>RPT.download('manual (menú)','(informe pedido por el usuario)')
+  });
+})();
+</script>
 </body>
 </html>
