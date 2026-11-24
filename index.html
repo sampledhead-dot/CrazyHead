@@ -201,7 +201,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <div class="row"><button id="pexp">Exportar archivo</button><button id="pimp">Importar archivo</button></div>
   <div class="small">El archivo .crazyhead lleva ajustes, secuencias y audio. Sirve de copia de seguridad o para pasarlo a otro dispositivo.</div>
   <input type="file" id="pfile" accept=".crazyhead,application/octet-stream" hidden></div></div>
-<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.22 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
+<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.23 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
 <div class="sheet" id="cpsheet"><div class="box"><h3>Loops</h3><p class="small" style="font-size:15px;font-weight:700" id="cptxt"></p>
   <div class="row"><button id="cpcopy">Copiar</button><button id="cpswap">Intercambiar</button><button id="cpno">Cancelar</button></div>
   <p class="small">Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.</p></div></div>
@@ -238,7 +238,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 'use strict';
 /* ===== Informe de error (.txt) automático ===== */
 const RPT=(()=>{
-  const VER='1.22',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
+  const VER='1.23',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
   const fm=a=>{try{return typeof a==='string'?a:(a&&a.stack)?a.stack:JSON.stringify(a)}catch(e){return String(a)}};
   ['log','info','warn','error','debug'].forEach(k=>{const o=console[k]&&console[k].bind(console);console[k]=function(){try{logs.push(new Date().toISOString().slice(11,23)+' ['+k+'] '+[].map.call(arguments,fm).join(' ').slice(0,600));if(logs.length>300)logs.shift()}catch(e){}if(o)o.apply(null,arguments)}});
   const step=m=>{steps.push(((Date.now()-t0)/1000).toFixed(2)+'s  '+m);if(steps.length>200)steps.shift();st.stage=String(m)};
@@ -1584,7 +1584,9 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 /* ============ CARGA DE AUDIO / CHOP ============ */
-function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('crazyhead',2);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains('aud'))db.createObjectStore('aud');if(!db.objectStoreNames.contains('proj'))db.createObjectStore('proj')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+/* 1.23: sin número de versión fijo (una copia .shdatos puede dejar la base en otra versión); crea los almacenes que falten */
+const openStores=function(name,stores){return new Promise((ok,ko)=>{const go=v=>{const r=v?indexedDB.open(name,v):indexedDB.open(name);r.onupgradeneeded=()=>{const d=r.result;stores.forEach(s=>{if(!d.objectStoreNames.contains(s[0]))d.createObjectStore(s[0],s[1])})};r.onsuccess=()=>{const d=r.result;if(stores.some(s=>!d.objectStoreNames.contains(s[0]))){const nv=d.version+1;d.close();go(nv)}else{d.onversionchange=()=>d.close();ok(d)}};r.onerror=()=>ko(r.error)};go(0)})};
+function idb(){return openStores('crazyhead',[['aud'],['proj']])}
 async function idbPut(k,v,st){st=st||'aud';try{const db=await idb();return await new Promise((res,rej)=>{const tx=db.transaction(st,'readwrite');tx.objectStore(st).put(v,k);tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}catch(e){return null}}
 async function idbGet(k,st){st=st||'aud';try{const db=await idb();return await new Promise((res,rej)=>{const q=db.transaction(st).objectStore(st).get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}catch(e){return null}}
 async function idbDel(k,st){st=st||'aud';try{const db=await idb();return await new Promise(res=>{const tx=db.transaction(st,'readwrite');tx.objectStore(st).delete(k);tx.oncomplete=res;tx.onerror=res})}catch(e){}}
