@@ -201,7 +201,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
   <div class="row"><button id="pexp">Exportar archivo</button><button id="pimp">Importar archivo</button></div>
   <div class="small">El archivo .crazyhead lleva ajustes, secuencias y audio. Sirve de copia de seguridad o para pasarlo a otro dispositivo.</div>
   <input type="file" id="pfile" accept=".crazyhead,application/octet-stream" hidden></div></div>
-<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.21 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
+<div class="sheet" id="guide"><div class="box"><button class="x" id="gclose">✕</button><div class="hero"><img src="icon-192.png" alt=""><div><h3 style="margin:0">CrazyHead</h3><div class="small">v1.22 · By SampledHead</div></div></div><div id="gbody"></div></div></div>
 <div class="sheet" id="cpsheet"><div class="box"><h3>Loops</h3><p class="small" style="font-size:15px;font-weight:700" id="cptxt"></p>
   <div class="row"><button id="cpcopy">Copiar</button><button id="cpswap">Intercambiar</button><button id="cpno">Cancelar</button></div>
   <p class="small">Copiar duplica el loop con todos sus ajustes y su secuencia. Intercambiar cambia de sitio los dos loops.</p></div></div>
@@ -223,7 +223,11 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
     <button class="tg on" id="mzc" title="Ajusta los bordes al cruce por cero más cercano (evita clics)">Cruce por cero</button></div>
   <div class="row"><button id="mplay">▶ Oír selección</button><button class="tg" id="mloop">Bucle</button><button id="msil">Quitar silencios</button><button id="mtrim">✂ Recortar</button><button id="mnorm">Normalizar</button></div>
   <div class="row"><span class="small">Fundido</span><input id="mfms" type="number" min="1" max="2000" value="10" class="mnum" style="width:64px"><span class="small">ms</span><button id="mfin">Entrada</button><button id="mfout">Salida</button><button id="mrev">Invertir</button><button id="mmono">A mono</button><button id="mundo">↶ Deshacer</button></div>
-  <div class="sub">Pasar al secuenciador</div>
+  <div id="mregrow" style="display:none"><div class="sub">Región para trocear</div>
+  <div class="row"><button class="go" id="mregok">✓ Consolidar y trocear</button><button id="mregall">Usar todo el audio</button>
+    <label class="small"><input type="checkbox" id="mregask"> Preguntar al cargar un audio</label></div>
+  <p class="small">Elige arriba la parte del audio que quieres trocear (arrastra sobre la onda o mueve los bordes). «Consolidar» deja en el loop solo esa parte y vuelve a detectar los golpes; el resto se descarta. Se puede deshacer cargando otra vez el archivo.</p></div>
+  <div class="sub" id="msubseq">Pasar al secuenciador</div>
   <div class="row"><span class="small">Cargar en</span><button class="go" data-use="0">A</button><button class="go" data-use="1">B</button><button class="go" data-use="2">C</button><button class="go" data-use="3">D</button><button id="mwav">💾 Guardar WAV</button></div>
   <p class="small" id="minfo"></p>
   <p class="small">Si eliges «Por compases» y el secuenciador está sonando, la grabación empieza en el siguiente compás y sigue su tempo. Con la entrada de línea desactiva el monitor y usa auriculares para evitar el acople. En «Libre» el máximo son 5 minutos.</p></div></div>
@@ -234,7 +238,7 @@ input{-webkit-user-select:text;user-select:text}.prow{display:flex;gap:6px;align
 'use strict';
 /* ===== Informe de error (.txt) automático ===== */
 const RPT=(()=>{
-  const VER='1.21',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
+  const VER='1.22',t0=Date.now(),logs=[],steps=[],st={stage:'inicio',file:null,partial:'',opts:null};let last=0,cnt=0;
   const fm=a=>{try{return typeof a==='string'?a:(a&&a.stack)?a.stack:JSON.stringify(a)}catch(e){return String(a)}};
   ['log','info','warn','error','debug'].forEach(k=>{const o=console[k]&&console[k].bind(console);console[k]=function(){try{logs.push(new Date().toISOString().slice(11,23)+' ['+k+'] '+[].map.call(arguments,fm).join(' ').slice(0,600));if(logs.length>300)logs.shift()}catch(e){}if(o)o.apply(null,arguments)}});
   const step=m=>{steps.push(((Date.now()-t0)/1000).toFixed(2)+'s  '+m);if(steps.length>200)steps.shift();st.stage=String(m)};
@@ -305,17 +309,26 @@ function genCell(D,sg,dur,i,rng,force){
   return hits;
 }
 /* Detección de golpes por flujo de energía en dos bandas */
+const ONSC=new WeakMap();   // 1.22: el análisis pesado se hace una vez por audio (antes se repetía hasta 14 veces al detectar)
 function detectOnsets(chs,sr,sens,gapMs){
   const n=chs[0].length,hop=Math.max(64,Math.round(sr*.003)),nf=Math.floor(n/hop);
   if(nf<8)return[];
+  let F=ONSC.get(chs[0]);if(!F||F.sr!==sr||F.nch!==chs.length){F=onsetFeat(chs,sr,hop,nf);F.sr=sr;F.nch=chs.length;ONSC.set(chs[0],F)}
+  const{flux,pre}=F;
+  const W=Math.max(4,Math.round(.25*sr/hop));
+  return onsetPick(flux,pre,nf,hop,sr,W,sens,gapMs);
+}
+function onsetFeat(chs,sr,hop,nf){
   const eL=new Float32Array(nf),eH=new Float32Array(nf);
   let lp=0;const a=1-Math.exp(-2*Math.PI*250/sr);
   for(let f=0;f<nf;f++){let sl=0,sh=0;for(let j=f*hop,e=j+hop;j<e;j++){let x=0;for(let c=0;c<chs.length;c++)x+=chs[c][j];x/=chs.length;lp+=a*(x-lp);sl+=Math.abs(lp);sh+=Math.abs(x-lp)}
     eL[f]=Math.log(1+80*sl/hop);eH[f]=Math.log(1+80*sh/hop)}
   const flux=new Float32Array(nf);
   for(let f=9;f<nf-1;f++){let rl=0,rh=0;for(let q=f-8;q<=f-3;q++){rl+=eL[q];rh+=eH[q]}rl/=6;rh/=6;flux[f]=Math.max(0,Math.max(eL[f],eL[f+1])-rl)+Math.max(0,Math.max(eH[f],eH[f+1])-rh)*1.2}
-  const W=Math.max(4,Math.round(.25*sr/hop));
   const pre=new Float64Array(nf+1);for(let f=0;f<nf;f++)pre[f+1]=pre[f]+flux[f];
+  return{flux,pre};
+}
+function onsetPick(flux,pre,nf,hop,sr,W,sens,gapMs){
   const factor=1.15+(100-sens)/100*4.5,floor=.02+(100-sens)/100*.05;
   const gap=Math.max(1,Math.round(gapMs/1000*sr/hop));
   const kept=[];
@@ -1162,19 +1175,25 @@ async function sendSampler(kind){
   try{
     const items=[];
     if(kind==='loops'){
-      const bars=+$('#exbars').value,mix=bufToWav(await renderMix(bars,-1));
+      const bars=+$('#exbars').value,mix=bufToWav(loopCut(await renderMix(bars,-1),bars));
       items.push({name:'CrazyHead mezcla',wav:mix.buffer.slice(0),pad:-1});
       for(let d=0;d<4;d++)if(AUD[d]){const b=AUD[d].buf,chs=[];for(let c=0;c<b.numberOfChannels;c++)chs.push(b.getChannelData(c));items.push({name:'CrazyHead '+NM[d],wav:wavEncode(chs,b.sampleRate).buffer.slice(0),pad:-1})}
     }else{
       for(let d=0;d<4;d++){const A=AUD[d];if(!A)continue;const D=S.decks[d],sg=segsOf(D.markers,A.buf.duration);let k=0;
         sg.forEach((x,j)=>{if(D.pool[j]===false||k>=16)return;items.push({name:`CH ${NM[d]}${k+1}`,wav:sliceWav(A.buf,x.a,x.b).buffer.slice(0),pad:d*16+k});k++})}
     }
+    // 1.22: en las apps instaladas (Android, Windows/Mac) cada app tiene su almacenamiento: se envía por la bandeja común (sh-core)
+    if(window.SH&&(SH.isAndroid||SH.isDesktop)){
+      await SH.bridge.send('sampler',items.map(x=>({name:x.name,kind:kind==='loops'?'loop':'pad',wav:x.wav,bpm:S.bpm,meta:{pad:x.pad}})),'crazyhead');
+      $('#sheet').classList.remove('show');toast('Enviado a SampledHead App: '+items.length+(items.length===1?' sonido':' sonidos'));
+      await SH.open('sampler');return;
+    }
     await BR.set('fromCrazyHead',{ts:Date.now(),kind,items});
     $('#sheet').classList.remove('show');
     let u=null;try{u=await BR.get('url:sampler')}catch(e){}
     toast('Enviado al sampler: '+items.length+(items.length===1?' sonido':' sonidos'));
     if(u)window.open(u,'_blank');else toast('Abre SampledHead para recogerlos (Más → Recoger de CrazyHead)',4000);
-  }catch(e){RPT.err('enviar al sampler',e);toast('No se pudo enviar al sampler')}
+  }catch(e){RPT.err('enviar al sampler',e);toast(e&&/instalada/.test(e.message)?e.message:'No se pudo enviar al sampler',6000)}
 }
 /* ---- Mixer (1.7.1) ---- */
 function buildMix(){
@@ -1230,11 +1249,23 @@ function mixMeters(){
 const MR={chs:null,sr:44100,a:0,b:0,v0:0,v1:0,mode:'free',rec:false,armed:false,cl:[],cr:[],n:0,nch:1,pre:[],max:0,t0:null,stream:null,src:null,node:null,sink:null,gain:null,mon:null,lvl:0,pk:0,clip:0,play:null,ph:null,undo:[],pkb:null,devLabel:'',dev:''};
 const micDur=()=>MR.chs?MR.chs[0].length/MR.sr:0;
 async function micOpen(){
+  MR.region=null;regUI();
   $('#mic').classList.add('show');$('#mtgt').textContent='';
   micSync();micDraw();
   if(!MR.stream)await micInput(MR.dev||(()=>{try{return localStorage.getItem('crazyhead.rcdev')||''}catch(e){return''}})());
 }
-function micClose(){if(MR.rec)micStop(true);micStopPlay();micInClose();$('#mic').classList.remove('show')}
+function micClose(){if(MR.rec)micStop(true);micStopPlay();micInClose();$('#mic').classList.remove('show');if(MR.region!=null){MR.region=null;regUI()}}
+/* 1.22: región antes de trocear + consolidar. Reutiliza el editor del grabador con el audio del loop, sin abrir el micro. */
+function regUI(){const on=MR.region!=null;$('#mregrow').style.display=on?'':'none';
+  $$('#mic .row').forEach((r,i)=>{if(r.querySelector('#mdev,#mch,#mmode,#mgo,.mlv'))r.style.display=on?'none':''});
+  const lv=$('#mic .mlv');if(lv)lv.style.display=on?'none':'';const db=$('#mdb');if(db)db.style.display=on?'none':'';
+  if(on){$('#mregok').textContent='✓ Consolidar y trocear '+NM[MR.region];try{$('#mregask').checked=localStorage.getItem('crazyhead.regask')!=='0'}catch(e){}}}
+function regionOpen(d){
+  const A=AUD[d];if(!A){toast('Carga antes un audio en el loop '+NM[d]);return}
+  micStopPlay();MR.region=d;MR.sr=A.buf.sampleRate;MR.chs=[];for(let c=0;c<Math.min(2,A.buf.numberOfChannels);c++)MR.chs.push(new Float32Array(A.buf.getChannelData(c)));
+  MR.undo=[];MR.a=0;MR.b=micDur();MR.v0=0;MR.v1=MR.b;MR.regName=A.name;
+  $('#mic').classList.add('show');$('#mtgt').textContent='· '+LL('región de ','region of ')+NM[d];regUI();micPeaks();micSync();micDraw();RPT.step('región: abrir '+NM[d]);
+}
 function micInClose(){
   try{MR.src&&MR.src.disconnect();MR.gain&&MR.gain.disconnect();MR.node&&(MR.node.onaudioprocess=null,MR.node.disconnect());MR.sink&&MR.sink.disconnect();MR.mon&&MR.mon.disconnect()}catch(e){}
   try{MR.stream&&MR.stream.getTracks().forEach(t=>t.stop())}catch(e){}
@@ -1452,9 +1483,9 @@ async function micUse(d){
   if(!MR.chs)return;
   try{
     const sr=MR.sr,a=Math.floor(MR.a*sr),b=Math.max(a+64,Math.min(MR.chs[0].length,Math.floor(MR.b*sr)));
-    if(AUD[d]&&!confirm(tr('Ese loop ya tiene audio. ¿Sustituirlo?')))return;
+    if(AUD[d]&&MR.region!==d&&!confirm(tr('Ese loop ya tiene audio. ¿Sustituirlo?')))return;
     const chs=MR.chs.map(c=>c.slice(a,b)),buf=ctx.createBuffer(chs.length,chs[0].length,sr);chs.forEach((c,i)=>buf.getChannelData(i).set(c));
-    const name='Grabación '+stamp().slice(4),wav=wavEncode(chs,sr);
+    const name=MR.region!=null?String(MR.regName||'Audio').replace(/ \(región\)$/,'')+' (región)':'Grabación '+stamp().slice(4),wav=wavEncode(chs,sr);
     await idbPut('a'+d,{name,data:wav.buffer.slice(0)});
     setBuffer(d,buf,name,'file',MR.mode==='bars'?{bars:+$('#mbars').value}:undefined);
     S.sel=d;micClose();setView('loops');syncUI();toast('Cargado en '+NM[d]+': '+name);RPT.step('grabador: enviado a '+NM[d]);
@@ -1880,6 +1911,8 @@ async function loadFile(d,file){
     const buf=await ctx.decodeAudioData(ab.slice(0));
     await idbPut('a'+d,{name:file.name,data:ab});
     setBuffer(d,buf,file.name,'file');
+    let ask=true;try{ask=localStorage.getItem('crazyhead.regask')!=='0'}catch(e){}
+    if(ask&&buf.duration>2.5)setTimeout(()=>{regionOpen(d);toast(LL('Elige la región que quieres trocear (o «Usar todo el audio»)','Choose the region to chop (or «Use the whole audio»)'),4500)},150);
     toast('Cargado: '+file.name);
   }catch(e){RPT.err('cargar audio',e);toast('No se pudo leer el audio')}
 }
@@ -1937,7 +1970,7 @@ function buildDeck(){
   <div class="row"><button id="zout">−</button><button id="zin">＋</button><span class="small" id="zlab">zoom 1×</span>
     <button class="tg" id="mmark">＋ Marcar</button><button class="tg" id="mlisten">▶ Oír</button><button id="mdel">Borrar corte</button></div>
   <div class="sub">Cortes</div>
-  <div class="row"><button id="bauto">Detectar golpes</button><span class="small">Máx.</span><select id="maxcuts" title="Límite de cortes"><option>8</option><option>16</option><option>32</option><option>64</option></select><button class="tg" id="bsnap">Imán</button>
+  <div class="row"><button id="bregion" title="Elegir la parte del audio que se va a trocear y consolidarla">✂ Región</button><button id="bauto">Detectar golpes</button><span class="small">Máx.</span><select id="maxcuts" title="Límite de cortes"><option>8</option><option>16</option><option>32</option><option>64</option></select><button class="tg" id="bsnap">Imán</button>
     <select id="gridn"><option value="4">4</option><option value="8">8</option><option value="16" selected>16</option><option value="32">32</option></select><button id="bgrid">En rejilla</button></div>
   ${KG([knob('Sensibilidad','sens',0,100),knob('Separación','gap',30,300,5)],'k2')}
   <div class="chips" id="chips"></div>
@@ -2069,6 +2102,10 @@ function bindDeck(){
   $('#bwarp').onclick=()=>warpDeck(S.sel);
   $('#bbpm').onclick=()=>{const A=AUD[S.sel];if(!A)return;S.bpm=Math.round(clamp(cur().loopBars*4*60/A.buf.duration,40,220));eng.applyAll();save();syncUI()};
   $('#bauto').onclick=()=>{autoChop(S.sel);toast(cur().markers.length+' cortes')};
+  $('#bregion').onclick=()=>regionOpen(S.sel);
+  $('#mregok').onclick=()=>{const d=MR.region;if(d==null)return;const all=MR.a<=0.001&&MR.b>=micDur()-0.001;if(all){micClose();return}micUse(d)};
+  $('#mregall').onclick=()=>micClose();
+  $('#mregask').onchange=e=>{try{localStorage.setItem('crazyhead.regask',e.target.checked?'1':'0')}catch(err){}};
   $('#bgrid').onclick=()=>gridChop(S.sel,+$('#gridn').value);
   $('#maxcuts').value=maxCuts();$('#maxcuts').onchange=e=>{S.maxCuts=+e.target.value;save();toast(LL('Máx. '+S.maxCuts+' cortes (se aplica al detectar o al hacer la rejilla)','Max '+S.maxCuts+' cuts (applies on detect or grid)'))};
   $('#bregen').onclick=()=>{regen(S.sel,true);syncUI()};
@@ -2160,20 +2197,29 @@ function wfPeaks(W){
   for(let x=0;x<W;x++){const a=Math.floor(x*n/W),b=Math.min(n,Math.floor((x+1)*n/W)),st=Math.max(1,Math.floor((b-a)/48));let lo=0,hi=0;for(let k=a;k<b;k+=st){const v=ch[k];if(v<lo)lo=v;if(v>hi)hi=v}mn[x]=lo;mx[x]=hi}
   return{mn,mx,W};
 }
+let wfCache=null;   // 1.22: la onda, los tramos y los marcadores se dibujan una vez y se reutilizan; en cada fotograma solo el destello
 function drawWf(){
   const c=$('#wf');if(!c)return;const x=c.getContext('2d'),W=parseFloat(c.style.width),H=120,A=AUD[S.sel],D=cur();
-  x.clearRect(0,0,W,H);
-  if(!A){x.fillStyle='#8f78c9';x.font='13px system-ui';x.textAlign='center';x.fillText('Carga un audio o elige una demo',W/2,H/2);return}
+  if(!A){x.clearRect(0,0,W,H);x.fillStyle='#8f78c9';x.font='13px system-ui';x.textAlign='center';x.fillText('Carga un audio o elige una demo',W/2,H/2);wfCache=null;return}
   const Wi=Math.round(W);if(!wfPk||wfPk.W!==Wi||wfPk.A!==A){wfPk=wfPeaks(Wi);wfPk.A=A}
   const dur=A.buf.duration,sg=segsOf(D.markers,dur);
-  sg.forEach((q,k)=>{const x0=q.a/dur*W,x1=q.b/dur*W;x.fillStyle=skc(k,sg.length);x.globalAlpha=D.pool[k]===false?.04:.14;x.fillRect(x0,0,x1-x0,H);
-    const f=FL[S.sel];if(f&&f.s===k&&performance.now()-f.t<160){x.globalAlpha=.45;x.fillRect(x0,0,x1-x0,H)}});
-  x.globalAlpha=1;x.strokeStyle='#e6dcff';x.beginPath();
-  const mid=H/2;for(let i=0;i<Wi;i++){x.moveTo(i+.5,mid+wfPk.mn[i]*mid*.95);x.lineTo(i+.5,mid+wfPk.mx[i]*mid*.95+.5)}
-  x.stroke();
-  D.markers.forEach((m,k)=>{const px=m/dur*W;x.strokeStyle=k===selM?'#fff':COL[S.sel];x.lineWidth=k===selM?2.5:1.5;x.beginPath();x.moveTo(px,0);x.lineTo(px,H);x.stroke();
-    x.fillStyle=k===selM?'#fff':COL[S.sel];x.fillRect(px-6,0,12,13);x.fillStyle='#111';x.font='bold 10px system-ui';x.textAlign='center';x.fillText(k+1,px,10)});
-  x.lineWidth=1;wfDirty=false;
+  const key=c.width+'x'+c.height+'|'+W+'|'+S.sel+'|'+selM+'|'+D.markers.join(',')+'|'+D.pool.map(v=>v===false?0:1).join('');
+  if(!wfCache||wfCache.key!==key||wfCache.A!==A||wfCache.pk!==wfPk){
+    const oc=wfCache&&wfCache.cv||document.createElement('canvas');oc.width=c.width;oc.height=c.height;
+    const y=oc.getContext('2d');y.setTransform(x.getTransform());y.clearRect(0,0,W,H);
+    sg.forEach((q,k)=>{const x0=q.a/dur*W,x1=q.b/dur*W;y.fillStyle=skc(k,sg.length);y.globalAlpha=D.pool[k]===false?.04:.14;y.fillRect(x0,0,x1-x0,H)});
+    y.globalAlpha=1;y.strokeStyle='#e6dcff';y.beginPath();
+    const mid=H/2;for(let i=0;i<Wi;i++){y.moveTo(i+.5,mid+wfPk.mn[i]*mid*.95);y.lineTo(i+.5,mid+wfPk.mx[i]*mid*.95+.5)}
+    y.stroke();
+    const many=D.markers.length>24;
+    D.markers.forEach((m,k)=>{const px=m/dur*W;y.strokeStyle=k===selM?'#fff':COL[S.sel];y.lineWidth=k===selM?2.5:1.5;y.beginPath();y.moveTo(px,0);y.lineTo(px,H);y.stroke();
+      if(many&&k!==selM&&k%4)return;   // con muchos cortes solo se numeran 1 de cada 4 (y el elegido)
+      y.fillStyle=k===selM?'#fff':COL[S.sel];y.fillRect(px-6,0,12,13);y.fillStyle='#111';y.font='bold 10px system-ui';y.textAlign='center';y.fillText(k+1,px,10)});
+    y.lineWidth=1;wfCache={key,A,pk:wfPk,cv:oc};
+  }
+  x.save();x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,c.width,c.height);x.drawImage(wfCache.cv,0,0);x.restore();
+  const f=FL[S.sel];if(f&&performance.now()-f.t<160){const q=sg[f.s];if(q){x.fillStyle=skc(f.s,sg.length);x.globalAlpha=.45;x.fillRect(q.a/dur*W,0,(q.b-q.a)/dur*W,H);x.globalAlpha=1}}
+  wfDirty=false;
 }
 
 /* --- editor de patrón --- */
@@ -2244,6 +2290,14 @@ async function renderMix(bars,solo){
   for(let gs=0;gs<steps;gs++)stepAll(e,S2,AUD,gs,gs*sd,sd,null);
   return await oc.startRendering();
 }
+/* 1.22: los WAV exportados duran exactamente los compases elegidos; la cola que sobra (reverb, delay, golpes largos)
+   se suma al principio, como cuando el loop vuelve a empezar, para que encaje perfecto al repetirse. */
+function loopCut(b,bars){
+  const sr=b.sampleRate,N=Math.round(bars*16*(60/S.bpm/4)*sr);if(!(N>0)||N>=b.length)return b;
+  const o=new AudioBuffer({numberOfChannels:b.numberOfChannels,length:N,sampleRate:sr});
+  for(let c=0;c<b.numberOfChannels;c++){const src=b.getChannelData(c),d=o.getChannelData(c);d.set(src.subarray(0,N));for(let i=N;i<src.length;i++)d[(i-N)%N]+=src[i]}
+  return o;
+}
 function bufToWav(b){const chs=[];for(let c=0;c<b.numberOfChannels;c++)chs.push(b.getChannelData(c));let pk=0;for(const c of chs)for(let i=0;i<c.length;i++){const v=Math.abs(c[i]);if(v>pk)pk=v}
   if(pk>.98){const g=.98/pk;for(const c of chs)for(let i=0;i<c.length;i++)c[i]*=g}return wavEncode(chs,b.sampleRate)}
 function stamp(){return new Date().toISOString().slice(0,16).replace(/[-:T]/g,'')}
@@ -2251,8 +2305,8 @@ async function exportWav(stems){
   if(!AUD.some(a=>a)){toast('No hay loops cargados');return}
   const bars=+$('#exbars').value;toast('Renderizando…',60000);
   try{
-    if(!stems){download(new Blob([bufToWav(await renderMix(bars,-1))],{type:'audio/wav'}),`crazyhead_${stamp()}.wav`)}
-    else{const files=[];for(let d=0;d<4;d++)if(AUD[d]){files.push({name:`loop_${NM[d]}.wav`,data:bufToWav(await renderMix(bars,d))})}
+    if(!stems){download(new Blob([bufToWav(loopCut(await renderMix(bars,-1),bars))],{type:'audio/wav'}),`crazyhead_${stamp()}.wav`)}
+    else{const files=[];for(let d=0;d<4;d++)if(AUD[d]){files.push({name:`loop_${NM[d]}.wav`,data:bufToWav(loopCut(await renderMix(bars,d),bars))})}
       download(zipStore(files),`crazyhead_stems_${stamp()}.zip`)}
     toast('Listo');
   }catch(e){RPT.err('renderizar',e);toast('Error al renderizar')}
@@ -2922,7 +2976,7 @@ const EN={
 'Ableton: un proyecto .als con 4 pistas (Drum Rack con los cortes + la secuencia), un proyecto con Simpler (el loop entero con tus marcas y un clip por pista), o un Drum Rack .adg por loop con su .mid. Koala: un proyecto .koala con los 4 loops en los bancos A–D y sus 4 secuencias. El WAV incluye los efectos y las mutaciones de cada vuelta. El MIDI lleva un canal por loop; la nota 36 (C1) es el corte 1, 37 el corte 2, etc.':'Ableton: one .als project with 4 tracks (Drum Rack with the cuts + the sequence), a Simpler project (the whole loop with your marks and one clip per track), or one .adg Drum Rack per loop with its .mid. Koala: one .koala project with the 4 loops in banks A–D and their 4 sequences. The WAV includes the effects and the mutations of each pass. The MIDI has one channel per loop; note 36 (C1) is cut 1, 37 is cut 2, etc.',
 'Proyecto':'Project','Borrar todo':'Delete all','Idioma / Language':'Language / Idioma','📖 Guía':'📖 Guide',
 '@Reproducir / parar':'@Play / stop','@BPM menos':'@BPM down','@BPM más':'@BPM up','@Regenerar todos (los no bloqueados)':'@Regenerate all (unlocked)','@Regenerar todo':'@Regenerate all','@Ajustes y exportar':'@Settings and export','@Bloquear':'@Lock',
-'Sin loops':'No loops','Solo con el chop':'Only on chop','Solo en el compás':'Only on bar','Prob.':'Prob.','Compases':'Bars','Probabilidad de que suene cada golpe fijo':'Chance that each fixed hit plays','Todos':'All','Con «Todos» y ningún compás marcado, agacha con cada golpe. Si marcas chop y compás, deben cumplirse los dos.':'With “All” and no bar selected, it ducks on every hit. If you set both chop and bar, both must match.','Grabar muestra':'Record sample','Entrada':'Input','Canales':'Channels','Mono':'Mono','Estéreo':'Stereo','Ganancia':'Gain','🎧 Monitor':'🎧 Monitor','Modo':'Mode','Libre':'Free','Por compases':'By bars','Esperar sonido':'Wait for sound','📂 Abrir audio':'📂 Open audio','Cruce por cero':'Zero crossing','▶ Oír selección':'▶ Play selection','Bucle':'Loop','Quitar silencios':'Trim silence','✂ Recortar':'✂ Trim','Normalizar':'Normalize','Fundido':'Fade','Entrada':'Input','Salida':'Output','Invertir':'Reverse','A mono':'To mono','↶ Deshacer':'↶ Undo','Pasar al secuenciador':'Send to sequencer','Cargar en':'Load into','💾 Guardar WAV':'💾 Save WAV','Ver selección':'Zoom selection','Descargar informe (.txt)':'Download report (.txt)','Pulsa «Grabar» o abre un audio':'Press “Record” or open an audio file','Ese loop ya tiene audio. ¿Sustituirlo?':'That loop already has audio. Replace it?','Entrada apagada':'Input off','📌 Golpes fijos':'📌 Fixed hits','Elige un corte y toca los tiempos donde debe sonar siempre; el resto sigue siendo aleatorio.':'Pick a cut and tap the steps where it must always play; the rest stays random.','Quitar fijos':'Clear fixed','Roland SP-404 MK2 · muestras + MIDI (.zip)':'Roland SP-404 MK2 · samples + MIDI (.zip)','Nombre del proyecto SP-404 MK2':'SP-404 MK2 project name','Máx.':'Max','Arrastra un archivo aquí o usa Cargar. Elige una región (máx. 60 s): arrastra sobre la onda, mueve la región o sus bordes. Rueda o pellizco = zoom, Mayús + rueda o el mapa de abajo = desplazar.':'Drop a file here or use Load. Pick a region (max 60 s): drag on the waveform, move the region or its edges. Wheel or pinch = zoom, Shift + wheel or the map below = scroll.','Ver región':'Zoom to region','Ver todo':'Show all','Inicio':'Start','Fin':'End','Nuevo proyecto: se vaciarán los loops, las secuencias y el audio. ¿Continuar?':'New project: loops, sequences and audio will be cleared. Continue?','¿Guardar antes una copia del proyecto actual? (queda en Proyectos y se descarga como .crazyhead)':'Save a copy of the current project first? (kept in Projects and downloaded as .crazyhead)','No se pudo guardar la copia. ¿Continuar igualmente?':'Could not save the copy. Continue anyway?','🆕 Nuevo proyecto':'🆕 New project','Sostener: cada golpe suena hasta que empieza el siguiente':'Sustain: each hit rings until the next one starts','Ableton Live · Drum Rack (.adg + MIDI)':'Ableton Live · Drum Rack (.adg + MIDI)','Ableton Live · proyecto (.als)':'Ableton Live · project (.als)','Ableton Live · proyecto con Simpler (.als)':'Ableton Live · Simpler project (.als)','Nombre del proyecto de Ableton':'Ableton project name','compases':'bars','cortes':'cuts','Koala · proyecto con secuencias':'Koala · project with sequences','Nombre del proyecto Koala':'Koala project name','Nombre del kit de Ableton':'Ableton kit name','SampledHead ha enviado audio a CrazyHead':'SampledHead has sent audio to CrazyHead','Se cargará en A–D y sustituye los loops actuales. ¿Continuar?':'It will load into A–D and replace the current loops. Continue?','Importar':'Import','📥 Varios archivos o ZIP → A–D':'📥 Several files or ZIP → A–D','Por ejemplo las pistas del Looper o del generador de SampledHead (ZIP o WAV sueltos): se reparten en A, B, C y D por orden de nombre.':'For example the Looper or generator tracks from SampledHead (ZIP or loose WAVs): they are spread over A, B, C and D in name order.','📁 Proyectos':'📁 Projects','Proyectos':'Projects','Guardar':'Save','Guardados':'Saved','Archivo':'File','Exportar archivo':'Export file','Importar archivo':'Import file','Cargar':'Load','Exportar':'Export','Borrar':'Delete',
+'Sin loops':'No loops','Solo con el chop':'Only on chop','Solo en el compás':'Only on bar','✂ Región':'✂ Region','Región para trocear':'Region to chop','Usar todo el audio':'Use the whole audio','Preguntar al cargar un audio':'Ask when loading audio','Elegir la parte del audio que se va a trocear y consolidarla':'Choose the part of the audio to chop and consolidate it','Elige arriba la parte del audio que quieres trocear (arrastra sobre la onda o mueve los bordes). «Consolidar» deja en el loop solo esa parte y vuelve a detectar los golpes; el resto se descarta. Se puede deshacer cargando otra vez el archivo.':'Choose above the part of the audio you want to chop (drag on the waveform or move the edges). «Consolidate» keeps only that part in the loop and detects the hits again; the rest is discarded. Undo it by loading the file again.','Prob.':'Prob.','Compases':'Bars','Probabilidad de que suene cada golpe fijo':'Chance that each fixed hit plays','Todos':'All','Con «Todos» y ningún compás marcado, agacha con cada golpe. Si marcas chop y compás, deben cumplirse los dos.':'With “All” and no bar selected, it ducks on every hit. If you set both chop and bar, both must match.','Grabar muestra':'Record sample','Entrada':'Input','Canales':'Channels','Mono':'Mono','Estéreo':'Stereo','Ganancia':'Gain','🎧 Monitor':'🎧 Monitor','Modo':'Mode','Libre':'Free','Por compases':'By bars','Esperar sonido':'Wait for sound','📂 Abrir audio':'📂 Open audio','Cruce por cero':'Zero crossing','▶ Oír selección':'▶ Play selection','Bucle':'Loop','Quitar silencios':'Trim silence','✂ Recortar':'✂ Trim','Normalizar':'Normalize','Fundido':'Fade','Entrada':'Input','Salida':'Output','Invertir':'Reverse','A mono':'To mono','↶ Deshacer':'↶ Undo','Pasar al secuenciador':'Send to sequencer','Cargar en':'Load into','💾 Guardar WAV':'💾 Save WAV','Ver selección':'Zoom selection','Descargar informe (.txt)':'Download report (.txt)','Pulsa «Grabar» o abre un audio':'Press “Record” or open an audio file','Ese loop ya tiene audio. ¿Sustituirlo?':'That loop already has audio. Replace it?','Entrada apagada':'Input off','📌 Golpes fijos':'📌 Fixed hits','Elige un corte y toca los tiempos donde debe sonar siempre; el resto sigue siendo aleatorio.':'Pick a cut and tap the steps where it must always play; the rest stays random.','Quitar fijos':'Clear fixed','Roland SP-404 MK2 · muestras + MIDI (.zip)':'Roland SP-404 MK2 · samples + MIDI (.zip)','Nombre del proyecto SP-404 MK2':'SP-404 MK2 project name','Máx.':'Max','Arrastra un archivo aquí o usa Cargar. Elige una región (máx. 60 s): arrastra sobre la onda, mueve la región o sus bordes. Rueda o pellizco = zoom, Mayús + rueda o el mapa de abajo = desplazar.':'Drop a file here or use Load. Pick a region (max 60 s): drag on the waveform, move the region or its edges. Wheel or pinch = zoom, Shift + wheel or the map below = scroll.','Ver región':'Zoom to region','Ver todo':'Show all','Inicio':'Start','Fin':'End','Nuevo proyecto: se vaciarán los loops, las secuencias y el audio. ¿Continuar?':'New project: loops, sequences and audio will be cleared. Continue?','¿Guardar antes una copia del proyecto actual? (queda en Proyectos y se descarga como .crazyhead)':'Save a copy of the current project first? (kept in Projects and downloaded as .crazyhead)','No se pudo guardar la copia. ¿Continuar igualmente?':'Could not save the copy. Continue anyway?','🆕 Nuevo proyecto':'🆕 New project','Sostener: cada golpe suena hasta que empieza el siguiente':'Sustain: each hit rings until the next one starts','Ableton Live · Drum Rack (.adg + MIDI)':'Ableton Live · Drum Rack (.adg + MIDI)','Ableton Live · proyecto (.als)':'Ableton Live · project (.als)','Ableton Live · proyecto con Simpler (.als)':'Ableton Live · Simpler project (.als)','Nombre del proyecto de Ableton':'Ableton project name','compases':'bars','cortes':'cuts','Koala · proyecto con secuencias':'Koala · project with sequences','Nombre del proyecto Koala':'Koala project name','Nombre del kit de Ableton':'Ableton kit name','SampledHead ha enviado audio a CrazyHead':'SampledHead has sent audio to CrazyHead','Se cargará en A–D y sustituye los loops actuales. ¿Continuar?':'It will load into A–D and replace the current loops. Continue?','Importar':'Import','📥 Varios archivos o ZIP → A–D':'📥 Several files or ZIP → A–D','Por ejemplo las pistas del Looper o del generador de SampledHead (ZIP o WAV sueltos): se reparten en A, B, C y D por orden de nombre.':'For example the Looper or generator tracks from SampledHead (ZIP or loose WAVs): they are spread over A, B, C and D in name order.','📁 Proyectos':'📁 Projects','Proyectos':'Projects','Guardar':'Save','Guardados':'Saved','Archivo':'File','Exportar archivo':'Export file','Importar archivo':'Import file','Cargar':'Load','Exportar':'Export','Borrar':'Delete',
 'Todo se guarda solo en este dispositivo; aquí puedes guardar versiones con nombre.':'Everything is saved automatically on this device; here you can save named versions.','Sin proyectos guardados':'No saved projects',
 'El archivo .crazyhead lleva ajustes, secuencias y audio. Sirve de copia de seguridad o para pasarlo a otro dispositivo.':'The .crazyhead file holds settings, sequences and audio. Use it as a backup or to move to another device.','@Nombre del proyecto':'@Project name'
 };
@@ -3067,7 +3121,7 @@ async function restore(){
   SH.ui.dock({me:'crazyhead',pos:'left',bottom:64,kinds:['loop'],sendHint:'Manda los loops A–D a otra app',
     provide:async()=>{const out=AUD.map((a,i)=>a&&a.buf?{name:String(a.name||('Loop '+'ABCD'[i])).replace(/\.[^.]+$/,''),kind:'loop',audio:a.buf,bpm:S.bpm}:null).filter(Boolean);return out.length?out:null},
     accept:async list=>{const its=list.filter(x=>x.wav).slice(0,4);if(!its.length)return false;
-      await BR.set('toCrazyHead',{ts:Date.now(),items:its.map(x=>({name:x.name,wav:x.wav,sr:x.sr,secs:x.secs,bpm:x.bpm||null}))});
+      await BR.set('toCrazyHead',{ts:Date.now(),items:its.map(x=>({name:x.name,wav:x.wav,sr:x.sr,secs:x.secs,bpm:x.bpm||null,cuts:x.meta&&x.meta.cuts||null,bars:x.meta&&x.meta.bars||null}))});
       await brCheck();return true}});
 })();
 </script>
